@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/style.css">
+    <title>Limbo</title>
+</head>
+<body>
+    <header id="header">
+    <div class="logo-area">
+        <h1>LIMBO</h1>
+        <svg class="limbo-boy" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50,85 Q35,80 25,60 Q15,40 25,20 Q35,5 55,10 Q75,5 85,30 Q90,55 75,75 Q65,85 50,85" fill="#000" />
+            <path d="M25,25 L30,15 L40,20 L50,5 L65,18 L75,10 L82,25" fill="#000" />
+            
+            <g class="eyes">
+                <circle cx="42" cy="48" r="5.5" fill="#fff" />
+                <circle cx="68" cy="48" r="5.5" fill="#fff" />
+            </g>
+        </svg>
+    </div>
+
+    <div>
+        <svg id="menu-hamb" width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="1.2" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+            </defs>
+            <g fill="#DAF1DE" filter="url(#glow)">
+                <path d="M8 12 L42 11 L41 16 L9 17 Z" />
+                <path d="M10 23 L38 24 L39 28 L11 27 Z" />
+                <path d="M9 35 L43 34 L41 39 L8 38 Z" />
+            </g>
+        </svg>
+    </div>
+</header>
+
+    <main class="contenedor">
+        <h2 class="titulo-seccion">TEXTO DE RELLENO PARA VER COMO SE VA VIENDO </h2>
+        
+        <div class="grid-productos">
+            <article class="tarjeta-producto">
+                <div class="imagen-contenedor">
+                    <div class="img-producto" role="img" aria-label="Producto Limbo" style="background-image: url('imagenes/sudadera.jpg');"></div>
+                    <div class="sombra-interior"></div>
+                </div>
+                <div class="info-producto">
+                    <h3 class="nombre-producto">Enguatada cómica</h3>
+                    <p class="desc-producto">Una locura de enguatada la verdad, fijate que ni se que decirte</p>
+                    <span class="precio">$35.00 USD</span>
+                    <button class="btn-anadir">Añadir al Pedido</button>
+                </div>
+            </article>
+            <article class="tarjeta-producto">
+                <div class="imagen-contenedor">
+                    <div class="img-producto" role="img" aria-label="Producto Limbo" style="background-image: url('imagenes/sudadera.jpg');"></div>
+                </div>
+                <div class="info-producto">
+                    <h3 class="nombre-producto">Enguatada cómica</h3>
+                    <p class="desc-producto">Una locura de enguatada la verdad, fijate que ni se que decirte</p>
+                    <span class="precio">$35.00 USD</span>
+                    <button class="btn-anadir">Añadir al Pedido</button>
+                </div>
+            </article>
+            <article class="tarjeta-producto">
+                <div class="imagen-contenedor">
+                    <div class="img-producto" role="img" aria-label="Producto Limbo" style="background-image: url('imagenes/sudadera.jpg');"></div>
+                </div>
+                <div class="info-producto">
+                    <h3 class="nombre-producto">Enguatada cómica</h3>
+                    <p class="desc-producto">Una locura de enguatada la verdad, fijate que ni se que decirte</p>
+                    <span class="precio">$35.00 USD</span>
+                    <button class="btn-anadir">Añadir al Pedido</button>
+                </div>
+            </article>
+            <article class="tarjeta-producto">
+                <div class="imagen-contenedor">
+                    <div class="img-producto" role="img" aria-label="Producto Limbo" style="background-image: url('imagenes/sudadera.jpg');"></div>
+                </div>
+                <div class="info-producto">
+                    <h3 class="nombre-producto">Enguatada cómica</h3>
+                    <p class="desc-producto">Una locura de enguatada la verdad, fijate que ni se que decirte</p>
+                    <span class="precio">$35.00 USD</span>
+                    <button class="btn-anadir">Añadir al Pedido</button>
+                </div>
+            </article>
+            </div>
+    </main>
+
+    <script src="js/js.js"></script>
+</body>
+</html>
