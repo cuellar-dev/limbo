@@ -1,13 +1,13 @@
 /* Importación de fuentes (Eliminé el duplicado que tenías de Limbo) */
 @font-face {
     font-family: 'Limbo';
-    src: url('Fuentes/limbo_font__by_alex484000-d5dthys.ttf') format('truetype');
+    src: url('../Fuentes/limbo_font__by_alex484000-d5dthys.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 @font-face {
     font-family: 'Arcane';
-    src: url('Fuentes/The\ Foregen\ Regular.ttf') format('truetype');
+    src: url('../Fuentes/The\ Foregen\ Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
