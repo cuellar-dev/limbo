@@ -11,7 +11,16 @@
     font-weight: normal;
     font-style: normal;
 }
-
+@font-face{
+    font-family: 'Quicksand';
+    src: url('../Fuentes/Quicksand/Quicksand-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face{
+    font-family: 'Panton';
+    src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
+}
 /* Variables CSS para mantener la paleta bajo control estricto */
 :root {
     --fondo-oscuro: #051F20;
@@ -40,8 +49,7 @@ body {
     background-attachment: fixed;
     background-position: 45%;
     background-repeat: no-repeat;
-    background-size: 1300px 100%;
-
+    background-size: 1300px 100%; /* para ver el fondo del body*/
 }
 
 /* --- HEADER --- */
@@ -93,35 +101,47 @@ h1 {
     letter-spacing: 1px;
 }
 
-/* --- GRID DE PRODUCTOS --- */
+/* --- LISTA DE PRODUCTOS EN FLEX --- */
 .grid-productos {
-    display: grid;
-    /* Esto hace que las tarjetas se adapten solas en móviles y PC */
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 15px; /* Reducimos el espacio entre ellas para móviles */
+}
+
+/* En PC o tablets, aumentamos el tamaño y el espacio */
+@media (min-width: 768px) {
+    .grid-productos {
+        gap: 30px;
+    }
+
+    .tarjeta-producto {
+        flex: 1 1 240px;
+        min-width: 240px;
+    }
 }
 
 /* --- TARJETA DE PRODUCTO --- */
+/* --- TARJETA DE PRODUCTO (DISEÑO MÓVIL SÓLIDO) --- */
 .tarjeta-producto {
-    background-color: var(--tarjeta-fondo);
-    border: 1px solid var(--verde-oscuro);
-    border-radius: 4px; /* Bordes casi cuadrados para estética indie */
+    flex: 1 1 calc((100% - 15px) / 2); /* Mantiene 2 tarjetas por fila en móvil cuando hay espacio */
+    min-width: 145px;
+    background-color: var(--fondo-header); /* Fondo sólido y limpio */
+    border: 1px solid rgba(166, 229, 185, 0.15); /* Borde sutil y nítido */
+    border-radius: 8px;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-
-.tarjeta-producto:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
-    border-color: var(--verde-medio);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); /* Sombra estática para separar del fondo */
+    min-height: 350px; /* Altura mínima para mantener la consistencia visual en móviles */
 }
 
 .imagen-contenedor {
     position: relative;
     width: 100%;
-    height: 250px;
-    background-color: var(--fondo-oscuro);
+    aspect-ratio: 1 / 1; /* Hace que la imagen sea siempre un cuadrado perfecto */
+    background-color: #000;
+    border-bottom: 1px solid rgba(166, 229, 185, 0.05);
     overflow: hidden;
 }
 
@@ -129,73 +149,108 @@ h1 {
     width: 100%;
     height: 100%;
     display: block;
-    object-fit: cover;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* TRUCO LIMBO: Le baja el color a la foto y le sube el contraste para que se vea sombría */
-    filter: grayscale(40%) contrast(120%) brightness(80%);
-    transition: filter 0.3s ease;
 }
 
-.tarjeta-producto:hover .img-producto {
-    filter: grayscale(10%) contrast(110%) brightness(100%); /* Se "ilumina" al pasar el mouse */
-}
-
-/* Simula viñeta/sombra sobre la imagen */
+/* Sombra interior muy sutil solo en la base de la imagen */
 .sombra-interior {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: radial-gradient(circle, transparent 40%, rgba(5, 31, 32, 0.8) 100%);
-    pointer-events: none;
+    display: none;
 }
 
 .info-producto {
-    padding: 20px;
+    padding: 12px; /* Espacio ajustado para que respire en pantallas pequeñas */
+    padding-top: 10px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    flex-grow: 1; /* Permite que el contenedor llene el espacio disponible */
 }
 
 .nombre-producto {
     color: var(--texto-brillante);
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    text-align: left;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    -ms-hyphens: auto;
+    overflow-wrap: break-word;
+    font-family: 'Panton';         /* TRUCO MAGICO: Limita el texto a 2 líneas exactamente */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .desc-producto {
-    font-size: 14px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
     line-height: 1.4;
     color: var(--texto-secundario);
-    flex-grow: 1; /* Empuja el botón hacia abajo si el texto es corto */
+    font-weight: 600;
+    margin-bottom: 12px;
+    
+    /* TRUCO MAGICO: Limita el texto a 2 líneas exactamente */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
+.contenedor-row{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-content: center;
+}
+.btn-vermas{
+    border: none;
+    font-family: 'Panton', 'Quicksand', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 3px 0;
+    margin: 5px 0; /* Espacio entre el botón y la descripción */
+    border-radius: 5px;
+    min-height: 25px;
+    background-color:transparent;
+    border: 2px solid var(--verde-medio);
+    color: var(--brillo-limbo);
 
+}
 .precio {
     font-family: 'Arcane', sans-serif;
     color: var(--brillo-limbo);
-    font-size: 24px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-size: 20px;
+    margin-top: auto; /* Esto empuja el precio y el botón siempre hacia abajo */
 }
 
 .btn-anadir {
-    background-color: var(--verde-oscuro);
+    background-color: rgba(166, 229, 185, 0.08); /* Fondo casi transparente */
     color: var(--texto-brillante);
-    border: 1px solid var(--verde-medio);
-    padding: 12px;
-    font-size: 16px;
+    border: 1px solid rgba(166, 229, 185, 0.3);
+    font-family: 'Panton', sans-serif;
+    border-radius: 6px;
+    padding: 10px 0;
+    font-size: 10px;
     cursor: pointer;
     text-transform: uppercase;
     font-weight: bold;
-    transition: all 0.3s ease;
-    border-radius: 2px;
+    width: 100%; /* Botón de ancho completo, ideal para pulgares */
     margin-top: 10px;
+    -webkit-tap-highlight-color: transparent; /* Quita el destello azul por defecto en Android */
 }
 
-.btn-anadir:hover {
-    background-color: var(--verde-medio);
-    color: #fff;
-    box-shadow: 0 0 10px rgba(166, 229, 185, 0.2);
+/* Efecto al tocar la pantalla (Active en lugar de Hover) */
+.btn-anadir:active {
+    background-color: var(--brillo-limbo);
+    color: var(--fondo-oscuro);
+    transform: scale(0.98); /* Pequeña contracción para dar sensación física al tocar */
 }
 /* Contenedor del logo y el niño */
 .logo-area {
@@ -238,9 +293,4 @@ h1 {
         transform: scaleY(0.1); /* Simula el cierre del párpado */
         opacity: 0.5;
     }
-}
-
-/* Ajuste del H1 para que no se pegue */
-h1 {
-    margin-left: 0; /* Ya no hace falta el margin-left de 20px */
 }
