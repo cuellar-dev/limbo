@@ -1,10 +1,4 @@
-/* Importación de fuentes (Eliminé el duplicado que tenías de Limbo) */
-@font-face {
-    font-family: 'Limbo';
-    src: url('../Fuentes/limbo_font__by_alex484000-d5dthys.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+/* Importación de fuentes (Eliminada la fuente Limbo) */
 @font-face {
     font-family: 'Arcane';
     src: url('../Fuentes/The\ Foregen\ Regular.ttf') format('truetype');
@@ -21,16 +15,16 @@
     font-family: 'Panton';
     src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
 }
-/* Variables CSS para mantener la paleta bajo control estricto */
+
+/* Variables CSS para la nueva paleta LEVITA */
 :root {
-    --fondo-oscuro: #051F20;
-    --fondo-header: #0B2B26;
-    --tarjeta-fondo: #0B2B26;
-    --verde-oscuro: #163832;
-    --verde-medio: #235347;
-    --texto-secundario: #8EB69B;
-    --texto-brillante: #DAF1DE;
-    --brillo-limbo: #a6e5b9; /* Tu verde brillante, usado solo para destellos/hover */
+    --fondo-oscuro: #000000; /* Negro puro */
+    --fondo-header: #111522; /* Azul noche muy oscuro */
+    --tarjeta-fondo: #1B2233; /* Azul noche medio */
+    --acento-dorado: #A68966; /* Dorado envejecido de las rosas */
+    --borde-dorado: rgba(166, 137, 102, 0.3); /* Dorado sutil para líneas */
+    --texto-secundario: #9BA4B5; /* Gris azulado suave */
+    --texto-brillante: #E2E2E2; /* Hueso / Crema */
 }
 
 * {
@@ -41,15 +35,13 @@
 
 body {
     background-color: var(--fondo-oscuro);
-    /* Usar una fuente sans-serif genérica de respaldo para los textos de la tienda */
     font-family: system-ui, -apple-system, sans-serif; 
     color: var(--texto-secundario);
     height: 5000px;
-    background-image: linear-gradient(#051f20f3, #051f20f3), url(../imagenes/fondo-body.png);
+    /* Degradado celestial: Luz azul noche arriba que se funde a negro puro abajo */
+    background-image: radial-gradient(circle at top center, #1B2233 0%, #000000 50%);
     background-attachment: fixed;
-    background-position: 45%;
     background-repeat: no-repeat;
-    background-size: 1300px 100%; /* para ver el fondo del body*/
 }
 
 /* --- HEADER --- */
@@ -58,23 +50,25 @@ body {
     justify-content: space-between;
     align-items: center;
     min-height: 70px;
-    background: linear-gradient(180deg, var(--fondo-oscuro) 0%, var(--fondo-header) 100%);
-    border-bottom: 1px solid var(--verde-oscuro);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sombra más oscura y realista */
+    background: rgba(17, 21, 34, 0.85); /* Azul noche semi-transparente */
+    backdrop-filter: blur(10px); /* Efecto cristal */
+    border-bottom: 1px solid var(--borde-dorado); /* Línea dorada inferior */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); 
     padding: 0 20px;
     position: sticky;
     top: 0;
     z-index: 100;
-    overflow: hidden;
 }
 
 h1 {
-    font-family: 'Limbo', sans-serif;
+    /* Tipografía serif elegante (tipo revista/lujo) por defecto del sistema */
+    font-family: 'Playfair Display', 'Didot', 'Georgia', serif;
     color: var(--texto-brillante);
-    letter-spacing: 2px; /* Un poco más separado para el logo */
-    font-size: 43px;
-    text-shadow: 0px 0px 8px rgba(166, 229, 185, 0.4); /* Resplandor usando tu color */
+    letter-spacing: 5px; /* Separación amplia para dar aspecto premium */
+    font-size: 28px;
+    text-shadow: 0px 2px 5px rgba(0, 0, 0, 0.9); 
     margin: 0;
+    font-weight: 400; /* Letra más fina, no tan gruesa */
 }
 
 #menu-hamb {
@@ -84,7 +78,6 @@ h1 {
 #menu-hamb:hover {
     transform: scale(1.05);
 }
-
 /* --- CONTENEDOR PRINCIPAL --- */
 .contenedor {
     max-width: 1200px;
@@ -124,16 +117,16 @@ h1 {
 /* --- TARJETA DE PRODUCTO --- */
 /* --- TARJETA DE PRODUCTO (DISEÑO MÓVIL SÓLIDO) --- */
 .tarjeta-producto {
-    flex: 1 1 calc((100% - 15px) / 2); /* Mantiene 2 tarjetas por fila en móvil cuando hay espacio */
+    flex: 1 1 calc((100% - 15px) / 2);
     min-width: 145px;
-    background-color: var(--fondo-header); /* Fondo sólido y limpio */
-    border: 1px solid rgba(166, 229, 185, 0.15); /* Borde sutil y nítido */
+    background-color: var(--tarjeta-fondo); 
+    border: 1px solid var(--borde-dorado); /* Borde dorado oscuro */
     border-radius: 8px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6); /* Sombra estática para separar del fondo */
-    min-height: 350px; /* Altura mínima para mantener la consistencia visual en móviles */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    min-height: 350px;
 }
 
 .imagen-contenedor {
@@ -174,10 +167,6 @@ h1 {
     line-height: 1.2;
     margin-bottom: 4px;
     text-align: left;
-    hyphens: auto;
-    -webkit-hyphens: auto;
-    -ms-hyphens: auto;
-    overflow-wrap: break-word;
     font-family: 'Panton';         /* TRUCO MAGICO: Limita el texto a 2 líneas exactamente */
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -205,7 +194,8 @@ h1 {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    align-content: center;
+    align-items: center;
+    margin-top: 20px;
 }
 .btn-vermas{
     border: none;
@@ -215,25 +205,23 @@ h1 {
     font-weight: 700;
     letter-spacing: 1.5px;
     padding: 3px 0;
-    margin: 5px 0; /* Espacio entre el botón y la descripción */
+    margin: 5px 0;
     border-radius: 5px;
     min-height: 25px;
     background-color:transparent;
-    border: 2px solid var(--verde-medio);
-    color: var(--brillo-limbo);
-
+    border: 1px solid var(--acento-dorado); /* Borde dorado */
+    color: var(--acento-dorado); /* Texto dorado */
 }
 .precio {
-    font-family: 'Arcane', sans-serif;
-    color: var(--brillo-limbo);
+    font-family: 'Arcane', sans-serif; /* Si Arcane ya no pega, podemos cambiarla luego */
+    color: var(--acento-dorado); /* Precio en dorado */
     font-size: 20px;
-    margin-top: auto; /* Esto empuja el precio y el botón siempre hacia abajo */
 }
 
 .btn-anadir {
-    background-color: rgba(166, 229, 185, 0.08); /* Fondo casi transparente */
+    background-color: rgba(166, 137, 102, 0.1); /* Fondo dorado casi transparente */
     color: var(--texto-brillante);
-    border: 1px solid rgba(166, 229, 185, 0.3);
+    border: 1px solid var(--borde-dorado);
     font-family: 'Panton', sans-serif;
     border-radius: 6px;
     padding: 10px 0;
@@ -241,56 +229,14 @@ h1 {
     cursor: pointer;
     text-transform: uppercase;
     font-weight: bold;
-    width: 100%; /* Botón de ancho completo, ideal para pulgares */
-    margin-top: 10px;
-    -webkit-tap-highlight-color: transparent; /* Quita el destello azul por defecto en Android */
+    width: 100%;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease;
 }
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
 .btn-anadir:active {
-    background-color: var(--brillo-limbo);
+    background-color: var(--acento-dorado); /* Se ilumina en dorado sólido al tocar */
     color: var(--fondo-oscuro);
-    transform: scale(0.98); /* Pequeña contracción para dar sensación física al tocar */
-}
-/* Contenedor del logo y el niño */
-.logo-area {
-    display: flex;
-    align-items: center;
-    gap: 0px; /* Espacio entre el texto y la cabeza */
-    position: relative;
-}
-
-/* Estilos de la cabeza del niño */
-.limbo-boy {
-    width: 100px; /* Tamaño sutil */
-    height: 100px;
-    filter: drop-shadow(0px 0px 5px rgba(166, 229, 185, 0.2));
-    opacity: 0.17; /* Para que no resalte demasiado */
-    position: absolute;
-    top: -20px;
-    left: 95px;
-}
-
-/* Efecto de resplandor en los ojos */
-.eyes circle {
-    filter: blur(0.5px);
-    box-shadow: 0 0 10px white;
-        width: 10px;
-}
-
-/* Animación de parpadeo */
-.eyes {
-    animation: blink 5s infinite;
-    transform-origin: center;
-
-}
-@keyframes blink {
-    0%, 90%, 93%, 100% {
-        transform: scaleY(1);
-        opacity: 1;
-    }
-    91%, 92% {
-        transform: scaleY(0.1); /* Simula el cierre del párpado */
-        opacity: 0.5;
-    }
+    transform: scale(0.98);
 }
