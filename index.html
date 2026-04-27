@@ -9,22 +9,42 @@
 <body>
     <header id="header">
         <div class="logo-area">
-            <h1>LEVITA</h1>
-            </div>
-
+    <div class="logo-wrapper">
+        <h1>LEVITA</h1>
+        <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <filter id="halo-glow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                    <feFlood flood-color="#A68966" flood-opacity="0.6" result="glow-color"/>
+                    <feComposite in="glow-color" in2="blur" operator="in" result="colored-blur"/>
+                    <feMerge>
+                        <feMergeNode in="colored-blur"/>
+                        <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                </filter>
+            </defs>
+            <path d="M20,25 A30,12 0 1,1 75,22" 
+                fill="none" 
+                stroke="#caac47" 
+                stroke-width="5" 
+                stroke-linecap="round" 
+                filter="url(#halo-glow)" />
+        </svg>
+    </div>
+</div>
             
         <div>
             <svg id="menu-hamb" width="50" height="50" viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <filter id="premium-glow" x="-50%" y="-50%" width="200%" height="200%">
                         <feGaussianBlur stdDeviation="0.6" result="blur"/>
-                        <feFlood flood-color="#A68966" flood-opacity="0.5" result="glow-color"/>
+                        <feFlood flood-color="#caac47" flood-opacity="0.5" result="glow-color"/>
                         <feComposite in="glow-color" in2="blur" operator="in" result="colored-blur"/>
                         <feMerge>
                             <feMergeNode in="colored-blur"/> <feMergeNode in="SourceGraphic"/> </feMerge>
                     </filter>
                 </defs>
-                <g fill="#A68966" filter="url(#premium-glow)">
+                <g fill="#caac47" filter="url(#premium-glow)">
                     <rect x="10" y="15" width="30" height="4" rx="2" />
                     <rect x="10" y="25" width="30" height="4" rx="2" />
                     <rect x="10" y="35" width="30" height="4" rx="2" />
@@ -34,8 +54,7 @@
     </header>
 
     <main class="contenedor">
-        <h2 class="titulo-seccion">TEXTO DE RELLENO PARA VER COMO SE VA VIENDO </h2>
-        
+
         <div class="grid-productos">
             <div class="switch-container">
                 <button>En Stack</button>

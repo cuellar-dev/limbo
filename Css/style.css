@@ -21,7 +21,7 @@
     --fondo-oscuro: #000000; /* Negro puro */
     --fondo-header: #111522; /* Azul noche muy oscuro */
     --tarjeta-fondo: #1B2233; /* Azul noche medio */
-    --acento-dorado: #A68966; /* Dorado envejecido de las rosas */
+    --acento-dorado: #caac47; /* Dorado envejecido de las rosas */
     --borde-dorado: rgba(166, 137, 102, 0.3); /* Dorado sutil para líneas */
     --texto-secundario: #9BA4B5; /* Gris azulado suave */
     --texto-brillante: #E2E2E2; /* Hueso / Crema */
@@ -100,7 +100,6 @@ h1 {
     flex-wrap: wrap;
     align-items: stretch;
     gap: 15px; /* Reducimos el espacio entre ellas para móviles */
-
     padding-top: 50px;
     overflow: hidden;
     border-radius: 20px 20px 0 0 ;
@@ -117,7 +116,8 @@ h1 {
 
     .tarjeta-producto {
         flex: 1 1 240px;
-        min-width: 240px;
+        min-width: 200px;
+        max-width: 240px;
     }
 }
 
@@ -246,4 +246,27 @@ h1 {
     background-color: var(--acento-dorado); /* Se ilumina en dorado sólido al tocar */
     color: var(--fondo-oscuro);
     transform: scale(0.98);
+}
+/* Contenedor para agrupar el texto y el aro */
+.logo-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.halo-icon {
+    position: absolute;
+    width: 45px;       /* Tamaño del aro */
+    height: auto;
+    top: -8px;        /* Lo eleva sobre las letras */
+    right: -10px;      /* Lo mueve hacia la derecha (sobre la A) */
+    transform: rotate(3deg); /* Le da un toque orgánico de inclinación */
+    pointer-events: none;     /* Evita que el SVG interfiera con clicks */
+    z-index: 2;
+}
+
+/* Ajuste al h1 para que no se mueva */
+.logo-area h1 {
+    position: relative;
+    z-index: 1;
+    margin: 0;
 }
