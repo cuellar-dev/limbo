@@ -46,9 +46,27 @@ if (productosGrid && typeof Masonry !== 'undefined') {
 		columnWidth: '.grid-sizer',
 		gutter: '.gutter-sizer',
 		percentPosition: true,
+		resizeContainer: true,
 		transitionDuration: '0.25s'
 	});
 
-	window.addEventListener('load', () => masonry.layout());
-	window.addEventListener('resize', () => masonry.layout());
+	const relayoutMasonry = () => {
+		requestAnimationFrame(() => masonry.layout());
+	};
+
+	window.addEventListener('load', relayoutMasonry);
+	window.addEventListener('resize', relayoutMasonry);
+
+	if (document.fonts && document.fonts.ready) {
+		document.fonts.ready.then(relayoutMasonry);
+	}
+
+	const gridImages = productosGrid.querySelectorAll('.img-producto');
+	gridImages.forEach((img) => {
+		if (!img.complete) {
+			img.addEventListener('load', relayoutMasonry, { once: true });
+		}
+	});
+
+	setTimeout(relayoutMasonry, 120);
 }

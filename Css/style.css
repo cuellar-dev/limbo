@@ -87,11 +87,6 @@ h1 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-
 }
 
 .titulo-seccion {
@@ -107,7 +102,7 @@ h1 {
 .grid-productos {
     display: block;
     padding-top: 0px; /* Espacio superior para el switch */
-    overflow: hidden;
+    overflow: visible;
     border-radius: 20px 20px 0 0;
     position: relative;
     width: 100%;
@@ -126,7 +121,6 @@ h1 {
 
 .switch-container {
     z-index: 20;
-
     background: rgba(17, 21, 34, 0.65); /* Azul noche semi-transparente */
     backdrop-filter: blur(12px); /* Efecto cristal (Glassmorphism) */
     border: 1px solid var(--borde-dorado);
@@ -139,6 +133,10 @@ h1 {
     align-items: center;
     padding: 5px; /* Espacio interno para que el indicador no pegue en los bordes */
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Sombra para que flote */
+    position: sticky;
+    top: 80px;
+    margin: 0 auto;
+    z-index: 90;
 }
 
 /* El Indicador Dorado */
@@ -197,8 +195,6 @@ h1 {
     .grid-sizer,
     .tarjeta-producto {
         width: calc((100% - 90px) / 4);
-        min-width: 200px;
-        max-width: 240px;
     }
 
     .gutter-sizer {
@@ -213,7 +209,6 @@ h1 {
 /* --- TARJETA DE PRODUCTO --- */
 /* --- TARJETA DE PRODUCTO (DISEÑO MÓVIL SÓLIDO) --- */
 .tarjeta-producto {
-    min-width: 145px;
     background-color: var(--tarjeta-fondo); 
     border: 1px solid var(--borde-dorado); /* Borde dorado oscuro */
     border-radius: 8px;
@@ -230,19 +225,14 @@ h1 {
 .imagen-contenedor {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 1; /* Hace que la imagen sea siempre un cuadrado perfecto */
     background-color: #000;
     border-bottom: 1px solid rgba(166, 229, 185, 0.05);
     overflow: hidden;
 }
-
 .img-producto {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 /* Sombra interior muy sutil solo en la base de la imagen */
