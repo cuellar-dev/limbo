@@ -46,6 +46,13 @@ body {
     background-image: radial-gradient(circle at top center, #1B2233 0%, #000000 50%);
     background-attachment: fixed;
     background-repeat: no-repeat;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 /* --- HEADER --- */
@@ -88,7 +95,40 @@ h1 {
     margin: 0 auto;
     padding: 40px 20px;
 }
-
+.iconos-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+.carrito-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+#carrito-btn{
+    width: 30px;
+    height: 30px;
+    fill: var(--acento-dorado);
+}
+.carrito-badge {
+    position: absolute;
+    right: -7px;
+    bottom: -4px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: var(--acento-dorado);
+    color: var(--fondo-oscuro);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    text-align: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    pointer-events: none;
+}
 .titulo-seccion {
     font-family: 'Arcane', sans-serif;
     color: var(--texto-brillante);
@@ -278,19 +318,51 @@ h1 {
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
+.etiquetas-container{
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: nowrap;
+    margin-top: 5px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 2px;
+}
+
+.etiquetas-container::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+.etiquetas{
+    border: 1px solid rgba(166, 137, 102, 0.22);
+    border-radius: 999px;
+    padding: 3px 9px;
+    font-size: 10px;
+    line-height: 1;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    color: rgba(226, 226, 226, 0.78);
+    background: rgba(255, 255, 255, 0.02);
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+
+}
 .contenedor-row{
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
     justify-content: space-between;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 .carrito-add{
     width: 20px;
     fill: var(--acento-dorado);
-
-
 }
 .precio {
     font-family: 'Arcane', sans-serif; /* Si Arcane ya no pega, podemos cambiarla luego */
@@ -330,9 +402,9 @@ h1 {
     position: absolute;
     width: 38px;       /* Tamaño del aro */
     height: auto;
-    top: -10px;        /* Lo eleva sobre las letras */
+    top: -4px;        /* Lo eleva sobre las letras */
     right: 13%;      /* Lo mueve hacia la derecha (sobre la A) */
-    transform: rotate(3deg); /* Le da un toque orgánico de inclinación */
+    transform: rotate(4deg); /* Le da un toque orgánico de inclinación */
     pointer-events: none;     /* Evita que el SVG interfiera con clicks */
     z-index: 2;
 }
