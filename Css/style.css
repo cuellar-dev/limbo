@@ -12,7 +12,7 @@
     font-style: normal;
 }
 @font-face{
-    font-family: 'Panton';
+    font-family: 'drink';
     src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
 }
 
@@ -99,15 +99,105 @@ h1 {
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
-    gap: 15px; /* Reducimos el espacio entre ellas para móviles */
-    padding-top: 50px;
+    gap: 15px; 
+    padding-top: 60px; /* Aumentamos el espacio para que el switch respire */
     overflow: hidden;
-    border-radius: 20px 20px 0 0 ;
+    border-radius: 20px 20px 0 0;
     position: relative;
 }
-.switch-container{
+
+/* Velo superior: se funde con el fondo y queda por detras de las tarjetas */
+.grid-productos::before {
+    content: "";
     position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 170px;
+    background: linear-gradient(
+        to bottom,
+        rgba(27, 34, 51, 0.9) 0%,
+        rgba(0, 0, 0, 0.82) 45%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    z-index: 0;
 }
+.switch-container {
+    position: absolute;
+    z-index: 20;
+    top: 7px; /* Flotando elegantemente dentro del grid */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(17, 21, 34, 0.65); /* Azul noche semi-transparente */
+    backdrop-filter: blur(12px); /* Efecto cristal (Glassmorphism) */
+    border: 1px solid var(--borde-dorado);
+    border-radius: 40px; /* Forma de píldora perfecta */
+    width: max-content; /* Se ajusta a los botones, no a toda la pantalla */
+    min-width: 270px;
+    height: 46px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px; /* Espacio interno para que el indicador no pegue en los bordes */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8); /* Sombra para que flote */
+}
+
+/* El Indicador Dorado */
+.color-switch {
+    height: calc(100% - 10px); /* Ocupa el alto respetando el padding */
+    border-radius: 30px;
+    top: 50%;
+    left: 0; /* JS controla la posición X */
+    /* Degradado dorado para dar sensación metálica premium */
+    background: linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%); 
+    position: absolute;
+    z-index: 10;
+    /* Transición elástica tipo iOS */
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background 0.35s ease, box-shadow 0.35s ease;
+    box-shadow: 0 4px 15px rgba(202, 172, 71, 0.4);
+}
+
+.switch-container.is-encargue .color-switch {
+    background: linear-gradient(135deg, #5965d3 0%, #4855cf 50%, #1d2463 100%);
+    box-shadow: 0 4px 15px #4855cf66;
+}
+
+/* Los Botones del Switch */
+.switch-container button {
+    flex: 1; /* Ambos botones ocupan exactamente lo mismo */
+    background: transparent;
+    border: none;
+    color: var(--texto-secundario);
+    font-family: 'drink', 'Quicksand', sans-serif; /* Fuente limpia y elegante */
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase; /* Mayúsculas para más formalidad */
+    padding: 0 20px;
+    height: 100%;
+    cursor: pointer;
+    position: relative;
+    z-index: 20;
+    transition: color 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Texto del botón activo */
+.switch-container button.is-active {
+    color: var(--fondo-oscuro); /* Negro puro para contrastar perfecto sobre el dorado */
+    text-shadow: none;
+}
+
+.switch-container button:last-of-type {
+    color: #ffffff;
+}
+
+.switch-container button:last-of-type.is-active {
+    color: #d6e3ff;
+    text-shadow: 0 0 10px rgba(72, 85, 207, 0.5);
+}
+
 /* En PC o tablets, aumentamos el tamaño y el espacio */
 @media (min-width: 768px) {
     .grid-productos {
@@ -133,6 +223,8 @@ h1 {
     display: flex;
     flex-direction: column;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+    position: relative;
+    z-index: 1;
 
 }
 
@@ -174,7 +266,7 @@ h1 {
     line-height: 1.2;
     margin-bottom: 4px;
     text-align: left;
-    font-family: 'Panton';         /* TRUCO MAGICO: Limita el texto a 2 líneas exactamente */
+    font-family: 'drink';         /* TRUCO MAGICO: Limita el texto a 2 líneas exactamente */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -220,8 +312,6 @@ h1 {
 .btn-anadir {
     background-color: transparent;
     color: var(--texto-brillante);
-    border: 1px solid var(--borde-dorado);
-    font-family: 'Panton', sans-serif;
     border-radius: 50%;
     padding: 8px;
     cursor: pointer;
@@ -232,6 +322,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
+    border: none;
 }
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
