@@ -70,3 +70,75 @@ if (productosGrid && typeof Masonry !== 'undefined') {
 
 	setTimeout(relayoutMasonry, 120);
 }
+/* VENTANAS MODAL*/
+// Lógica de la Modal de Detalles
+const modal = document.getElementById('modal-producto');
+const btnCerrar = document.querySelector('.btn-cerrar-modal');
+
+// Función para abrir la modal con datos
+function abrirDetalles(datos) {
+    document.getElementById('modal-titulo').innerText = datos.nombre;
+    document.getElementById('modal-precio').innerText = datos.precio;
+	const modalImg = document.getElementById('modal-img');
+	modalImg.style.setProperty('--modal-image-url', datos.imagen ? `url("${datos.imagen}")` : 'none');
+    
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('is-active'), 10);
+    document.body.style.overflow = 'hidden'; // Bloquea scroll fondo
+}
+
+// Función para cerrar
+function cerrarModal() {
+    modal.classList.remove('is-active');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }, 500);
+}
+
+// Event Delegation para los productos
+const grid = document.querySelector('.grid-productos');
+if(grid) {
+    grid.addEventListener('click', (e) => {
+        const tarjeta = e.target.closest('.tarjeta-producto');
+        const btnAnadir = e.target.closest('.btn-anadir');
+
+        if (tarjeta && !btnAnadir) {
+            const nombre = tarjeta.querySelector('.nombre-producto').innerText;
+            const precio = tarjeta.querySelector('.precio').innerText;
+			const imgProducto = tarjeta.querySelector('.img-producto');
+			const imagen = (imgProducto?.currentSrc || imgProducto?.getAttribute('src') || '').trim();
+            
+            abrirDetalles({ nombre, precio, imagen });
+        }
+    });
+}
+
+// Eventos de cierre
+btnCerrar.addEventListener('click', cerrarModal);
+modal.addEventListener('click', (e) => {
+    if (e.target === modal) cerrarModal();
+});
+// Cosa pa header
+// Motor de Scroll para el Header dinámico
+const header = document.getElementById('header');
+
+if (header) {
+	const updateHeaderProgress = () => {
+		const scrollActual = window.scrollY;
+
+		// Menor rango = necesita menos scroll para colapsar/volver.
+		const rangoScroll = Math.max(140, window.innerHeight * 0.18);
+		const progreso = Math.min(1, Math.max(0, scrollActual / rangoScroll));
+
+		header.style.setProperty('--p', progreso.toFixed(3));
+
+		// Estados robustos para evitar depender de selectores [style*="..."]
+		header.classList.toggle('is-collapsed', progreso >= 0.9);
+		header.classList.toggle('is-expanded', progreso <= 0.18);
+	};
+
+	window.addEventListener('scroll', updateHeaderProgress, { passive: true });
+	window.addEventListener('resize', updateHeaderProgress);
+	updateHeaderProgress();
+}
