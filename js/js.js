@@ -36,3 +36,19 @@ if (switchContainer) {
 		}
 	});
 }
+
+// Relacionado a la libreria Masonry.js
+const productosGrid = document.querySelector('.grid-productos');
+
+if (productosGrid && typeof Masonry !== 'undefined') {
+	const masonry = new Masonry(productosGrid, {
+		itemSelector: '.tarjeta-producto',
+		columnWidth: '.grid-sizer',
+		gutter: '.gutter-sizer',
+		percentPosition: true,
+		transitionDuration: '0.25s'
+	});
+
+	window.addEventListener('load', () => masonry.layout());
+	window.addEventListener('resize', () => masonry.layout());
+}

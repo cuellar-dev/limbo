@@ -15,6 +15,10 @@
     font-family: 'drink';
     src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
 }
+@font-face{
+    font-family: 'Elegante';
+    src: url('../Fuentes/josefin-sans/JosefinSans-Regular.ttf') format('truetype');
+}
 
 /* Variables CSS para la nueva paleta LEVITA */
 :root {
@@ -62,7 +66,7 @@ body {
 
 h1 {
     /* Tipografía serif elegante (tipo revista/lujo) por defecto del sistema */
-    font-family: 'Playfair Display', 'Didot', 'Georgia', serif;
+    font-family: 'Elegante' serif;
     color: var(--texto-brillante);
     letter-spacing: 5px; /* Separación amplia para dar aspecto premium */
     font-size: 28px;
@@ -83,6 +87,11 @@ h1 {
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
 }
 
 .titulo-seccion {
@@ -96,39 +105,28 @@ h1 {
 
 /* --- LISTA DE PRODUCTOS EN FLEX --- */
 .grid-productos {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: stretch;
-    gap: 15px; 
-    padding-top: 60px; /* Aumentamos el espacio para que el switch respire */
+    display: block;
+    padding-top: 0px; /* Espacio superior para el switch */
     overflow: hidden;
     border-radius: 20px 20px 0 0;
     position: relative;
+    width: 100%;
+}
+
+.grid-sizer,
+.tarjeta-producto {
+    width: calc((100% - 15px) / 2);
+}
+
+.gutter-sizer {
+    width: 15px;
 }
 
 /* Velo superior: se funde con el fondo y queda por detras de las tarjetas */
-.grid-productos::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 170px;
-    background: linear-gradient(
-        to bottom,
-        rgba(27, 34, 51, 0.9) 0%,
-        rgba(0, 0, 0, 0.82) 45%,
-        rgba(0, 0, 0, 0) 100%
-    );
-    pointer-events: none;
-    z-index: 0;
-}
+
 .switch-container {
-    position: absolute;
     z-index: 20;
-    top: 7px; /* Flotando elegantemente dentro del grid */
-    left: 50%;
-    transform: translateX(-50%);
+
     background: rgba(17, 21, 34, 0.65); /* Azul noche semi-transparente */
     backdrop-filter: blur(12px); /* Efecto cristal (Glassmorphism) */
     border: 1px solid var(--borde-dorado);
@@ -189,32 +187,32 @@ h1 {
     text-shadow: none;
 }
 
-.switch-container button:last-of-type {
-    color: #ffffff;
-}
-
 .switch-container button:last-of-type.is-active {
-    color: #d6e3ff;
+    color: var(--fondo-oscuro);
     text-shadow: 0 0 10px rgba(72, 85, 207, 0.5);
 }
 
 /* En PC o tablets, aumentamos el tamaño y el espacio */
 @media (min-width: 768px) {
-    .grid-productos {
-        gap: 30px;
+    .grid-sizer,
+    .tarjeta-producto {
+        width: calc((100% - 90px) / 4);
+        min-width: 200px;
+        max-width: 240px;
+    }
+
+    .gutter-sizer {
+        width: 30px;
     }
 
     .tarjeta-producto {
-        flex: 1 1 240px;
-        min-width: 200px;
-        max-width: 240px;
+        margin-bottom: 30px;
     }
 }
 
 /* --- TARJETA DE PRODUCTO --- */
 /* --- TARJETA DE PRODUCTO (DISEÑO MÓVIL SÓLIDO) --- */
 .tarjeta-producto {
-    flex: 1 1 calc((100% - 15px) / 2);
     min-width: 145px;
     background-color: var(--tarjeta-fondo); 
     border: 1px solid var(--borde-dorado); /* Borde dorado oscuro */
@@ -225,6 +223,7 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
     position: relative;
     z-index: 1;
+    margin-bottom: 15px;
 
 }
 
