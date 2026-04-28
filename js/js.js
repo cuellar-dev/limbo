@@ -1,10 +1,14 @@
 const switchContainer = document.querySelector('.switch-container');
 const estadoTienda = {
 	productos: [],
-	masonry: null
+	masonry: null,
+	carrito: [],
+	productoDetalleActual: null
 };
 
 const MENSAJE_SIN_RESULTADOS = 'No se encontraron resultados.';
+const STORAGE_KEY_CARRITO = 'levitad-carrito';
+const WHATSAPP_OWNER_NUMBER = '5490000000000';
 
 const iconoCarrito = `
 	<svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" class="carrito-add">
@@ -16,6 +20,145 @@ const formatPrecio = (precio) => {
 	const valor = Number(precio) || 0;
 	return `$${valor.toLocaleString('es-DO')}`;
 };
+
+function guardarCarrito() {
+	localStorage.setItem(STORAGE_KEY_CARRITO, JSON.stringify(estadoTienda.carrito));
+}
+
+function cargarCarritoGuardado() {
+	try {
+		const guardado = localStorage.getItem(STORAGE_KEY_CARRITO);
+		if (!guardado) return;
+
+		const carrito = JSON.parse(guardado);
+		estadoTienda.carrito = Array.isArray(carrito) ? carrito : [];
+	} catch (error) {
+		console.error('No se pudo recuperar el carrito:', error);
+		estadoTienda.carrito = [];
+	}
+}
+
+function obtenerCantidadCarrito() {
+	return estadoTienda.carrito.reduce((total, item) => total + (item.cantidad || 1), 0);
+}
+
+function obtenerTotalCarrito() {
+	return estadoTienda.carrito.reduce((total, item) => total + ((Number(item.precio) || 0) * (item.cantidad || 1)), 0);
+}
+
+function refrescarBadgeCarrito() {
+	const badge = document.querySelector('.carrito-badge');
+	if (badge) {
+		badge.textContent = String(obtenerCantidadCarrito());
+	}
+}
+
+function renderizarCarrito() {
+	const lista = document.getElementById('carrito-lista');
+	const vacio = document.getElementById('carrito-vacio');
+	const total = document.getElementById('carrito-total');
+
+	if (!lista || !vacio || !total) return;
+
+	if (!estadoTienda.carrito.length) {
+		lista.innerHTML = '';
+		vacio.hidden = false;
+	} else {
+		vacio.hidden = true;
+			lista.innerHTML = estadoTienda.carrito.map((item, index) => `
+			<li class="carrito-item" data-carrito-index="${index}">
+				<img class="carrito-item-img" src="${item.imagen}" alt="${item.nombre}">
+				<div class="carrito-item-info">
+					<span class="carrito-item-nombre">${item.nombre}</span>
+					<span class="carrito-item-precio">${formatPrecio(item.precio)}</span>
+				</div>
+				<button class="carrito-item-eliminar" type="button" aria-label="Eliminar ${item.nombre}">✕</button>
+			</li>
+		`).join('');
+	}
+
+	total.textContent = formatPrecio(obtenerTotalCarrito());
+	refrescarBadgeCarrito();
+	guardarCarrito();
+}
+
+function abrirCarrito() {
+	const overlay = document.getElementById('carrito-overlay');
+	const panel = document.getElementById('carrito-panel');
+	if (!overlay || !panel) return;
+
+	overlay.classList.add('is-active');
+	panel.classList.add('is-active');
+	overlay.setAttribute('aria-hidden', 'false');
+	panel.setAttribute('aria-hidden', 'false');
+	document.body.classList.add('carrito-abierto');
+}
+
+function cerrarCarrito() {
+	const overlay = document.getElementById('carrito-overlay');
+	const panel = document.getElementById('carrito-panel');
+	if (!overlay || !panel) return;
+
+	overlay.classList.remove('is-active');
+	panel.classList.remove('is-active');
+	overlay.setAttribute('aria-hidden', 'true');
+	panel.setAttribute('aria-hidden', 'true');
+	document.body.classList.remove('carrito-abierto');
+}
+
+function animarBotonAnadir(boton) {
+	if (!boton) return;
+	boton.classList.remove('is-added');
+	void boton.offsetWidth;
+	boton.classList.add('is-added');
+	setTimeout(() => boton.classList.remove('is-added'), 450);
+}
+
+function agregarAlCarrito(producto, boton) {
+	if (!producto) return;
+
+	estadoTienda.carrito.push({
+		nombre: producto.nombre,
+		precio: Number(producto.precio) || 0,
+		imagen: producto.imagen || ''
+	});
+
+	animarBotonAnadir(boton);
+	renderizarCarrito();
+}
+
+function eliminarDelCarrito(index) {
+	if (!Number.isInteger(index) || index < 0 || index >= estadoTienda.carrito.length) return;
+
+	estadoTienda.carrito.splice(index, 1);
+	renderizarCarrito();
+}
+
+function construirMensajeWhatsApp() {
+	if (!estadoTienda.carrito.length) {
+		return 'Hola Lévitad quiero comprar estos productos:\n\nDonde podemos quedar para hacer ver el producto y realizar la compra?';
+	}
+
+	const productosTexto = estadoTienda.carrito.map((item) => `${item.nombre} ${formatPrecio(item.precio)}`).join(' ');
+	return `Hola Lévitad quiero comprar estos productos:\n${productosTexto}\n\nDonde podemos quedar para hacer ver el producto y realizar la compra?`;
+}
+
+function enviarPedidoWhatsApp() {
+	const url = `https://wa.me/${WHATSAPP_OWNER_NUMBER}?text=${encodeURIComponent(construirMensajeWhatsApp())}`;
+	window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+const carritoLista = document.getElementById('carrito-lista');
+if (carritoLista) {
+	carritoLista.addEventListener('click', (e) => {
+		const botonEliminar = e.target.closest('.carrito-item-eliminar');
+		if (!botonEliminar) return;
+
+		const item = botonEliminar.closest('.carrito-item');
+		const index = Number(item?.dataset.carritoIndex);
+		eliminarDelCarrito(index);
+	});
+}
 
 function crearTarjetaProducto(producto, index) {
 	const etiquetas = Array.isArray(producto.tags)
@@ -33,7 +176,7 @@ function crearTarjetaProducto(producto, index) {
 				<div class="etiquetas-container">${etiquetas}</div>
 				<div class="contenedor-row">
 					<span class="precio">${formatPrecio(producto.precio)}</span>
-					<button class="btn-anadir" aria-label="Agregar ${producto.nombre}">
+					<button class="btn-anadir" type="button" aria-label="Agregar ${producto.nombre}">
 						${iconoCarrito}
 					</button>
 				</div>
@@ -209,6 +352,7 @@ const btnCerrar = document.querySelector('.btn-cerrar-modal');
 
 // Función para abrir la modal con datos
 function abrirDetalles(datos) {
+	estadoTienda.productoDetalleActual = datos;
 	document.getElementById('modal-titulo').innerText = datos.nombre;
 	document.getElementById('modal-precio').innerText = formatPrecio(datos.precio);
 
@@ -256,7 +400,16 @@ if (grid) {
 		const tarjeta = e.target.closest('.tarjeta-producto');
 		const btnAnadir = e.target.closest('.btn-anadir');
 
-		if (tarjeta && !btnAnadir) {
+		if (btnAnadir && tarjeta) {
+			const idProducto = Number(tarjeta.dataset.productoId);
+			const producto = estadoTienda.productos[idProducto];
+			if (producto) {
+				agregarAlCarrito(producto, btnAnadir);
+			}
+			return;
+		}
+
+		if (tarjeta) {
 			const idProducto = Number(tarjeta.dataset.productoId);
 			const producto = estadoTienda.productos[idProducto];
 			if (producto) {
@@ -292,6 +445,8 @@ function filtrarProductos(termino) {
 	renderizarProductos(productosFiltrados, { mostrarVacio: productosFiltrados.length === 0 });
 }
 document.addEventListener('DOMContentLoaded', () => {
+	cargarCarritoGuardado();
+	renderizarCarrito();
 	cargarProductos();
 
 	// Inicializar búsqueda
@@ -300,6 +455,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	const searchInput = document.getElementById('search-input');
 	const searchSubmitBtn = document.getElementById('search-submit-btn');
 	const filterBtn = document.getElementById('filter-btn');
+	const carritoWrapper = document.querySelector('.carrito-wrapper');
+	const carritoOverlay = document.getElementById('carrito-overlay');
+	const carritoCerrar = document.getElementById('carrito-cerrar');
+	const carritoWhatsapp = document.getElementById('carrito-whatsapp');
+	const btnComprarAhora = document.getElementById('btn-comprar-ahora');
 
 	if (searchSubmitBtn) {
 		actualizarBotonBusqueda(searchSubmitBtn);
@@ -341,6 +501,31 @@ document.addEventListener('DOMContentLoaded', () => {
 				console.log('Filtros avanzados en desarrollo');
 			});
 		}
+	}
+
+	if (carritoWrapper) {
+		carritoWrapper.addEventListener('click', abrirCarrito);
+	}
+
+	if (carritoOverlay) {
+		carritoOverlay.addEventListener('click', cerrarCarrito);
+	}
+
+	if (carritoCerrar) {
+		carritoCerrar.addEventListener('click', cerrarCarrito);
+	}
+
+	if (carritoWhatsapp) {
+		carritoWhatsapp.addEventListener('click', enviarPedidoWhatsApp);
+	}
+
+	if (btnComprarAhora) {
+		btnComprarAhora.addEventListener('click', () => {
+			if (estadoTienda.productoDetalleActual) {
+				agregarAlCarrito(estadoTienda.productoDetalleActual, btnComprarAhora);
+				cerrarModal();
+			}
+		});
 	}
 });
 // Cosa pa header

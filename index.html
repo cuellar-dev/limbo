@@ -116,10 +116,33 @@
         </div>
 
         <div class="modal-footer">
-            <button class="btn-comprar-ahora">Añadir al Pedido</button>
+            <button id="btn-comprar-ahora" class="btn-comprar-ahora">Añadir al Pedido</button>
         </div>
     </div>
 </div>
+
+    <div id="carrito-overlay" class="carrito-overlay" aria-hidden="true"></div>
+    <aside id="carrito-panel" class="carrito-panel" aria-hidden="true" aria-label="Carrito de compras">
+        <div class="carrito-panel-header">
+            <h2>Tu Pedido</h2>
+            <button id="carrito-cerrar" class="carrito-cerrar" aria-label="Cerrar carrito">✕</button>
+        </div>
+
+        <div class="carrito-panel-body">
+            <ul id="carrito-lista" class="carrito-lista"></ul>
+            <p id="carrito-vacio" class="carrito-vacio">Aun no agregaste productos.</p>
+        </div>
+
+        <div class="carrito-panel-footer">
+            <p class="carrito-total-linea">
+                <span>Total</span>
+                <strong id="carrito-total">$0</strong>
+            </p>
+            <button id="carrito-whatsapp" class="carrito-whatsapp-btn" type="button">Enviar Pedido por WhatsApp</button>
+            <p class="carrito-nota">Configura el numero en js.js, constante WHATSAPP_OWNER_NUMBER.</p>
+        </div>
+    </aside>
+
 <svg version="1.2" class="ala-izquierda" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2541 2091" width="2541" height="2091">
 	<style>
 		.s0 { fill: #caac47 } 

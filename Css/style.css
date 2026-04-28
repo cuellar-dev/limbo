@@ -439,6 +439,8 @@ body.is-encargue #menu-hamb g {
     justify-content: center;
     align-items: center;
     border: none;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
@@ -446,6 +448,36 @@ body.is-encargue #menu-hamb g {
     background-color: var(--acento-dorado); /* Se ilumina en dorado sólido al tocar */
     color: var(--fondo-oscuro);
     transform: scale(0.98);
+}
+
+.btn-anadir.is-added {
+    background-color: var(--acento-encargue);
+    color: var(--texto-brillante);
+    animation: addPulse 0.45s ease;
+}
+
+.btn-anadir.is-added .carrito-add {
+    fill: var(--texto-brillante);
+}
+
+.btn-anadir.is-added::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 70%);
+    animation: addRipple 0.45s ease;
+}
+
+@keyframes addPulse {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@keyframes addRipple {
+    from { opacity: 0.7; transform: scale(0.2); }
+    to { opacity: 0; transform: scale(1.4); }
 }
 /* Contenedor para agrupar el texto y el aro */
 .logo-wrapper {
@@ -824,6 +856,205 @@ h1 .logo-text {
     text-align: center;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     pointer-events: none;
+}
+
+.carrito-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+    z-index: 1090;
+}
+
+.carrito-overlay.is-active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.carrito-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(100%, 390px);
+    height: 100vh;
+    background: linear-gradient(180deg, rgba(17, 21, 34, 0.98), rgba(0, 0, 0, 0.98));
+    border-left: 1px solid rgba(202, 172, 71, 0.18);
+    box-shadow: -18px 0 50px rgba(0, 0, 0, 0.48);
+    transform: translateX(100%);
+    transition: transform 0.34s cubic-bezier(0.25, 1, 0.5, 1);
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+}
+
+.carrito-panel.is-active {
+    transform: translateX(0);
+}
+
+.carrito-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 18px 14px;
+    border-bottom: 1px solid rgba(202, 172, 71, 0.14);
+}
+
+.carrito-panel-header h2 {
+    color: var(--texto-brillante);
+    font-family: 'drink', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.8px;
+}
+
+.carrito-cerrar {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(202, 172, 71, 0.18);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--texto-brillante);
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.carrito-panel-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 10px;
+}
+
+.carrito-lista {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.carrito-item {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(202, 172, 71, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.carrito-item-img {
+    width: 72px;
+    min-width: 72px;
+    height: 72px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: #000;
+}
+
+.carrito-item-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    flex: 1;
+}
+
+.carrito-item-eliminar {
+    align-self: flex-start;
+    width: 30px;
+    height: 30px;
+    border: 1px solid rgba(202, 172, 71, 0.18);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--texto-brillante);
+    border-radius: 50%;
+    cursor: pointer;
+    flex: 0 0 auto;
+    margin-left: auto;
+    transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.carrito-item-eliminar:active {
+    transform: scale(0.92);
+    background: rgba(202, 172, 71, 0.14);
+    border-color: rgba(202, 172, 71, 0.38);
+    color: var(--acento-dorado);
+}
+
+.carrito-item-nombre {
+    color: var(--texto-brillante);
+    font-family: 'drink', sans-serif;
+    font-size: 14px;
+    line-height: 1.2;
+    margin-bottom: 6px;
+}
+
+.carrito-item-precio {
+    color: var(--acento-dorado);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.carrito-vacio {
+    color: var(--texto-secundario);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+    padding: 12px 4px;
+}
+
+.carrito-panel-footer {
+    padding: 16px 18px 20px;
+    border-top: 1px solid rgba(202, 172, 71, 0.14);
+    background: linear-gradient(180deg, rgba(17, 21, 34, 0.4), rgba(0, 0, 0, 0.3));
+}
+
+.carrito-total-linea {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    color: var(--texto-brillante);
+    font-family: 'drink', sans-serif;
+    font-size: 18px;
+    margin-bottom: 14px;
+}
+
+.carrito-whatsapp-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 18px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #25d366 0%, #1faa52 100%);
+    color: white;
+    font-family: 'drink', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.carrito-whatsapp-btn:active {
+    transform: scale(0.98);
+    filter: brightness(0.95);
+}
+
+.carrito-nota {
+    margin-top: 10px;
+    color: rgba(155, 164, 181, 0.72);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+body.carrito-abierto {
+    overflow: hidden;
+}
+
+@media (max-width: 480px) {
+    .carrito-panel {
+        width: 100%;
+    }
 }
 
 #menu-hamb {
