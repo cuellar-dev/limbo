@@ -17,7 +17,7 @@
 }
 @font-face{
     font-family: 'Elegante';
-    src: url('../Fuentes/josefin-sans/JosefinSans-Regular.ttf') format('truetype');
+    src: url('../Fuentes/josefin-sans/JosefinSans-Bold.ttf') format('truetype');
 }
 
 /* Variables CSS para la nueva paleta LEVITA */
@@ -426,18 +426,18 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 12px 16px 0;
+    padding: 12px 20px 0;
     background: linear-gradient(to bottom, rgba(27, 34, 51, 0.95), rgba(0, 0, 0, 0.95));
+    background-color:linear-gradient(to bottom, rgba(27, 34, 51, 0.85), rgba(0, 0, 0, 0.85));
 }
 
 .modal-img-bg {
     width: min(100%, 560px);
     height: 100%;
-    background-image: var(--modal-image-url), linear-gradient(to bottom, rgba(27, 34, 51, 0.85), rgba(0, 0, 0, 0.85));
+    background-image: var(--modal-image-url);
     background-size: contain, cover;
     background-repeat: no-repeat, no-repeat;
     background-position: center, center;
-    background-color: #000;
     border-radius: 10px;
 }
 .modal-body {
@@ -462,36 +462,48 @@ h1 {
     color: var(--acento-dorado);
     font-size: 28px;
     display: block;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
 }
 
-.modal-descripcion {
-    font-family: 'Quicksand', sans-serif;
-    color: var(--texto-secundario);
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-/* Sugeridos */
-.sugeridos-container h4 {
+.modal-especificaciones h4 {
     color: var(--texto-brillante);
-    margin-bottom: 15px;
+    margin-bottom: 14px;
+    font-family: 'drink';
+    font-size: 17px;
+    letter-spacing: 0.5px;
 }
 
-.sugeridos-grid {
-    display: flex;
-    gap: 15px;
-    overflow-x: auto;
-    padding-bottom: 10px;
+.modal-detalles-lista {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
 }
 
-.sugerido-item {
-    min-width: 100px;
-    height: 100px;
-    background-size: cover;
-    border-radius: 12px;
-    flex-shrink: 0;
-    border: 1px solid var(--borde-dorado);
+.detalle-item {
+    display: grid;
+    grid-template-columns: minmax(92px, 120px) 1fr;
+    gap: 8px;
+    align-items: start;
+    border: 1px solid rgba(202, 172, 71, 0.2);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.22);
+    padding: 9px 10px;
+}
+
+.detalle-label {
+    font-family: 'drink', sans-serif;
+    color: rgba(202, 172, 71, 0.95);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.detalle-valor {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--texto-brillante);
+    font-size: 13px;
+    line-height: 1.35;
 }
 
 /* Footer Fijo */
@@ -501,20 +513,23 @@ h1 {
     width: 100%;
     padding: 20px;
     background: linear-gradient(to top, #000, transparent);
+    display: flex;
 }
 
 .btn-comprar-ahora {
-    width: 100%;
+    width: 80%;
     padding: 18px;
     background-color: var(--acento-dorado);
     border: none;
     border-radius: 15px;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 20px;
     cursor: pointer;
     transition: transform 0.2s;
+    font-family: 'drink', sans-serif;
+    margin: auto;
+    color: var(--tarjeta-fondo);
 }
-
 .btn-comprar-ahora:active {
     transform: scale(0.95);
 }
@@ -604,9 +619,9 @@ h1 {
 }
 
 .header-nav li {
-    font-family: 'Panton', sans-serif;
+    font-family: 'drink', sans-serif;
     color: var(--acento-dorado);
-    font-size: 12px;
+    font-size: 10px;
     letter-spacing: 2.2px;
     text-transform: uppercase;
     padding: 8px 14px;
