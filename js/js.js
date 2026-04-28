@@ -349,6 +349,17 @@ document.addEventListener('DOMContentLoaded', () => {
 const header = document.getElementById('header');
 let headerWasCollapsed = false;
 
+const title = header ? header.querySelector('h1') : null;
+const leftWing = document.querySelector('.ala-izquierda');
+const rightWing = document.querySelector('.ala-derecha');
+
+if (title && leftWing && rightWing) {
+	leftWing.setAttribute('aria-hidden', 'true');
+	rightWing.setAttribute('aria-hidden', 'true');
+	title.insertBefore(leftWing, title.firstChild);
+	title.appendChild(rightWing);
+}
+
 if (header) {
 	const updateHeaderProgress = () => {
 		const scrollActual = window.scrollY;

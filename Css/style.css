@@ -27,11 +27,55 @@
     --tarjeta-fondo: #1B2233; /* Azul noche medio */
     --acento-dorado: #caac47; /* Dorado envejecido de las rosas */
     --acento-encargue: #5d72e9;
+    --color-alas-principal: var(--acento-dorado);
     --borde-dorado: rgba(166, 137, 102, 0.3); /* Dorado sutil para líneas */
     --texto-secundario: #9BA4B5; /* Gris azulado suave */
     --texto-brillante: #E2E2E2; /* Hueso / Crema */
 }
 
+body.is-encargue {
+    --color-alas-principal: var(--acento-encargue);
+}
+.ala-izquierda,
+.ala-derecha {
+    --ala-principal: var(--color-alas-principal);
+    --ala-secundario: #0E131D;
+    position: absolute;
+    top: 50%;
+    width: 200px;
+    height: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, filter 0.25s ease;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+}
+
+.ala-izquierda {
+    right: calc(100% + 6px);
+    transform: translateY(-50%) translateX(14px) scale(0.82) rotate(8deg);
+    transform-origin: center right;
+}
+
+.ala-derecha {
+    left: calc(100% + 6px);
+    transform: translateY(-50%) translateX(-14px) scale(0.82) rotate(-8deg);
+    transform-origin: center left;
+}
+
+.ala-izquierda .s0,
+.ala-derecha .s0 {
+    fill: var(--ala-principal) !important;
+}
+
+.ala-izquierda .s1,
+.ala-derecha .s1 {
+    fill: var(--ala-secundario) !important;
+}
+
+body.is-encargue .ala-izquierda,
+body.is-encargue .ala-derecha {
+    --ala-secundario: var(--tarjeta-fondo);
+}
 * {
     margin: 0;
     padding: 0;
@@ -419,8 +463,8 @@ body.is-encargue #menu-hamb g {
 .logo-a {
     position: relative;
     display: inline-block;
-    margin-left: -0.50em;
-    margin-right: -0.50em;
+    margin-left: -0.08em;
+    margin-right: -0.08em;
 }
 /*MODal */
 /* Estilos de la Modal Premium */
@@ -645,12 +689,35 @@ body.is-encargue #menu-hamb g {
 
 /* El h1 se agranda y mueve a la derecha al inicio */
 h1 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
     font-size: calc(36px - (8px * var(--p)));
     letter-spacing: calc(8px - (3px * var(--p)));
     transform: translateX(calc(6px * (1 - var(--p))));
     transition: all 0.1s linear;
+    isolation: isolate;
+    z-index: 100;
 }
 
+h1 .logo-a,
+h1 .logo-text {
+    position: relative;
+    z-index: 2;
+}
+
+
+#header.is-expanded h1 .ala-derecha {
+    opacity: 1;
+    transform: translateY(-63%) translateX(-80px) scale(1) rotate(10deg);
+    z-index: -1;
+}
+#header.is-expanded h1 .ala-izquierda{
+    opacity: 1;
+    transform: translateY(-70%) translateX(80px) scale(1) rotate(-10deg);
+    z-index: -1;
+}
 /* Halo icon siguiendo al texto */
 .logo-a .halo-icon {
     position: absolute;
