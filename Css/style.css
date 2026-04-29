@@ -1564,3 +1564,972 @@ body.is-encargue .filter-btn:active {
     filter: brightness(0.92);
     box-shadow: 0 4px 14px rgba(93, 114, 233, 0.3);
 }
+/* ═══════════════════════════════════════════════════════════════
+   PATCH — CARRITO PANEL PREMIUM + BUSCADOR CON SCROLL
+   Agregá este bloque AL FINAL de tu style.css
+═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   1. BUSCADOR: sigue al header con el scroll
+   La barra ahora vive dentro del flujo del header
+   y usa --p para desaparecer junto con él.
+───────────────────────────────────────────── */
+
+/* Sobreescribimos el posicionamiento fijo anterior */
+.search-bar-container {
+    position: sticky;        /* se pega al top junto con el header */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: rgba(17, 21, 34, 0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 99;             /* justo por debajo del header (z:100) */
+    border-bottom: 1px solid var(--borde-dorado);
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    /* transform vertical para que salga/entre desde arriba */
+    transform: translateY(-8px);
+    transition:
+        height   0.38s cubic-bezier(0.25, 1, 0.5, 1),
+        opacity  0.28s ease,
+        transform 0.38s cubic-bezier(0.25, 1, 0.5, 1);
+    margin-top: 0;
+}
+
+.search-bar-container.is-active {
+    height: 64px;
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+/* Cuando el header colapsa, la barra se va hacia arriba con él */
+.search-bar-container.is-scroll-hidden {
+    height: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-100%) !important;
+    transition:
+        height   0.22s ease,
+        opacity  0.18s ease,
+        transform 0.22s ease;
+}
+
+.search-bar-container.is-closing {
+    height: 64px;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────
+   2. CARRITO PANEL — REDISEÑO PREMIUM
+   Con variables que cambian según el modo activo
+───────────────────────────────────────────── */
+
+/* Variables por modo — se sobreescriben en body.is-encargue */
+:root {
+    --carrito-acento:       var(--acento-dorado);
+    --carrito-acento-rgb:   202, 172, 71;
+    --carrito-glow:         rgba(202, 172, 71, 0.12);
+    --carrito-borde:        rgba(202, 172, 71, 0.16);
+    --carrito-borde-fuerte: rgba(202, 172, 71, 0.30);
+    --carrito-btn-bg:       linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%);
+    --carrito-btn-shadow:   rgba(202, 172, 71, 0.38);
+    --carrito-badge-color:  var(--fondo-oscuro);
+}
+
+body.is-encargue {
+    --carrito-acento:       var(--acento-encargue);
+    --carrito-acento-rgb:   93, 114, 233;
+    --carrito-glow:         rgba(93, 114, 233, 0.12);
+    --carrito-borde:        rgba(93, 114, 233, 0.18);
+    --carrito-borde-fuerte: rgba(93, 114, 233, 0.32);
+    --carrito-btn-bg:       linear-gradient(135deg, #7b8dff 0%, #5d72e9 50%, #3040b8 100%);
+    --carrito-btn-shadow:   rgba(93, 114, 233, 0.42);
+    --carrito-badge-color:  #fff;
+}
+
+/* Panel principal */
+.carrito-panel {
+    background: linear-gradient(
+        175deg,
+        rgba(17, 21, 34, 0.99) 0%,
+        rgba(10, 13, 22, 0.99) 55%,
+        rgba(0, 0, 0, 1) 100%
+    );
+    border-left: 1px solid var(--carrito-borde-fuerte);
+    box-shadow:
+        -22px 0 60px rgba(0, 0, 0, 0.55),
+        -1px  0 0   var(--carrito-borde);
+    transition:
+        transform   0.34s cubic-bezier(0.25, 1, 0.5, 1),
+        border-color 0.35s ease,
+        box-shadow   0.35s ease;
+}
+
+/* Brillo ambiental en la esquina superior del panel */
+.carrito-panel::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -30px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(
+        ellipse,
+        rgba(var(--carrito-acento-rgb), 0.14) 0%,
+        transparent 68%
+    );
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.35s ease;
+    border-radius: 50%;
+}
+
+/* Header del panel */
+.carrito-panel-header {
+    position: relative;
+    z-index: 1;
+    padding: 22px 20px 16px;
+    border-bottom: 1px solid var(--carrito-borde);
+    background: linear-gradient(
+        to bottom,
+        rgba(var(--carrito-acento-rgb), 0.06),
+        transparent
+    );
+    transition: border-color 0.35s ease, background 0.35s ease;
+}
+
+.carrito-panel-header h2 {
+    font-family: 'drink', sans-serif;
+    font-size: 22px;
+    letter-spacing: 1.2px;
+    color: var(--texto-brillante);
+    margin-bottom: 3px;
+}
+
+/* Subtítulo dinámico que cambia por modo */
+.carrito-panel-subtitulo {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    color: var(--carrito-acento);
+    opacity: 0.85;
+    transition: color 0.35s ease;
+}
+
+/* Botón cerrar */
+.carrito-cerrar {
+    border: 1px solid var(--carrito-borde-fuerte);
+    background: rgba(var(--carrito-acento-rgb), 0.06);
+    color: var(--texto-brillante);
+    transition:
+        background    0.2s ease,
+        border-color  0.2s ease,
+        transform     0.15s ease;
+}
+
+.carrito-cerrar:active {
+    transform: scale(0.92);
+    background: rgba(var(--carrito-acento-rgb), 0.14);
+}
+
+/* Badge */
+.carrito-badge {
+    background: var(--carrito-acento);
+    color: var(--carrito-badge-color);
+    transition: background 0.35s ease, color 0.35s ease;
+}
+
+/* Items del carrito */
+.carrito-item {
+    border: 1px solid var(--carrito-borde);
+    background: rgba(var(--carrito-acento-rgb), 0.04);
+    border-radius: 18px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Línea de acento izquierda en cada item */
+.carrito-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--carrito-acento);
+    opacity: 0.5;
+    transition: background 0.35s ease;
+}
+
+.carrito-item-img {
+    border-radius: 14px;
+    border: 1px solid var(--carrito-borde);
+    transition: border-color 0.3s ease;
+}
+
+.carrito-item-nombre {
+    font-family: 'drink', sans-serif;
+    font-size: 13.5px;
+    color: var(--texto-brillante);
+    margin-bottom: 5px;
+    line-height: 1.25;
+}
+
+.carrito-item-precio {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--carrito-acento);
+    transition: color 0.35s ease;
+}
+
+.carrito-item-eliminar {
+    border: 1px solid var(--carrito-borde);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--texto-secundario);
+    transition:
+        transform     0.15s ease,
+        background    0.15s ease,
+        border-color  0.15s ease,
+        color         0.15s ease;
+}
+
+.carrito-item-eliminar:active {
+    transform: scale(0.9);
+    background: rgba(var(--carrito-acento-rgb), 0.14);
+    border-color: var(--carrito-acento);
+    color: var(--carrito-acento);
+}
+
+/* Texto vacío */
+.carrito-vacio {
+    text-align: center;
+    padding: 32px 8px 16px;
+    color: rgba(155, 164, 181, 0.55);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Ícono decorativo para estado vacío */
+.carrito-vacio-icono {
+    display: block;
+    font-size: 32px;
+    margin-bottom: 10px;
+    opacity: 0.35;
+    filter: grayscale(0.3);
+}
+
+/* Footer del panel */
+.carrito-panel-footer {
+    padding: 18px 20px 22px;
+    border-top: 1px solid var(--carrito-borde);
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.6),
+        rgba(var(--carrito-acento-rgb), 0.03)
+    );
+    transition: border-color 0.35s ease, background 0.35s ease;
+}
+
+/* Línea de total */
+.carrito-total-linea {
+    font-family: 'drink', sans-serif;
+    font-size: 18px;
+    color: var(--texto-brillante);
+    margin-bottom: 16px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: 1px solid var(--carrito-borde);
+    background: rgba(var(--carrito-acento-rgb), 0.05);
+    transition: border-color 0.35s ease, background 0.35s ease;
+}
+
+.carrito-total-linea strong {
+    color: var(--carrito-acento);
+    font-size: 20px;
+    transition: color 0.35s ease;
+}
+
+/* Botón WhatsApp */
+.carrito-whatsapp-btn {
+    width: 100%;
+    border: none;
+    border-radius: 16px;
+    padding: 17px 18px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #25d366 0%, #1faa52 100%);
+    color: white;
+    font-family: 'drink', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.28);
+    transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+    margin-bottom: 10px;
+}
+
+.carrito-whatsapp-btn:active {
+    transform: scale(0.98);
+    filter: brightness(0.94);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2);
+}
+
+/* Nota inferior */
+.carrito-nota {
+    margin-top: 10px;
+    color: rgba(155, 164, 181, 0.55);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    text-align: center;
+    letter-spacing: 0.2px;
+}
+
+/* Overlay del carrito */
+.carrito-overlay {
+    transition: opacity 0.28s ease;
+}
+
+/* Divider decorativo entre cuerpo y footer */
+.carrito-panel-body {
+    position: relative;
+    z-index: 1;
+}
+
+/* Scrollbar del body del carrito */
+.carrito-panel-body::-webkit-scrollbar {
+    width: 3px;
+}
+.carrito-panel-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+.carrito-panel-body::-webkit-scrollbar-thumb {
+    background: rgba(var(--carrito-acento-rgb), 0.25);
+    border-radius: 99px;
+    transition: background 0.3s ease;
+}
+/* ═══════════════════════════════════════════════════════
+   PATCH 2 — etiquetas · filtros · buscador · menú
+   Pegá AL FINAL de style.css (después del patch anterior)
+═══════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   1. ETIQUETAS — rediseño premium
+───────────────────────────────────────────── */
+.etiquetas-container {
+    gap: 5px;
+    margin-top: 8px;
+    margin-bottom: 6px;
+}
+
+.etiquetas {
+    font-family: 'drink', sans-serif;
+    font-size: 9.5px;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: rgba(202, 172, 71, 0.7);
+    border: 1px solid rgba(202, 172, 71, 0.18);
+    border-radius: 999px;
+    padding: 4px 10px;
+    background: linear-gradient(
+        135deg,
+        rgba(202, 172, 71, 0.07) 0%,
+        rgba(202, 172, 71, 0.02) 100%
+    );
+    white-space: nowrap;
+    flex: 0 0 auto;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Punto decorativo antes del # */
+.etiquetas::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: currentColor;
+    margin-right: 4px;
+    opacity: 0.6;
+    vertical-align: middle;
+    margin-bottom: 1px;
+}
+
+body.is-encargue .etiquetas {
+    color: rgba(93, 114, 233, 0.75);
+    border-color: rgba(93, 114, 233, 0.2);
+    background: linear-gradient(
+        135deg,
+        rgba(93, 114, 233, 0.08) 0%,
+        rgba(93, 114, 233, 0.02) 100%
+    );
+}
+
+/* ─────────────────────────────────────────────
+   2. BUSCADOR — margen inferior cuando está activo
+───────────────────────────────────────────── */
+.search-bar-container.is-active + .switch-container,
+.search-bar-container.is-active ~ .contenedor,
+.search-bar-container.is-active ~ main {
+    /* El margen lo damos en el propio contenedor sticky */
+}
+
+/* Mejor: padding-bottom en el propio search bar cuando activo */
+.search-bar-container.is-active {
+    padding-bottom: 8px;
+    height: 72px; /* un poco más alto para el respiro */
+}
+
+/* ─────────────────────────────────────────────
+   3. BOTÓN FILTROS — indicador punto activo
+───────────────────────────────────────────── */
+.filter-btn {
+    position: relative;
+}
+
+.filter-btn.has-filters {
+    border-color: var(--acento-dorado);
+    color: var(--acento-dorado);
+    background: rgba(202, 172, 71, 0.1);
+}
+
+body.is-encargue .filter-btn.has-filters {
+    border-color: var(--acento-encargue);
+    color: var(--acento-encargue);
+    background: rgba(93, 114, 233, 0.1);
+}
+
+.filter-dot {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--acento-dorado);
+    border: 1.5px solid rgba(17, 21, 34, 0.9);
+    pointer-events: none;
+}
+
+body.is-encargue .filter-dot {
+    background: var(--acento-encargue);
+}
+
+/* ─────────────────────────────────────────────
+   4. MODAL DE FILTROS
+───────────────────────────────────────────── */
+.modal-filtros-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: flex-end;       /* sale desde abajo como bottom sheet */
+    justify-content: center;
+    padding: 0;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    pointer-events: none;
+    transition: background 0.32s ease, backdrop-filter 0.32s ease, opacity 0.32s ease;
+}
+
+.modal-filtros-overlay.is-active {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-filtros-overlay.is-closing {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.modal-filtros-card {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 520px;
+    max-height: 85vh;
+    background: linear-gradient(160deg, #1a2040 0%, #0d1224 55%, #060a15 100%);
+    border: 1px solid var(--carrito-borde-fuerte, rgba(202,172,71,0.28));
+    border-bottom: none;
+    border-radius: 28px 28px 0 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -20px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04) inset;
+
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.modal-filtros-overlay.is-active .modal-filtros-card {
+    transform: translateY(0);
+}
+
+.modal-filtros-overlay.is-closing .modal-filtros-card {
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+/* Indicador de arrastre */
+.modal-filtros-card::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 99px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+}
+
+.modal-filtros-glow {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 160px;
+    background: radial-gradient(ellipse, rgba(var(--carrito-acento-rgb, 202,172,71), 0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.modal-filtros-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px 12px;
+    border-bottom: 1px solid var(--carrito-borde, rgba(202,172,71,0.14));
+}
+
+.modal-filtros-titulo {
+    font-family: 'drink', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1.5px;
+    color: var(--texto-brillante);
+    margin: 0;
+}
+
+.modal-filtros-cerrar {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--carrito-borde, rgba(202,172,71,0.2));
+    background: rgba(255,255,255,0.04);
+    color: var(--texto-brillante);
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.18s, transform 0.15s;
+}
+
+.modal-filtros-cerrar:active {
+    transform: scale(0.92);
+    background: rgba(var(--carrito-acento-rgb, 202,172,71), 0.12);
+}
+
+.modal-filtros-body {
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    padding: 20px 22px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scrollbar-width: none;
+}
+
+.modal-filtros-body::-webkit-scrollbar { display: none; }
+
+.filtros-seccion {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filtros-seccion-label {
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--carrito-acento, var(--acento-dorado));
+    opacity: 0.8;
+    margin: 0;
+}
+
+/* Botones de orden */
+.filtros-orden-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.filtros-orden-btn {
+    padding: 11px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--carrito-borde, rgba(202,172,71,0.16));
+    background: rgba(255,255,255,0.03);
+    color: var(--texto-secundario);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.filtros-orden-btn.is-active,
+.filtros-orden-btn:active {
+    border-color: var(--carrito-acento, var(--acento-dorado));
+    color: var(--carrito-acento, var(--acento-dorado));
+    background: rgba(var(--carrito-acento-rgb, 202,172,71), 0.1);
+}
+
+/* Tags en el modal de filtros */
+.filtros-tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filtros-tag-btn {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--carrito-borde, rgba(202,172,71,0.16));
+    background: rgba(255,255,255,0.03);
+    color: var(--texto-secundario);
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.filtros-tag-btn.is-active {
+    border-color: var(--carrito-acento, var(--acento-dorado));
+    color: var(--carrito-acento, var(--acento-dorado));
+    background: rgba(var(--carrito-acento-rgb, 202,172,71), 0.1);
+    box-shadow: 0 0 10px rgba(var(--carrito-acento-rgb, 202,172,71), 0.15);
+}
+
+/* Footer del modal filtros */
+.modal-filtros-footer {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 10px;
+    padding: 16px 22px 24px;
+    border-top: 1px solid var(--carrito-borde, rgba(202,172,71,0.14));
+    background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+}
+
+.filtros-btn-reset {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--carrito-borde-fuerte, rgba(202,172,71,0.28));
+    background: transparent;
+    color: var(--texto-secundario);
+    font-family: 'drink', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filtros-btn-reset:active {
+    background: rgba(255,255,255,0.05);
+    color: var(--texto-brillante);
+}
+
+.filtros-btn-aplicar {
+    flex: 2;
+    padding: 14px;
+    border-radius: 14px;
+    border: none;
+    background: var(--carrito-btn-bg, linear-gradient(135deg,#e3c878,#caac47,#a68966));
+    color: var(--fondo-oscuro);
+    font-family: 'drink', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(var(--carrito-acento-rgb, 202,172,71), 0.3);
+    transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.filtros-btn-aplicar:active {
+    transform: scale(0.97);
+    filter: brightness(0.93);
+}
+
+/* ─────────────────────────────────────────────
+   5. MENÚ HAMBURGUESA — animación X + panel nav
+───────────────────────────────────────────── */
+
+/* Animación de las barras a X */
+#menu-hamb .bar-1,
+#menu-hamb .bar-2,
+#menu-hamb .bar-3 {
+    transform-origin: center;
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
+}
+
+#menu-hamb.is-open .bar-1 {
+    transform: translateY(10px) rotate(45deg);
+}
+
+#menu-hamb.is-open .bar-2 {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+#menu-hamb.is-open .bar-3 {
+    transform: translateY(-10px) rotate(-45deg);
+}
+
+/* Overlay */
+.menu-nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    z-index: 1200;
+    opacity: 0;
+    transition: background 0.35s ease, backdrop-filter 0.35s ease, opacity 0.35s ease;
+    pointer-events: none;
+}
+
+.menu-nav-overlay.is-active {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.menu-nav-overlay.is-closing {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Panel lateral nav */
+.menu-nav-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(80vw, 320px);
+    height: 100dvh;
+    z-index: 1210;
+    background: linear-gradient(
+        170deg,
+        #151c2e 0%,
+        #0d1020 50%,
+        #060810 100%
+    );
+    border-left: 1px solid rgba(202, 172, 71, 0.2);
+    box-shadow: -24px 0 70px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.menu-nav-panel.is-active {
+    transform: translateX(0);
+}
+
+.menu-nav-panel.is-closing {
+    transform: translateX(100%);
+    transition: transform 0.32s ease;
+}
+
+body.is-encargue .menu-nav-panel {
+    border-left-color: rgba(93, 114, 233, 0.22);
+}
+
+/* Brillo ambiental */
+.menu-nav-glow {
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 260px;
+    height: 260px;
+    background: radial-gradient(
+        ellipse,
+        rgba(202, 172, 71, 0.12) 0%,
+        transparent 68%
+    );
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.35s ease;
+}
+
+body.is-encargue .menu-nav-glow {
+    background: radial-gradient(
+        ellipse,
+        rgba(93, 114, 233, 0.14) 0%,
+        transparent 68%
+    );
+}
+
+/* Header del panel nav */
+.menu-nav-header {
+    position: relative;
+    z-index: 1;
+    padding: 54px 28px 28px;
+    border-bottom: 1px solid rgba(202, 172, 71, 0.1);
+}
+
+body.is-encargue .menu-nav-header {
+    border-bottom-color: rgba(93, 114, 233, 0.12);
+}
+
+.menu-nav-marca {
+    font-family: 'drink', sans-serif;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: var(--acento-dorado);
+    opacity: 0.7;
+    text-transform: uppercase;
+    transition: color 0.35s ease;
+}
+
+body.is-encargue .menu-nav-marca {
+    color: var(--acento-encargue);
+}
+
+/* Links de navegación */
+.menu-nav-links {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+}
+
+.menu-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 28px;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.2s ease, padding-left 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-nav-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--acento-dorado);
+    transform: scaleY(0);
+    transition: transform 0.2s ease;
+    transform-origin: bottom;
+}
+
+body.is-encargue .menu-nav-item::before {
+    background: var(--acento-encargue);
+}
+
+.menu-nav-item:active {
+    background: rgba(255, 255, 255, 0.04);
+    padding-left: 34px;
+}
+
+.menu-nav-item:active::before {
+    transform: scaleY(1);
+}
+
+.menu-nav-num {
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--acento-dorado);
+    opacity: 0.55;
+    flex-shrink: 0;
+    width: 22px;
+    transition: color 0.35s ease;
+}
+
+body.is-encargue .menu-nav-num {
+    color: var(--acento-encargue);
+}
+
+.menu-nav-text {
+    font-family: 'drink', sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 1.5px;
+    color: var(--texto-brillante);
+    flex: 1;
+}
+
+.menu-nav-arrow {
+    font-size: 14px;
+    color: var(--acento-dorado);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: opacity 0.2s ease, transform 0.2s ease, color 0.35s ease;
+    flex-shrink: 0;
+}
+
+body.is-encargue .menu-nav-arrow {
+    color: var(--acento-encargue);
+}
+
+.menu-nav-item:active .menu-nav-arrow {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Footer del panel nav */
+.menu-nav-footer {
+    position: relative;
+    z-index: 1;
+    padding: 24px 28px 36px;
+    border-top: 1px solid rgba(202, 172, 71, 0.08);
+}
+
+body.is-encargue .menu-nav-footer {
+    border-top-color: rgba(93, 114, 233, 0.1);
+}
+
+.menu-nav-tagline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(155, 164, 181, 0.45);
+    letter-spacing: 0.5px;
+    margin: 0;
+}

@@ -108,6 +108,41 @@ function refrescarBadgeCarrito() {
 	if (badge) badge.textContent = String(obtenerCantidadCarrito());
 }
 
+/* Textos del panel según el modo */
+const CARRITO_TEXTOS = {
+	stack: {
+		titulo:    'Tu Pedido',
+		subtitulo: 'Productos en stock',
+		vacio:     'Aún no agregaste nada.\nExplorá el catálogo y sumá lo que te guste.',
+		vacioBadge:'🛍️',
+		whatsapp:  'Enviar Pedido por WhatsApp',
+		nota:      'Te contactamos para coordinar entrega y pago.'
+	},
+	encargue: {
+		titulo:    'Tu Encargue',
+		subtitulo: 'Piezas a medida',
+		vacio:     'Aún no elegiste nada para encargar.\nSeleccioná las prendas que querés personalizar.',
+		vacioBadge:'✦',
+		whatsapp:  'Enviar Encargue por WhatsApp',
+		nota:      'Coordinamos cada detalle juntos antes de producir.'
+	}
+};
+
+function actualizarTextosPanelCarrito() {
+	const modo   = modoActual();
+	const textos = CARRITO_TEXTOS[modo];
+
+	const titulo    = document.querySelector('.carrito-panel-header h2');
+	const subtitulo = document.querySelector('.carrito-panel-subtitulo');
+	const whatsapp  = document.getElementById('carrito-whatsapp');
+	const nota      = document.querySelector('.carrito-nota');
+
+	if (titulo)    titulo.textContent    = textos.titulo;
+	if (subtitulo) subtitulo.textContent = textos.subtitulo;
+	if (whatsapp)  whatsapp.textContent  = textos.whatsapp;
+	if (nota)      nota.textContent      = textos.nota;
+}
+
 function renderizarCarrito() {
 	const lista = document.getElementById('carrito-lista');
 	const vacio = document.getElementById('carrito-vacio');
@@ -115,12 +150,19 @@ function renderizarCarrito() {
 	if (!lista || !vacio || !total) return;
 
 	const carrito = carritoActivo();
+	const modo    = modoActual();
+	const textos  = CARRITO_TEXTOS[modo];
 
 	if (!carrito.length) {
 		lista.innerHTML = '';
-		vacio.hidden = false;
+		vacio.hidden    = false;
+		// Texto de vacío personalizado por modo
+		vacio.innerHTML = `
+			<span class="carrito-vacio-icono">${textos.vacioBadge}</span>
+			${textos.vacio.replace('\n', '<br>')}
+		`;
 	} else {
-		vacio.hidden = true;
+		vacio.hidden    = true;
 		lista.innerHTML = carrito.map((item, index) => `
 			<li class="carrito-item" data-carrito-index="${index}">
 				<img class="carrito-item-img" src="${item.imagen}" alt="${item.nombre}">
@@ -135,10 +177,11 @@ function renderizarCarrito() {
 
 	total.textContent = formatPrecio(obtenerTotalCarrito());
 	refrescarBadgeCarrito();
+	actualizarTextosPanelCarrito();
 	guardarCarrito();
 
 	// Actualizar botones según el carrito activo
-	const isEncargue = modoActual() === 'encargue';
+	const isEncargue = modo === 'encargue';
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
@@ -486,20 +529,20 @@ function crearModalEncargue() {
 			</div>
 
 			<h2 id="modal-encargue-titulo" class="modal-encargue-titulo">Modo Encargue</h2>
-			<p class="modal-encargue-subtitulo">Un espacio para mirar y encargar ropas que pudieramos tener a futuro</p>
+			<p class="modal-encargue-subtitulo">Un espacio para pedir piezas a tu medida</p>
 
 			<ul class="modal-encargue-lista">
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Prendas llamativas, para alimentar tu estilo y alimentar tus Outfits</span>
+					<span>Prendas hechas especialmente para vos, en el color, talla y material que elijas</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Diseños que nos parecieron interesantes y queremos compartir</span>
+					<span>Diseños únicos que no encontrás en el stock habitual</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Coordinamos por WhatsApp para los detalles del encargo</span>
+					<span>Coordinamos por WhatsApp para que cada detalle sea perfecto</span>
 				</li>
 			</ul>
 
@@ -508,9 +551,7 @@ function crearModalEncargue() {
 			<p class="modal-encargue-nota">
 				Los artículos que selecciones acá se guardan separados de tu carrito habitual.
 			</p>
-			<p class="modal-encargue-nota">
-				Recuerda, los productos que verás a continuacion no lo tenemos, serían por encargos
-			</p>
+
 			<button class="modal-encargue-btn" id="modal-encargue-cerrar">
 				Entendido, explorar ✦
 			</button>
@@ -646,15 +687,222 @@ if (btnCerrar && modal) {
 	modal.addEventListener('click', e => { if (e.target === modal) cerrarModal(); });
 }
 
-/* ─── BÚSQUEDA ─── */
-function filtrarProductos(termino) {
-	const t = termino.toLowerCase().trim();
-	if (!t) {
-		renderizarProductos(estadoTienda.productos, { mostrarVacio: false });
-		return;
+/* ─── BÚSQUEDA Y FILTROS ─── */
+
+const estadoFiltros = {
+	termino: '',
+	tags:    new Set(),
+	orden:   null
+};
+
+function aplicarFiltros() {
+	let resultado = [...estadoTienda.productos];
+
+	if (estadoFiltros.termino) {
+		const t = estadoFiltros.termino.toLowerCase();
+		resultado = resultado.filter(p =>
+			p.nombre.toLowerCase().includes(t) ||
+			(Array.isArray(p.tags) && p.tags.some(tag => tag.toLowerCase().includes(t)))
+		);
 	}
-	const filtrados = estadoTienda.productos.filter(p => p.nombre.toLowerCase().includes(t));
-	renderizarProductos(filtrados, { mostrarVacio: filtrados.length === 0 });
+
+	if (estadoFiltros.tags.size > 0) {
+		resultado = resultado.filter(p =>
+			Array.isArray(p.tags) &&
+			[...estadoFiltros.tags].every(tag => p.tags.includes(tag))
+		);
+	}
+
+	if (estadoFiltros.orden === 'precio-asc')  resultado.sort((a, b) => a.precio - b.precio);
+	if (estadoFiltros.orden === 'precio-desc') resultado.sort((a, b) => b.precio - a.precio);
+	if (estadoFiltros.orden === 'nombre')      resultado.sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+	renderizarProductos(resultado, { mostrarVacio: resultado.length === 0 });
+	actualizarIndicadorFiltros();
+}
+
+function filtrarProductos(termino) {
+	estadoFiltros.termino = termino.trim();
+	aplicarFiltros();
+}
+
+function actualizarIndicadorFiltros() {
+	const filterBtn = document.getElementById('filter-btn');
+	if (!filterBtn) return;
+	const hayFiltros = estadoFiltros.tags.size > 0 || estadoFiltros.orden !== null;
+	filterBtn.classList.toggle('has-filters', hayFiltros);
+	let dot = filterBtn.querySelector('.filter-dot');
+	if (hayFiltros && !dot) {
+		dot = document.createElement('span');
+		dot.className = 'filter-dot';
+		filterBtn.appendChild(dot);
+	} else if (!hayFiltros && dot) {
+		dot.remove();
+	}
+}
+
+function obtenerTodosLosTags() {
+	const set = new Set();
+	estadoTienda.productos.forEach(p => {
+		if (Array.isArray(p.tags)) p.tags.forEach(t => set.add(t));
+	});
+	return [...set].sort();
+}
+
+function abrirModalFiltros() {
+	const existe = document.getElementById('modal-filtros');
+	if (existe) { cerrarModalFiltros(); return; }
+
+	const el = document.createElement('div');
+	el.id        = 'modal-filtros';
+	el.className = 'modal-filtros-overlay';
+	el.setAttribute('role', 'dialog');
+	el.setAttribute('aria-modal', 'true');
+
+	const todos = obtenerTodosLosTags();
+
+	el.innerHTML = `
+		<div class="modal-filtros-card">
+			<div class="modal-filtros-glow"></div>
+			<div class="modal-filtros-header">
+				<h3 class="modal-filtros-titulo">Filtrar</h3>
+				<button class="modal-filtros-cerrar" id="modal-filtros-cerrar" aria-label="Cerrar filtros">✕</button>
+			</div>
+			<div class="modal-filtros-body">
+				<div class="filtros-seccion">
+					<p class="filtros-seccion-label">Ordenar por</p>
+					<div class="filtros-orden-grid">
+						${[
+							{ val: '__null__', label: 'Relevancia' },
+							{ val: 'precio-asc',  label: 'Precio ↑' },
+							{ val: 'precio-desc', label: 'Precio ↓' },
+							{ val: 'nombre',      label: 'Nombre A–Z' }
+						].map(o => `
+							<button class="filtros-orden-btn ${(estadoFiltros.orden === null && o.val === '__null__') || estadoFiltros.orden === o.val ? 'is-active' : ''}" data-orden="${o.val}">${o.label}</button>
+						`).join('')}
+					</div>
+				</div>
+				<div class="filtros-seccion">
+					<p class="filtros-seccion-label">Etiquetas</p>
+					<div class="filtros-tags-grid">
+						${todos.map(tag => `
+							<button class="filtros-tag-btn ${estadoFiltros.tags.has(tag) ? 'is-active' : ''}" data-tag="${tag}">#${tag}</button>
+						`).join('')}
+					</div>
+				</div>
+			</div>
+			<div class="modal-filtros-footer">
+				<button class="filtros-btn-reset" id="filtros-reset">Limpiar todo</button>
+				<button class="filtros-btn-aplicar" id="filtros-aplicar">Aplicar</button>
+			</div>
+		</div>
+	`;
+
+	document.body.appendChild(el);
+
+	el.querySelector('#modal-filtros-cerrar').addEventListener('click', cerrarModalFiltros);
+	el.addEventListener('click', e => { if (e.target === el) cerrarModalFiltros(); });
+
+	el.querySelectorAll('.filtros-orden-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			el.querySelectorAll('.filtros-orden-btn').forEach(b => b.classList.remove('is-active'));
+			btn.classList.add('is-active');
+			estadoFiltros.orden = btn.dataset.orden === '__null__' ? null : btn.dataset.orden;
+		});
+	});
+
+	el.querySelectorAll('.filtros-tag-btn').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const tag = btn.dataset.tag;
+			if (estadoFiltros.tags.has(tag)) {
+				estadoFiltros.tags.delete(tag);
+				btn.classList.remove('is-active');
+			} else {
+				estadoFiltros.tags.add(tag);
+				btn.classList.add('is-active');
+			}
+		});
+	});
+
+	el.querySelector('#filtros-reset').addEventListener('click', () => {
+		estadoFiltros.tags.clear();
+		estadoFiltros.orden = null;
+		el.querySelectorAll('.filtros-tag-btn').forEach(b => b.classList.remove('is-active'));
+		el.querySelectorAll('.filtros-orden-btn').forEach(b => b.classList.remove('is-active'));
+		el.querySelector('[data-orden="__null__"]')?.classList.add('is-active');
+	});
+
+	el.querySelector('#filtros-aplicar').addEventListener('click', () => {
+		aplicarFiltros();
+		cerrarModalFiltros();
+	});
+
+	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-active')));
+}
+
+function cerrarModalFiltros() {
+	const el = document.getElementById('modal-filtros');
+	if (!el) return;
+	el.classList.add('is-closing');
+	setTimeout(() => el.remove(), 350);
+}
+
+/* ── Menu hamburguesa ── */
+function initMenuHamburguesa() {
+	const menuBtn = document.getElementById('menu-hamb');
+	if (!menuBtn) return;
+
+	function abrirMenu() {
+		if (document.getElementById('menu-nav-panel')) return;
+		menuBtn.classList.add('is-open');
+
+		const overlay = document.createElement('div');
+		overlay.id        = 'menu-nav-overlay';
+		overlay.className = 'menu-nav-overlay';
+
+		const panel = document.createElement('div');
+		panel.id        = 'menu-nav-panel';
+		panel.className = 'menu-nav-panel';
+
+		panel.innerHTML = `
+			<div class="menu-nav-glow"></div>
+			<div class="menu-nav-header">
+				<span class="menu-nav-marca">LÉVITAD</span>
+			</div>
+			<nav class="menu-nav-links">
+				<a class="menu-nav-item" href="#"><span class="menu-nav-num">01</span><span class="menu-nav-text">Productos</span><span class="menu-nav-arrow">→</span></a>
+				<a class="menu-nav-item" href="#"><span class="menu-nav-num">02</span><span class="menu-nav-text">Colecciones</span><span class="menu-nav-arrow">→</span></a>
+				<a class="menu-nav-item" href="#"><span class="menu-nav-num">03</span><span class="menu-nav-text">Encargues</span><span class="menu-nav-arrow">→</span></a>
+				<a class="menu-nav-item" href="#"><span class="menu-nav-num">04</span><span class="menu-nav-text">Contacto</span><span class="menu-nav-arrow">→</span></a>
+			</nav>
+			<div class="menu-nav-footer">
+				<p class="menu-nav-tagline">Prendas que elevan.</p>
+			</div>
+		`;
+
+		document.body.appendChild(overlay);
+		document.body.appendChild(panel);
+
+		overlay.addEventListener('click', cerrarMenu);
+
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			overlay.classList.add('is-active');
+			panel.classList.add('is-active');
+		}));
+	}
+
+	function cerrarMenu() {
+		menuBtn.classList.remove('is-open');
+		const overlay = document.getElementById('menu-nav-overlay');
+		const panel   = document.getElementById('menu-nav-panel');
+		if (overlay) { overlay.classList.add('is-closing'); setTimeout(() => overlay.remove(), 380); }
+		if (panel)   { panel.classList.add('is-closing');   setTimeout(() => panel.remove(),   380); }
+	}
+
+	menuBtn.addEventListener('click', () => {
+		if (menuBtn.classList.contains('is-open')) cerrarMenu();
+		else abrirMenu();
+	});
 }
 
 /* ─── INIT ─── */
@@ -695,9 +943,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		);
 
 		if (filterBtn) {
-			filterBtn.addEventListener('click', () => console.log('Filtros avanzados en desarrollo'));
+			filterBtn.addEventListener('click', abrirModalFiltros);
 		}
 	}
+
+	initMenuHamburguesa();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
 	if (carritoOverlay)  carritoOverlay.addEventListener('click',  cerrarCarrito);
@@ -750,14 +1000,26 @@ if (header) {
 		if (isCollapsed)     headerWasCollapsed = true;
 		else if (isExpanded) headerWasCollapsed = false;
 
-		if (searchBar && searchInput && searchSubmitBtn &&
-			searchBar.classList.contains('is-active') &&
-			!searchBar.classList.contains('is-closing')) {
-			if (headerWasCollapsed && progreso <= 0.5) {
-				cerrarBuscador(searchBar, searchInput, searchSubmitBtn);
-				headerWasCollapsed = false;
-			} else if (!headerWasCollapsed && progreso > 0.2) {
-				cerrarBuscador(searchBar, searchInput, searchSubmitBtn);
+		/* ── Buscador: sigue la animación del header ──
+		   Cuando el header se colapsa (progreso > 0.2) la barra
+		   se esconde hacia arriba con la clase is-scroll-hidden.
+		   Cuando vuelve arriba (progreso <= 0.1) reaparece.
+		   Si el usuario la tenía activa y hace scroll, se cierra
+		   limpiamente antes de ocultarla. */
+		if (searchBar) {
+			const baraActiva  = searchBar.classList.contains('is-active');
+			const baraCerrando = searchBar.classList.contains('is-closing');
+
+			if (progreso > 0.2) {
+				// Header colapsando → ocultar barra
+				if (baraActiva && !baraCerrando) {
+					// Cerrar limpiamente (borra búsqueda) y luego ocultar
+					cerrarBuscador(searchBar, searchInput, searchSubmitBtn);
+				}
+				searchBar.classList.add('is-scroll-hidden');
+			} else {
+				// Header expandido → barra disponible de nuevo
+				searchBar.classList.remove('is-scroll-hidden');
 			}
 		}
 	};
