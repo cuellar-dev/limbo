@@ -19,7 +19,7 @@
 	{
 		"nombre": "Jogger Eclipse Negro",
 		"precio": 36900,
-		"imagen": "imagenes/IMG-20230320-WA0178.jpg",
+		"imagen": "../imagenes/img.webp",
 		"categoria": "pantalon",
 		"tags": ["jogger", "basico", "comodo", "streetwear"],
 		"detalles": {
@@ -87,7 +87,7 @@
 	{
 		"nombre": "Pantalon Cargo Noche",
 		"precio": 42900,
-		"imagen": "imagenes/IMG-20230320-WA0178.jpg",
+		"imagen": "../imagenes/img.webp",
 		"categoria": "pantalon",
 		"tags": ["cargo", "bolsillos", "urbano", "resistente"],
 		"detalles": {
@@ -138,7 +138,7 @@
 	{
 		"nombre": "Short Urbano Crema",
 		"precio": 19900,
-		"imagen": "imagenes/IMG-20230320-WA0178.jpg",
+		"imagen": "../imagenes/img.webp",
 		"categoria": "short",
 		"tags": ["short", "verano", "ligero", "diario"],
 		"detalles": {
@@ -189,7 +189,7 @@
 	{
 		"nombre": "Chaleco Niebla Técnica",
 		"precio": 51900,
-		"imagen": "imagenes/IMG-20230320-WA0178.jpg",
+		"imagen": "../imagenes/img.webp",
 		"categoria": "chaleco",
 		"tags": ["chaleco", "ligero", "capas", "tecnico"],
 		"detalles": {
