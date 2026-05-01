@@ -4,6 +4,9 @@
 		"precio": 48900,
 		"imagen": "imagenes/sudadera.jpg",
 		"categoria": "buzo",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["oversize", "unisex", "urbano", "premium"],
 		"detalles": {
 			"Talla": "XL",
@@ -21,6 +24,9 @@
 		"precio": 36900,
 		"imagen": "../imagenes/img.webp",
 		"categoria": "pantalon",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["jogger", "basico", "comodo", "streetwear"],
 		"detalles": {
 			"Talla": "L",
@@ -38,6 +44,9 @@
 		"precio": 21900,
 		"imagen": "imagenes/images.jpg",
 		"categoria": "remera",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["remera", "liviana", "daily", "premium"],
 		"detalles": {
 			"Talla": "M",
@@ -55,6 +64,9 @@
 		"precio": 55900,
 		"imagen": "imagenes/sudadera.jpg",
 		"categoria": "campera",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["campera", "abrigo", "capucha", "premium"],
 		"detalles": {
 			"Talla": "XL",
@@ -72,6 +84,9 @@
 		"precio": 17900,
 		"imagen": "imagenes/images.jpg",
 		"categoria": "top",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["top", "liviano", "fresco", "verano"],
 		"detalles": {
 			"Talla": "S",
@@ -89,6 +104,9 @@
 		"precio": 42900,
 		"imagen": "../imagenes/img.webp",
 		"categoria": "pantalon",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["cargo", "bolsillos", "urbano", "resistente"],
 		"detalles": {
 			"Talla": "L",
@@ -106,6 +124,9 @@
 		"precio": 46500,
 		"imagen": "imagenes/sudadera.jpg",
 		"categoria": "buzo",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["canguro", "capucha", "street", "algodon"],
 		"detalles": {
 			"Talla": "M",
@@ -123,6 +144,9 @@
 		"precio": 39900,
 		"imagen": "imagenes/images.jpg",
 		"categoria": "camisa",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["camisa", "boxy", "minimal", "capas"],
 		"detalles": {
 			"Talla": "L",
@@ -140,6 +164,9 @@
 		"precio": 19900,
 		"imagen": "../imagenes/img.webp",
 		"categoria": "short",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["short", "verano", "ligero", "diario"],
 		"detalles": {
 			"Talla": "M",
@@ -157,6 +184,9 @@
 		"precio": 68900,
 		"imagen": "imagenes/sudadera.jpg",
 		"categoria": "conjunto",
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"tags": ["conjunto", "relajado", "premium", "nuevo"],
 		"detalles": {
 			"Talla": "XL",
@@ -175,6 +205,9 @@
 		"imagen": "imagenes/images.jpg",
 		"categoria": "remera",
 		"tags": ["remera", "basica", "verde", "soft"],
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"detalles": {
 			"Talla": "S",
 			"Color": "Verde oliva",
@@ -192,6 +225,9 @@
 		"imagen": "../imagenes/img.webp",
 		"categoria": "chaleco",
 		"tags": ["chaleco", "ligero", "capas", "tecnico"],
+		"ventas": 50, 
+    	"interacciones": 120,
+    	"pesoManual": 5,
 		"detalles": {
 			"Talla": "L",
 			"Color": "Gris humo",

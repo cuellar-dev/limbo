@@ -11,7 +11,7 @@ const MENSAJE_SIN_RESULTADOS       = 'No se encontraron resultados.';
 const STORAGE_KEY_CARRITO          = 'levitad-carrito';
 const STORAGE_KEY_CARRITO_ENCARGUE = 'levitad-carrito-encargue';
 const STORAGE_KEY_MODAL_ENCARGUE   = 'levitad-modal-encargue-visto';
-const WHATSAPP_OWNER_NUMBER        = '5490000000000';
+const WHATSAPP_OWNER_NUMBER        = '+5359271359';
 
 /* ─── ICONOS ─── */
 const iconoCarrito = `
@@ -113,21 +113,20 @@ const CARRITO_TEXTOS = {
 	stack: {
 		titulo:    'Tu Pedido',
 		subtitulo: 'Productos en stock',
-		vacio:     'Aún no agregaste nada.\nExplorá el catálogo y sumá lo que te guste.',
+		vacio:     'Aún no agregaste nada.\nExplora el catálogo y suma lo que te guste.',
 		vacioBadge:'🛍️',
 		whatsapp:  'Enviar Pedido por WhatsApp',
-		nota:      'Te contactamos para coordinar entrega y pago.'
+		nota:      'Escribenos para coordinar pago y entrega'
 	},
 	encargue: {
-		titulo:    'Tu Encargue',
-		subtitulo: 'Piezas a medida',
-		vacio:     'Aún no elegiste nada para encargar.\nSeleccioná las prendas que querés personalizar.',
+		titulo:    'Listo para Encargar ?',
+		subtitulo: 'Alimente su Outfit',
+		vacio:     'Aún no elegiste nada para encargar.\nSelecciona las prendas que quiera encargar',
 		vacioBadge:'✦',
 		whatsapp:  'Enviar Encargue por WhatsApp',
-		nota:      'Coordinamos cada detalle juntos antes de producir.'
+		nota:      'Coordinamos cada detalle juntos.'
 	}
 };
-
 function actualizarTextosPanelCarrito() {
 	const modo   = modoActual();
 	const textos = CARRITO_TEXTOS[modo];
@@ -437,12 +436,43 @@ function renderizarProductos(productos, opciones = {}) {
 	inicializarMasonry();
 }
 
+// --------- LA FUNCION DEL ALGORITMO DE PESO ----------//
+//cogemos los productos que tenemos y lo ordenamos por un peso que le asignamos por sus ventas, sus interacciones y por el peso que le asignemos//
+function ordenarPorPesoAleatorio(productos) {
+	// aqui cogemos las interacciones que teniamos guardadas en el localstorage, si no habian, tomamos un arreglo vacio//
+
+	const interaccionesLocales = JSON.parse(localStorage.getItem('levitad-interacciones') || '{}');
+	// Aqui creamos un nuevo arreglo de productos creandole la propiedad peso, que se rige por las ventas y eso//
+	const productosConPeso = productos.map(producto => {
+		const ventas = producto.ventas || 0;
+		const pesoManual = producto.pesoManual || 0;
+		
+		const interaccionesGlobales = producto.interacciones || 0;
+		const interaccionesPersonales = interaccionesLocales[producto.nombre] || 0;
+		const interaccionesTotales = interaccionesGlobales + interaccionesPersonales;
+
+		// LA FORMULA DEL PESO//
+		const pesoTotal = (ventas*3) + (interaccionesTotales*2) + (pesoManual*5);
+		const bloquePeso = Math.floor(pesoTotal / 10) * 10;
+		const pesoFinal = bloquePeso + Math.random() // Agrega un componente aleatorio dentro del bloque de peso
+		//aqui retornamos todo el arrgelo original de producto pero con la propiedad _pesoOrdenamiento con el valor de pesoFinal//
+		return { ...producto, _pesoOrdenamiento: pesoFinal };
+	});
+	// Luego aqui usamos lo que nos devolvio el .map, y lo ordenammos de mayor a menor basandonos en el peso que tendrian asignados cada uno //
+	return productosConPeso.sort((a, b) => b._pesoOrdenamiento - a._pesoOrdenamiento);
+}
+
+
+
+
 async function cargarProductos() {
 	try {
 		const response = await fetch('datos/datos.json');
 		if (!response.ok) throw new Error(`No se pudo leer datos.json (${response.status})`);
-		const productos       = await response.json();
-		estadoTienda.productos = Array.isArray(productos) ? productos : [];
+		const productos = await response.json();
+		const productosSeguros = Array.isArray(productos) ? productos : [];
+		estadoTienda.productos = ordenarPorPesoAleatorio(productosSeguros);
+
 		renderizarProductos(estadoTienda.productos);
 	} catch (error) {
 		console.error('Error cargando productos:', error);
@@ -624,7 +654,17 @@ if (switchContainer) {
 const modal     = document.getElementById('modal-producto');
 const btnCerrar = document.querySelector('.btn-cerrar-modal');
 
+function registrarInteraccion(nombreProducto) {
+	const key = 'levitad-interacciones';
+	const interacciones = JSON.parse(localStorage.getItem(key) || '{}');
+	// Sumamos 1 a la interacción de este producto
+	interacciones[nombreProducto] = (interacciones[nombreProducto] || 0) + 1;
+	localStorage.setItem(key, JSON.stringify(interacciones));
+}
+
 function abrirDetalles(datos) {
+	registrarInteraccion(datos.nombre);
+
 	estadoTienda.productoDetalleActual = datos;
 	document.getElementById('modal-titulo').innerText = datos.nombre;
 	document.getElementById('modal-precio').innerText = formatPrecio(datos.precio);
@@ -868,27 +908,30 @@ function initMenuHamburguesa() {
 			<div class="menu-nav-glow"></div>
 			<div class="menu-nav-header">
 				<span class="menu-nav-marca">LÉVITAD</span>
+				<p class="menu-nav-tagline">Prendas que elevan.</p>
 			</div>
 			<nav class="menu-nav-links">
 				<a class="menu-nav-item" href="#"><span class="menu-nav-num">01</span><span class="menu-nav-text">Productos</span><span class="menu-nav-arrow">→</span></a>
 				<a class="menu-nav-item" href="#"><span class="menu-nav-num">02</span><span class="menu-nav-text">Colecciones</span><span class="menu-nav-arrow">→</span></a>
-				<a class="menu-nav-item" href="#"><span class="menu-nav-num">03</span><span class="menu-nav-text">Encargues</span><span class="menu-nav-arrow">→</span></a>
+				<a class="menu-nav-item" href="#"><span class="menu-nav-num">03</span><span class="menu-nav-text">Mis Encargos</span><span class="menu-nav-arrow">→</span></a>
 				<a class="menu-nav-item" href="#"><span class="menu-nav-num">04</span><span class="menu-nav-text">Contacto</span><span class="menu-nav-arrow">→</span></a>
 			</nav>
 			<div class="menu-nav-footer">
-				<p class="menu-nav-tagline">Prendas que elevan.</p>
+				<p class="menu-nav-tagline">Prod by La Casita</p>
 			</div>
 		`;
-
+		
 		document.body.appendChild(overlay);
 		document.body.appendChild(panel);
-
 		overlay.addEventListener('click', cerrarMenu);
-
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			overlay.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
+		let navItem = document.querySelectorAll(".menu-nav-item");
+		navItem.forEach(item => {
+			item.addEventListener('contextmenu', event => event.preventDefault());
+			});
 	}
 
 	function cerrarMenu() {

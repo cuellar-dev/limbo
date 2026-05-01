@@ -1954,12 +1954,6 @@ body.is-encargue .etiquetas {
 /* ─────────────────────────────────────────────
    2. BUSCADOR — margen inferior cuando está activo
 ───────────────────────────────────────────── */
-.search-bar-container.is-active + .switch-container,
-.search-bar-container.is-active ~ .contenedor,
-.search-bar-container.is-active ~ main {
-    /* El margen lo damos en el propio contenedor sticky */
-}
-
 /* Mejor: padding-bottom en el propio search bar cuando activo */
 .search-bar-container.is-active {
     padding-bottom: 8px;
@@ -2376,6 +2370,9 @@ body.is-encargue .menu-nav-glow {
     z-index: 1;
     padding: 54px 28px 28px;
     border-bottom: 1px solid rgba(202, 172, 71, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 body.is-encargue .menu-nav-header {
@@ -2384,18 +2381,16 @@ body.is-encargue .menu-nav-header {
 
 .menu-nav-marca {
     font-family: 'drink', sans-serif;
-    font-size: 11px;
+    font-size: 21px;
     letter-spacing: 5px;
     color: var(--acento-dorado);
     opacity: 0.7;
     text-transform: uppercase;
     transition: color 0.35s ease;
 }
-
 body.is-encargue .menu-nav-marca {
     color: var(--acento-encargue);
 }
-
 /* Links de navegación */
 .menu-nav-links {
     position: relative;
@@ -2405,7 +2400,6 @@ body.is-encargue .menu-nav-marca {
     flex-direction: column;
     padding: 16px 0;
 }
-
 .menu-nav-item {
     display: flex;
     align-items: center;
@@ -2417,8 +2411,10 @@ body.is-encargue .menu-nav-marca {
     -webkit-tap-highlight-color: transparent;
     position: relative;
     overflow: hidden;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
-
 .menu-nav-item::before {
     content: '';
     position: absolute;
@@ -2431,11 +2427,9 @@ body.is-encargue .menu-nav-marca {
     transition: transform 0.2s ease;
     transform-origin: bottom;
 }
-
 body.is-encargue .menu-nav-item::before {
     background: var(--acento-encargue);
 }
-
 .menu-nav-item:active {
     background: rgba(255, 255, 255, 0.04);
     padding-left: 34px;
