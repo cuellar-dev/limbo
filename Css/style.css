@@ -1107,6 +1107,8 @@ body.carrito-abierto {
     transform: scale(clamp(0.85, calc(0.85 + (0.15 * clamp(0, calc((var(--p) - 0.18) / 0.82), 1))), 1));
     transform-origin: center;
     transition: opacity 0.15s ease, transform 0.15s ease;
+    position: relative;
+    z-index: 2000;
 }
 
 #menu-hamb:hover {
