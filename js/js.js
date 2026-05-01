@@ -146,6 +146,7 @@ function renderizarCarrito() {
 	const lista = document.getElementById('carrito-lista');
 	const vacio = document.getElementById('carrito-vacio');
 	const total = document.getElementById('carrito-total');
+	const btnWhatsApp = document.getElementById('carrito-whatsapp');
 	if (!lista || !vacio || !total) return;
 
 	const carrito = carritoActivo();
@@ -155,6 +156,11 @@ function renderizarCarrito() {
 	if (!carrito.length) {
 		lista.innerHTML = '';
 		vacio.hidden    = false;
+		if(btnWhatsApp){
+			btnWhatsApp.disabled = true;
+			btnWhatsApp.style.opacity = "0.5"; // Opcional: para que se vea visualmente bloqueado
+			btnWhatsApp.style.cursor = "not-allowed";
+		}
 		// Texto de vacío personalizado por modo
 		vacio.innerHTML = `
 			<span class="carrito-vacio-icono">${textos.vacioBadge}</span>
@@ -162,6 +168,11 @@ function renderizarCarrito() {
 		`;
 	} else {
 		vacio.hidden    = true;
+		if (btnWhatsApp) {
+			btnWhatsApp.disabled = false;
+			btnWhatsApp.style.opacity = "1";
+			btnWhatsApp.style.cursor = "pointer";
+		}
 		lista.innerHTML = carrito.map((item, index) => `
 			<li class="carrito-item" data-carrito-index="${index}">
 				<img class="carrito-item-img" src="${item.imagen}" alt="${item.nombre}">
@@ -309,6 +320,7 @@ function construirMensajeWhatsApp() {
 }
 
 function enviarPedidoWhatsApp() {
+	if (carritoActivo().length === 0) return;
 	const url = `https://wa.me/${WHATSAPP_OWNER_NUMBER}?text=${encodeURIComponent(construirMensajeWhatsApp())}`;
 	window.open(url, '_blank', 'noopener,noreferrer');
 }
