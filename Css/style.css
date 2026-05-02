@@ -86,7 +86,6 @@ body {
     background-color: var(--fondo-oscuro);
     font-family: system-ui, -apple-system, sans-serif; 
     color: var(--texto-secundario);
-    height: 5000px;
     /* Degradado celestial: Luz azul noche arriba que se funde a negro puro abajo */
     background-image: radial-gradient(circle at top center, #1B2233 0%, #000000 50%);
     background-attachment: fixed;
@@ -446,8 +445,7 @@ body.is-encargue #menu-hamb g {
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
 .btn-anadir:active {
-    background-color: var(--acento-dorado); /* Se ilumina en dorado sólido al tocar */
-    color: var(--fondo-oscuro);
+
     transform: scale(0.98);
 }
 
@@ -719,17 +717,14 @@ svg.icono-transicion {
     transform: scale(0.95);
 }
 #header {
-    --h-grande: 30vh;
-    --h-pequena: 70px;
-    /* El alto varía según el scroll (--p) */
-    height: calc(var(--h-grande) - (var(--h-grande) - var(--h-pequena)) * var(--p));
-    min-height: var(--h-pequena);
+    height: 30vh;           /* JS actualiza en cada scroll */
+    min-height: 70px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: rgba(17, 21, 34, calc(0.85 + (0.15 * var(--p))));
+    background: rgba(17, 21, 34, 0.85);       /* JS ajusta la alpha */
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(202, 172, 71, calc(0.1 + (0.2 * var(--p))));
+    border-bottom: 1px solid rgba(202, 172, 71, 0.1); /* JS ajusta la alpha */
     position: sticky;
     top: 0;
     z-index: 100;
@@ -740,14 +735,13 @@ svg.icono-transicion {
 }
 .header-container {
     display: flex;
-    /* En scroll 0 es vertical, en scroll 1 es horizontal */
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
     position: relative;
-    padding-top: calc(6px + (10px * (1 - var(--p))));
-    padding-bottom: calc(10px + (18px * (1 - var(--p))));
+    padding-top: 16px;    /* JS interpola: 6px + 10*(1-p) */
+    padding-bottom: 28px; /* JS interpola: 10px + 18*(1-p) */
 }
 
 /* Transición del área del logo */
@@ -755,8 +749,7 @@ svg.icono-transicion {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Se mueve de arriba a la izquierda sutilmente */
-    transform: translateY(calc(24px * (1 - var(--p)))) translateX(calc(-25% * var(--p)));
+    transform: translateY(24px); /* JS interpola: translateY(24*(1-p)px) translateX(-25%*p) */
     transition: transform 0.1s linear;
     width: 100%;
 }
@@ -767,9 +760,9 @@ h1 {
     align-items: center;
     justify-content: center;
     width: fit-content;
-    font-size: calc(36px - (8px * var(--p)));
-    letter-spacing: calc(8px - (3px * var(--p)));
-    transform: translateX(calc(6px * (1 - var(--p))));
+    font-size: 36px;        /* JS interpola: 36 - 8*p px */
+    letter-spacing: 8px;   /* JS interpola: 8 - 3*p px */
+    transform: translateX(6px); /* JS interpola: translateX(6*(1-p)px) */
     transition: all 0.1s linear;
     isolation: isolate;
     z-index: 100;
@@ -809,7 +802,7 @@ h1 .logo-text {
     margin-top: 30px;
     display: flex;
     flex-wrap: wrap;
-    opacity: calc(1 - (var(--p) * 2.5)); /* Desaparece rápido */
+    opacity: 1; /* JS interpola: max(0, 1 - p*2.5) */
     visibility: hidden;
 }
 
@@ -857,8 +850,8 @@ h1 .logo-text {
     display: flex;
     align-items: center;
     gap: 15px;
-    opacity: clamp(0, calc((var(--p) - 0.18) / 0.82), 1);
-    transform: translateY(calc(-50% + (10px * (1 - clamp(0, calc((var(--p) - 0.18) / 0.82), 1))))) scale(clamp(0.92, calc(0.92 + (0.08 * clamp(0, calc((var(--p) - 0.18) / 0.82), 1))), 1));
+    opacity: 0;                               /* JS interpola: clamp(0,(p-0.18)/0.82,1) */
+    transform: translateY(-40%) scale(0.92); /* JS interpola con iconP */
     transform-origin: right center;
     transition: opacity 0.15s ease, transform 0.15s ease;
     pointer-events: none;
@@ -1103,10 +1096,10 @@ body.carrito-abierto {
     width: 50px;
     height: 50px;
     cursor: pointer;
-    opacity: clamp(0, calc((var(--p) - 0.18) / 0.82), 1);
-    transform: scale(clamp(0.85, calc(0.85 + (0.15 * clamp(0, calc((var(--p) - 0.18) / 0.82), 1))), 1));
+    opacity: 1;           /* el padre .iconos-container controla el fade-in */
+    transform: scale(1);  /* ídem */
     transform-origin: center;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    transition: transform 0.15s ease;
     position: relative;
     z-index: 2000;
 }
@@ -1139,6 +1132,7 @@ body.carrito-abierto {
     /* Ajustes del h1 cuando el header se recoge */
     #header.is-collapsed h1 {
         transform: translateX(0);
+        font-size: 30px;
     }
     #header.is-collapsed nav{
         display: none;
@@ -1548,7 +1542,7 @@ body.is-encargue .filter-btn:active {
 /* ─────────────────────────────────────────────
    1. BUSCADOR: sigue al header con el scroll
    La barra ahora vive dentro del flujo del header
-   y usa --p para desaparecer junto con él.
+   y desaparece junto con él vía la clase is-scroll-hidden.
 ───────────────────────────────────────────── */
 
 /* Sobreescribimos el posicionamiento fijo anterior */
@@ -2260,12 +2254,14 @@ body.is-encargue .filter-dot {
 #menu-hamb .bar-1,
 #menu-hamb .bar-2,
 #menu-hamb .bar-3 {
-    transform-origin: center;
+    /* Pivot en el centro exacto del viewport SVG (0 0 50 50) */
+    transform-origin: 25px 25px;
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease;
 }
 
 #menu-hamb.is-open .bar-1 {
-    transform: translateY(10px) rotate(45deg);
+    /* Centro de bar-1 está en y=17; necesita ir a y=25 → +8px */
+    transform: translateY(8px) rotate(45deg);
 }
 
 #menu-hamb.is-open .bar-2 {
@@ -2274,7 +2270,14 @@ body.is-encargue .filter-dot {
 }
 
 #menu-hamb.is-open .bar-3 {
-    transform: translateY(-10px) rotate(-45deg);
+    /* Centro de bar-3 está en y=37; necesita ir a y=25 → -12px */
+    transform: translateY(-12px) rotate(-45deg);
+}
+
+/* Cuando el menú lateral está abierto, liberar al header de su stacking context
+   para que el botón hamburguesa (z-index:2000) quede por encima del overlay y el panel */
+body.menu-open #header {
+    z-index: auto;
 }
 
 /* Overlay */
@@ -2503,3 +2506,350 @@ body.is-encargue .menu-nav-footer {
     letter-spacing: 0.5px;
     margin: 0;
 }
+/* ═══════════════════════════════════════════════════════════
+   FOOTER DEL MENÚ HAMBURGUESA
+   Pegá al final de style.css
+═══════════════════════════════════════════════════════════ */
+
+/* Reemplazamos el footer simple del menú */
+.menu-nav-footer {
+    position: relative;
+    z-index: 1;
+    padding: 20px 28px 32px;
+    border-top: 1px solid rgba(202, 172, 71, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+body.is-encargue .menu-nav-footer {
+    border-top-color: rgba(93, 114, 233, 0.12);
+}
+
+/* Slogan */
+.menu-nav-tagline {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    font-style: italic;
+    color: rgba(155, 164, 181, 0.45);
+    letter-spacing: 0.5px;
+    margin: 0 0 18px;
+}
+
+/* Redes sociales */
+.menu-nav-redes {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.menu-nav-red {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--texto-secundario);
+    font-family: 'drink', sans-serif;
+    font-size: 11px;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-nav-red svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: var(--acento-dorado);
+    transition: color 0.2s ease;
+}
+
+.menu-nav-red:active,
+.menu-nav-red:hover {
+    color: var(--texto-brillante);
+    border-color: rgba(202, 172, 71, 0.2);
+    background: rgba(202, 172, 71, 0.05);
+}
+
+body.is-encargue .menu-nav-red svg {
+    color: var(--acento-encargue);
+}
+body.is-encargue .menu-nav-red:active,
+body.is-encargue .menu-nav-red:hover {
+    border-color: rgba(93, 114, 233, 0.2);
+    background: rgba(93, 114, 233, 0.05);
+}
+
+/* Divider */
+.menu-nav-divider {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(202, 172, 71, 0.18),
+        transparent
+    );
+    margin-bottom: 16px;
+}
+
+body.is-encargue .menu-nav-divider {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(93, 114, 233, 0.2),
+        transparent
+    );
+}
+
+/* Créditos */
+.menu-nav-creditos {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.menu-nav-dev {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 11px;
+    color: rgba(155, 164, 181, 0.4);
+    line-height: 1.4;
+}
+
+.menu-nav-dev-link {
+    color: var(--acento-dorado);
+    text-decoration: none;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+.menu-nav-dev-link:hover { opacity: 1; }
+
+body.is-encargue .menu-nav-dev-link {
+    color: var(--acento-encargue);
+}
+
+.menu-nav-copy {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 9.5px;
+    color: rgba(155, 164, 181, 0.28);
+    letter-spacing: 0.2px;
+    line-height: 1.4;
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   FOOTER DE PÁGINA
+═══════════════════════════════════════════════════════════ */
+.site-footer {
+    position: relative;
+    overflow: hidden;
+    margin-top: 80px;
+    /* Borde superior como línea de luz */
+    border-top: 1px solid rgba(202, 172, 71, 0.12);
+    background: linear-gradient(
+        to bottom,
+        rgba(17, 21, 34, 0.6) 0%,
+        rgba(0, 0, 0, 0.95) 100%
+    );
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Brillo ambiental superior */
+.site-footer-glow {
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 200px;
+    background: radial-gradient(
+        ellipse,
+        rgba(202, 172, 71, 0.08) 0%,
+        transparent 68%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+body.is-encargue .site-footer-glow {
+    background: radial-gradient(
+        ellipse,
+        rgba(93, 114, 233, 0.08) 0%,
+        transparent 68%
+    );
+}
+
+/* Contenido principal del footer */
+.site-footer-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    align-items: center;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .site-footer-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
+/* Columna marca */
+.footer-col-marca {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.footer-logo {
+    font-family: 'drink', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 8px;
+    color: var(--texto-brillante);
+    margin: 0;
+    text-shadow: 0 2px 12px rgba(202, 172, 71, 0.2);
+}
+
+.footer-slogan {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(155, 164, 181, 0.45);
+    letter-spacing: 0.5px;
+    margin: 0;
+}
+
+/* Columna redes */
+.footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.footer-col-titulo {
+    font-family: 'drink', sans-serif;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--acento-dorado);
+    opacity: 0.6;
+    margin: 0;
+}
+
+body.is-encargue .footer-col-titulo {
+    color: var(--acento-encargue);
+}
+
+.footer-redes {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+@media (min-width: 640px) {
+    .footer-redes { justify-content: flex-start; }
+}
+
+/* Cada link de red social */
+.footer-red {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--texto-secundario);
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 9px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(202, 172, 71, 0.14);
+    background: rgba(255, 255, 255, 0.02);
+    transition: color 0.22s ease, border-color 0.22s ease, background 0.22s ease, transform 0.18s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.footer-red svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--acento-dorado);
+    transition: color 0.22s ease;
+}
+
+.footer-red:hover,
+.footer-red:active {
+    color: var(--texto-brillante);
+    border-color: rgba(202, 172, 71, 0.35);
+    background: rgba(202, 172, 71, 0.06);
+    transform: translateY(-2px);
+}
+
+body.is-encargue .footer-red svg        { color: var(--acento-encargue); }
+body.is-encargue .footer-red:hover,
+body.is-encargue .footer-red:active     {
+    border-color: rgba(93, 114, 233, 0.35);
+    background: rgba(93, 114, 233, 0.06);
+}
+
+/* Barra inferior */
+.site-footer-bottom {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 24px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    text-align: center;
+}
+
+@media (min-width: 640px) {
+    .site-footer-bottom {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+}
+
+.footer-copy {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 10px;
+    color: rgba(155, 164, 181, 0.3);
+    letter-spacing: 0.3px;
+}
+
+.footer-dev {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 10px;
+    color: rgba(155, 164, 181, 0.3);
+}
+
+.footer-dev-link {
+    color: var(--acento-dorado);
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+.footer-dev-link:hover { opacity: 1; }
+
+body.is-encargue .footer-dev-link { color: var(--acento-encargue); }

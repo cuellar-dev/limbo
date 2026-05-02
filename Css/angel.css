@@ -1,6 +1,5 @@
 /* ═══════════════════════════════════════════════
    ÁNGEL — mascota pixel art de Lévitad
-   Pegá al final de style.css
 ═══════════════════════════════════════════════ */
 
 /* ── Animaciones ── */
@@ -45,27 +44,50 @@
 /* ── Contenedor base ── */
 .angel-wrap {
     position: fixed;
-    z-index: 500;
+    /* Por encima de todos los paneles (carrito 1100, menu 1210) */
+    z-index: 1300;
     pointer-events: none;
-    /* tamaño del SVG interno: 32×56px × escala 2 = 64×112 */
     width: 64px;
     height: 112px;
-    /* oculto por defecto, JS lo posiciona y muestra */
+
+    /* Variable que cada clase pos-* puede sobrescribir */
+    --pos-x: 0px;
+    --pos-y: 0px;
+
     opacity: 0;
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    visibility: hidden;
+    /* Al ocultar: visibility espera al final de la transición */
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s linear 0.4s,
+                transform  0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(0.88);
 }
 
 .angel-wrap.is-visible {
-    opacity: 1;
+    opacity: .7;
+    visibility: visible;
+    /* Al mostrar: visibility es inmediata */
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s linear 0s,
+                transform  0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: scale(1);
 }
 
-/* posiciones por contexto — JS añade la clase */
-.angel-wrap.pos-catalog   { bottom: 24px; right: 24px; }
-.angel-wrap.pos-search    { bottom: 24px; left:  24px; }
-.angel-wrap.pos-filtros   { bottom: 24px; left:  24px; }
-.angel-wrap.pos-carrito   { bottom: 80px; right: 24px; }
-.angel-wrap.pos-empty     { bottom: 50%; right: 50%; transform: translate(50%,50%); }
-.angel-wrap.pos-idle      { bottom: 24px; right: 24px; }
+/* ── Posiciones por contexto ── */
+.angel-wrap.pos-catalog { bottom: 24px; right: 24px; }
+.angel-wrap.pos-search  { bottom: 24px; left:  24px; }
+.angel-wrap.pos-filtros { bottom: 24px; left:  24px; }
+/* El carrito abre a la derecha → ángel aparece a la izquierda para no quedar tapado */
+.angel-wrap.pos-carrito { bottom: 24px; right: 24px;}
+.angel-wrap.pos-idle    { bottom: 24px; right: 24px; }
+
+/* pos-empty: centrado en pantalla. Usamos margin-left/top para no tocar transform */
+.angel-wrap.pos-empty {
+    bottom: auto;
+    right:  auto;
+    top:    calc(50% - 56px);   /* 56px = altura/2 del elemento */
+    left:   calc(50% - 32px);   /* 32px = ancho/2 del elemento  */
+}
 
 /* ── SVG del ángel ── */
 .angel-svg {
@@ -74,54 +96,60 @@
     image-rendering: pixelated;
     image-rendering: crisp-edges;
     overflow: visible;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+    position: relative;
+    z-index: 200;
 }
 
-/* ── Partes animadas ── */
-.angel-halo   { animation: angel-halo  2.2s ease-in-out infinite; transform-origin: 16px 4px; }
-.angel-wingL  { animation: angel-wing  1.5s ease-in-out infinite; transform-origin: 11px 26px; }
-.angel-wingR  { animation: angel-wing  1.5s ease-in-out infinite reverse; transform-origin: 21px 26px; }
-.angel-eyes   { animation: angel-blink 3.8s ease-in-out infinite; transform-origin: 16px 16px; }
+/* ── Partes siempre animadas ── */
+.angel-halo  { animation: angel-halo  2.2s ease-in-out infinite; transform-origin: 16px 4px; }
+.angel-wingL { animation: angel-wing  1.5s ease-in-out infinite;         transform-origin: 11px 26px; }
+.angel-wingR { animation: angel-wing  1.5s ease-in-out infinite reverse; transform-origin: 21px 26px; }
+.angel-eyes  { animation: angel-blink 3.8s ease-in-out infinite; transform-origin: 16px 16px; }
 
-/* ── Estilos por estado ── */
+/* ── Animaciones por estado (solo cuando es visible) ── */
 
-/* Idle: flota suave */
-.angel-state-idle .angel-body {
+.angel-wrap.is-visible.angel-state-idle .angel-main-container {
     animation: angel-float 2.8s ease-in-out infinite;
 }
 
-/* Catálogo: flota con paso corto */
-.angel-state-walk .angel-body {
+.angel-wrap.is-visible.angel-state-walk .angel-main-container {
     animation: angel-float 0.6s ease-in-out infinite;
 }
 
-/* Buscador: cabeza se mueve */
-.angel-state-search .angel-head {
+.angel-wrap.is-visible.angel-state-search .angel-main-container {
+    animation: angel-float 2.8s ease-in-out infinite;
+}
+.angel-wrap.is-visible.angel-state-search .angel-head {
     animation: angel-look 2s ease-in-out infinite;
     transform-origin: 16px 17px;
 }
-.angel-state-search .angel-body {
-    animation: angel-float 2.8s ease-in-out infinite;
-}
 
-/* Filtros: cuerpo se sacude */
-.angel-state-filter .angel-body {
+.angel-wrap.is-visible.angel-state-filter .angel-main-container {
     animation: angel-shake 0.6s ease-in-out infinite;
     transform-origin: 16px 32px;
 }
 
-/* Carrito: salta de alegría */
-.angel-state-cart .angel-body {
+.angel-wrap.is-visible.angel-state-cart .angel-main-container {
     animation: angel-jump 0.8s ease-in-out infinite;
 }
-.angel-state-cart .angel-star-l { animation: angel-star 0.8s ease-in-out infinite 0s; }
-.angel-state-cart .angel-star-r { animation: angel-star 0.8s ease-in-out infinite 0.2s; }
-.angel-state-cart .angel-star-t { animation: angel-star 0.8s ease-in-out infinite 0.4s; }
+.angel-wrap.is-visible.angel-state-cart .angel-star-l { animation: angel-star 0.8s ease-in-out infinite 0.0s; }
+.angel-wrap.is-visible.angel-state-cart .angel-star-r { animation: angel-star 0.8s ease-in-out infinite 0.2s; }
+.angel-wrap.is-visible.angel-state-cart .angel-star-t { animation: angel-star 0.8s ease-in-out infinite 0.4s; }
 
-/* Sin resultados: duerme */
-.angel-state-empty .angel-body {
+.angel-wrap.is-visible.angel-state-empty .angel-body {
     animation: angel-float 3.5s ease-in-out infinite;
-    opacity: 0.7;
+    opacity: 0.8;
 }
-.angel-state-empty .angel-zzz1 { animation: angel-zzz 1.8s ease-in-out infinite 0s; }
-.angel-state-empty .angel-zzz2 { animation: angel-zzz 1.8s ease-in-out infinite 0.6s; }
-.angel-state-empty .angel-halo { opacity: 0.4; }
+.angel-wrap.is-visible.angel-state-empty .angel-zzz1 { animation: angel-zzz 1.8s ease-in-out infinite 0.0s; }
+.angel-wrap.is-visible.angel-state-empty .angel-zzz2 { animation: angel-zzz 1.8s ease-in-out infinite 0.6s; }
+.angel-wrap.is-visible.angel-state-empty .angel-halo  { opacity: 0.5; }
+
+.angel-lupa-vidrio {
+    fill: rgba(202, 172, 71, 0.2); /* Un toque dorado transparente */
+    stroke-dasharray: 40;
+    stroke-dashoffset: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 101;
+}

@@ -415,23 +415,27 @@ function actualizarBotonBusqueda(boton) {
 	if (boton) boton.setAttribute('aria-label', 'Limpiar búsqueda');
 }
 
+let _searchCloseTimer = null;
+
 function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
-	searchBar.classList.remove('is-closing', 'is-header-hidden');
+	clearTimeout(_searchCloseTimer);
+	_searchCloseTimer = null;
+	searchBar.classList.remove('is-closing', 'is-header-hidden', 'is-scroll-hidden');
 	searchBar.classList.add('is-active');
 	actualizarBotonBusqueda(searchSubmitBtn);
 	setTimeout(() => searchInput.focus(), 150);
 }
 
 function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
+	clearTimeout(_searchCloseTimer);
 	searchBar.classList.add('is-closing');
 	searchInput.value = '';
 	filtrarProductos('');
 	searchInput.blur();
-	const fin = () => {
+	_searchCloseTimer = setTimeout(() => {
 		searchBar.classList.remove('is-active', 'is-closing');
-		searchBar.removeEventListener('transitionend', fin);
-	};
-	searchBar.addEventListener('transitionend', fin);
+		_searchCloseTimer = null;
+	}, 420); // mayor que la transición más larga (380ms)
 }
 
 function renderizarProductos(productos, opciones = {}) {
@@ -900,6 +904,14 @@ function cerrarModalFiltros() {
 }
 
 /* ── Menu hamburguesa ── */
+/* ═══════════════════════════════════════════════════════════
+   PATCH — Menú hamburguesa con footer premium
+   + Footer de página
+
+   En tu js.js, reemplazá la función initMenuHamburguesa()
+   completa con esta versión.
+═══════════════════════════════════════════════════════════ */
+
 function initMenuHamburguesa() {
 	const menuBtn = document.getElementById('menu-hamb');
 	if (!menuBtn) return;
@@ -908,9 +920,9 @@ function initMenuHamburguesa() {
 		if (document.getElementById('menu-nav-panel')) return;
 		menuBtn.classList.add('is-open');
 
-		const overlay = document.createElement('div');
-		overlay.id        = 'menu-nav-overlay';
-		overlay.className = 'menu-nav-overlay';
+		const ov = document.createElement('div');
+		ov.id        = 'menu-nav-overlay';
+		ov.className = 'menu-nav-overlay';
 
 		const panel = document.createElement('div');
 		panel.id        = 'menu-nav-panel';
@@ -918,46 +930,178 @@ function initMenuHamburguesa() {
 
 		panel.innerHTML = `
 			<div class="menu-nav-glow"></div>
+
+			<!-- MARCA -->
 			<div class="menu-nav-header">
 				<span class="menu-nav-marca">LÉVITAD</span>
-				<p class="menu-nav-tagline">Prendas que elevan.</p>
 			</div>
+
+			<!-- LINKS -->
 			<nav class="menu-nav-links">
-				<a class="menu-nav-item" href="#"><span class="menu-nav-num">01</span><span class="menu-nav-text">Productos</span><span class="menu-nav-arrow">→</span></a>
-				<a class="menu-nav-item" href="#"><span class="menu-nav-num">02</span><span class="menu-nav-text">Colecciones</span><span class="menu-nav-arrow">→</span></a>
-				<a class="menu-nav-item" href="#"><span class="menu-nav-num">03</span><span class="menu-nav-text">Mis Encargos</span><span class="menu-nav-arrow">→</span></a>
-				<a class="menu-nav-item" href="#"><span class="menu-nav-num">04</span><span class="menu-nav-text">Contacto</span><span class="menu-nav-arrow">→</span></a>
+				<a class="menu-nav-item" href="#">
+					<span class="menu-nav-num">01</span>
+					<span class="menu-nav-text">Productos</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item" href="#">
+					<span class="menu-nav-num">02</span>
+					<span class="menu-nav-text">Colecciones</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item" href="#">
+					<span class="menu-nav-num">03</span>
+					<span class="menu-nav-text">Encargues</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item" href="#">
+					<span class="menu-nav-num">04</span>
+					<span class="menu-nav-text">Contacto</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
 			</nav>
-			<div class="menu-nav-footer">
-				<p class="menu-nav-tagline">Prod by La Casita</p>
-			</div>
+
+			<!-- FOOTER DEL MENÚ -->
+			<footer class="menu-nav-footer">
+
+				<!-- Slogan -->
+				<p class="menu-nav-tagline">Prendas que elevan.</p>
+
+				<!-- Redes sociales -->
+				<div class="menu-nav-redes">
+					<a href="https://instagram.com/levitad" target="_blank" rel="noopener noreferrer"
+					   class="menu-nav-red" aria-label="Instagram">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.6"/>
+							<circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>
+							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+						</svg>
+						<span>Instagram</span>
+					</a>
+					<a href="https://tiktok.com/@levitad" target="_blank" rel="noopener noreferrer"
+					   class="menu-nav-red" aria-label="TikTok">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<span>TikTok</span>
+					</a>
+					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
+					   class="menu-nav-red" aria-label="WhatsApp">
+						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.418A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+							<path d="M8.5 9.5c.5 1 1.5 3 3.5 4s3-1 3-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+						</svg>
+						<span>WhatsApp</span>
+					</a>
+				</div>
+
+				<!-- Divider -->
+				<div class="menu-nav-divider"></div>
+
+				<!-- Créditos -->
+				<div class="menu-nav-creditos">
+					<span class="menu-nav-dev">
+						Hecho con ✦ por
+						<a href="#" class="menu-nav-dev-link">La Casita</a>
+					</span>
+					<span class="menu-nav-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
+				</div>
+
+			</footer>
 		`;
-		
-		document.body.appendChild(overlay);
+
+		document.body.appendChild(ov);
 		document.body.appendChild(panel);
-		overlay.addEventListener('click', cerrarMenu);
+		document.body.classList.add('carrito-abierto', 'menu-open');
+
+		ov.addEventListener('click', cerrarMenu);
 		requestAnimationFrame(() => requestAnimationFrame(() => {
-			overlay.classList.add('is-active');
+			ov.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
-		let navItem = document.querySelectorAll(".menu-nav-item");
-		navItem.forEach(item => {
-			item.addEventListener('contextmenu', event => event.preventDefault());
-			});
 	}
 
 	function cerrarMenu() {
 		menuBtn.classList.remove('is-open');
-		const overlay = document.getElementById('menu-nav-overlay');
-		const panel   = document.getElementById('menu-nav-panel');
-		if (overlay) { overlay.classList.add('is-closing'); setTimeout(() => overlay.remove(), 380); }
-		if (panel)   { panel.classList.add('is-closing');   setTimeout(() => panel.remove(),   380); }
+		document.body.classList.remove('carrito-abierto', 'menu-open');
+		const ov    = document.getElementById('menu-nav-overlay');
+		const panel = document.getElementById('menu-nav-panel');
+		if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
+		if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
 	}
 
-	menuBtn.addEventListener('click', () => {
-		if (menuBtn.classList.contains('is-open')) cerrarMenu();
-		else abrirMenu();
-	});
+	menuBtn.addEventListener('click', () =>
+		menuBtn.classList.contains('is-open') ? cerrarMenu() : abrirMenu()
+	);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Footer de página — se inyecta dinámicamente al cargar.
+   Llamá initFooter() dentro de DOMContentLoaded.
+═══════════════════════════════════════════════════════════ */
+function initFooter() {
+	// Evitar duplicados
+	if (document.getElementById('site-footer')) return;
+
+	const footer = document.createElement('footer');
+	footer.id        = 'site-footer';
+	footer.className = 'site-footer';
+
+	footer.innerHTML = `
+		<div class="site-footer-glow"></div>
+
+		<div class="site-footer-inner">
+
+			<!-- Columna marca -->
+			<div class="footer-col footer-col-marca">
+				<h2 class="footer-logo">LÉVITAD</h2>
+				<p class="footer-slogan">Prendas que elevan.</p>
+			</div>
+
+			<!-- Columna redes -->
+			<div class="footer-col footer-col-redes">
+				<p class="footer-col-titulo">Seguinos</p>
+				<div class="footer-redes">
+					<a href="https://instagram.com/levitad" target="_blank" rel="noopener noreferrer"
+					   class="footer-red" aria-label="Instagram">
+						<svg viewBox="0 0 24 24" fill="none">
+							<rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.6"/>
+							<circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>
+							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+						</svg>
+						<span>Instagram</span>
+					</a>
+					<a href="https://tiktok.com/@levitad" target="_blank" rel="noopener noreferrer"
+					   class="footer-red" aria-label="TikTok">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						<span>TikTok</span>
+					</a>
+					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
+					   class="footer-red" aria-label="WhatsApp">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.418A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+							<path d="M8.5 9.5c.5 1 1.5 3 3.5 4s3-1 3-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+						</svg>
+						<span>WhatsApp</span>
+					</a>
+				</div>
+			</div>
+
+		</div>
+
+		<!-- Barra inferior -->
+		<div class="site-footer-bottom">
+			<span class="footer-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
+			<span class="footer-dev">
+				Diseñado por <a href="#" class="footer-dev-link">La Casita</a>
+			</span>
+		</div>
+	`;
+
+	// Insertar al final del body, antes de los SVG de alas si existen
+	document.body.appendChild(footer);
 }
 
 /* ─── INIT ─── */
@@ -965,7 +1109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	cargarCarritoGuardado();
 	renderizarCarrito();
 	cargarProductos();
-
+	initFooter();
 	const buscarBtn       = document.getElementById('buscar-btn');
 	const searchBar       = document.getElementById('search-bar');
 	const searchInput     = document.getElementById('search-input');
@@ -1035,51 +1179,119 @@ if (title && leftWing && rightWing) {
 }
 
 if (header) {
-	const updateHeaderProgress = () => {
-		const scrollActual    = window.scrollY;
-		const searchBar       = document.getElementById('search-bar');
-		const searchInput     = document.getElementById('search-input');
-		const searchSubmitBtn = document.getElementById('search-submit-btn');
+	// Referencias cacheadas — se leen una sola vez para no hacer querySelector en cada frame
+	const headerContainer  = header.querySelector('.header-container');
+	const logoArea         = header.querySelector('.logo-area');
+	const h1El             = header.querySelector('h1');
+	const headerNav        = header.querySelector('.header-nav');
+	const iconosContainer  = header.querySelector('.iconos-container');
+	const searchBar        = document.getElementById('search-bar');
+	const searchInput      = document.getElementById('search-input');
+	const searchSubmitBtn  = document.getElementById('search-submit-btn');
 
-		const rangoScroll = Math.max(140, window.innerHeight * 0.18);
-		const progreso    = Math.min(1, Math.max(0, scrollActual / rangoScroll));
+	// Constantes de altura (equivalen a las antiguas variables CSS --h-grande / --h-pequena)
+	const H_SMALL = 70; // px — altura colapsada
+	const H_BIG_VH = 0.30; // 30vh — altura expandida
 
-		header.style.setProperty('--p', progreso.toFixed(3));
+	let lastP    = -1; // evita recalcular si el progreso no cambió
+	let ticking  = false;
 
-		const isCollapsed = progreso >= 0.9;
-		const isExpanded  = progreso <= 0.18;
+	function applyHeaderStyles(p) {
+		if (Math.abs(p - lastP) < 0.001) return; // sin cambio visible
+		lastP = p;
 
+		const isCollapsed = p >= 0.9;
+		const isExpanded  = p <= 0.18;
+
+		// ── Clases de estado (para estilos CSS estructurales: flex-direction, etc.)
 		header.classList.toggle('is-collapsed', isCollapsed);
 		header.classList.toggle('is-expanded',  isExpanded);
 
 		if (isCollapsed)     headerWasCollapsed = true;
 		else if (isExpanded) headerWasCollapsed = false;
 
-		/* ── Buscador: sigue la animación del header ──
-		   Cuando el header se colapsa (progreso > 0.2) la barra
-		   se esconde hacia arriba con la clase is-scroll-hidden.
-		   Cuando vuelve arriba (progreso <= 0.1) reaparece.
-		   Si el usuario la tenía activa y hace scroll, se cierra
-		   limpiamente antes de ocultarla. */
-		if (searchBar) {
-			const baraActiva  = searchBar.classList.contains('is-active');
-			const baraCerrando = searchBar.classList.contains('is-closing');
+		// ── Altura del header
+		const hBig = window.innerHeight * H_BIG_VH;
+		header.style.height = `${hBig - (hBig - H_SMALL) * p}px`;
 
-			if (progreso > 0.2) {
-				// Header colapsando → ocultar barra
-				if (baraActiva && !baraCerrando) {
-					// Cerrar limpiamente (borra búsqueda) y luego ocultar
+		// ── Fondo y borde
+		header.style.background       = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
+		header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
+
+		// ── Nav-links: desaparecen rápido
+		if (headerNav) {
+			headerNav.style.opacity = Math.max(0, 1 - p * 2.5).toFixed(3);
+		}
+
+		// ── Iconos: aparecen después de que empieza el scroll
+		if (iconosContainer) {
+			const ip = Math.min(1, Math.max(0, (p - 0.18) / 0.82)); // 0→1 entre p=0.18 y p=1
+			iconosContainer.style.opacity   = ip.toFixed(3);
+			iconosContainer.style.transform =
+				`translateY(${(-50 + 10 * (1 - ip)).toFixed(2)}%) scale(${(0.92 + 0.08 * ip).toFixed(3)})`;
+		}
+
+		// ── Propiedades que cambian sólo en el rango no-colapsado
+		//    Cuando is-collapsed, se borran los estilos inline y el CSS de la clase toma el control
+		if (isCollapsed) {
+			if (headerContainer) {
+				headerContainer.style.paddingTop    = '';
+				headerContainer.style.paddingBottom = '';
+			}
+			if (logoArea)  logoArea.style.transform  = '';
+			if (h1El) {
+				h1El.style.fontSize      = '';
+				h1El.style.letterSpacing = '';
+				h1El.style.transform     = '';
+			}
+		} else {
+			if (headerContainer) {
+				headerContainer.style.paddingTop    = `${(6  + 10 * (1 - p)).toFixed(1)}px`;
+				headerContainer.style.paddingBottom = `${(10 + 18 * (1 - p)).toFixed(1)}px`;
+			}
+			if (logoArea) {
+				logoArea.style.transform =
+					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-25 * p).toFixed(2)}%)`;
+			}
+			if (h1El) {
+				h1El.style.fontSize      = `${(36 - 8 * p).toFixed(2)}px`;
+				h1El.style.letterSpacing = `${(8  - 3 * p).toFixed(2)}px`;
+				h1El.style.transform     = `translateX(${(6 * (1 - p)).toFixed(2)}px)`;
+			}
+		}
+
+		// ── Buscador: se oculta cuando el header colapsa
+		if (searchBar) {
+			if (p > 0.2) {
+				if (searchBar.classList.contains('is-active') &&
+				    !searchBar.classList.contains('is-closing')) {
 					cerrarBuscador(searchBar, searchInput, searchSubmitBtn);
 				}
-				searchBar.classList.add('is-scroll-hidden');
+				// Solo ocultar si el buscador no está abierto por el usuario
+				if (!searchBar.classList.contains('is-active')) {
+					searchBar.classList.add('is-scroll-hidden');
+				}
 			} else {
-				// Header expandido → barra disponible de nuevo
 				searchBar.classList.remove('is-scroll-hidden');
 			}
 		}
-	};
+	}
 
-	window.addEventListener('scroll', updateHeaderProgress, { passive: true });
-	window.addEventListener('resize', updateHeaderProgress);
-	updateHeaderProgress();
+	function scheduleUpdate() {
+		if (ticking) return;
+		ticking = true;
+		requestAnimationFrame(() => {
+			const rangoScroll = Math.max(140, window.innerHeight * 0.18);
+			const p = Math.min(1, Math.max(0, window.scrollY / rangoScroll));
+			applyHeaderStyles(p);
+			ticking = false;
+		});
+	}
+
+	window.addEventListener('scroll', scheduleUpdate, { passive: true });
+	window.addEventListener('resize', () => {
+		lastP = -1; // fuerza recalculo al cambiar tamaño de ventana
+		scheduleUpdate();
+	});
+	scheduleUpdate(); // estado inicial
 }
