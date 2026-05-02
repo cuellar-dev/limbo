@@ -214,6 +214,7 @@ function abrirCarrito() {
 	overlay.setAttribute('aria-hidden', 'false');
 	panel.setAttribute('aria-hidden',   'false');
 	document.body.classList.add('carrito-abierto');
+	window.pauseHeaderScroll?.();
 }
 
 function cerrarCarrito() {
@@ -225,6 +226,7 @@ function cerrarCarrito() {
 	overlay.setAttribute('aria-hidden', 'true');
 	panel.setAttribute('aria-hidden',   'true');
 	document.body.classList.remove('carrito-abierto');
+	window.resumeHeaderScroll?.();
 }
 
 function animarBotonAnadir(boton) {
@@ -708,6 +710,7 @@ function abrirDetalles(datos) {
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
 	document.body.style.overflow = 'hidden';
+	window.pauseHeaderScroll?.();
 }
 
 function cerrarModal() {
@@ -715,6 +718,7 @@ function cerrarModal() {
 	setTimeout(() => {
 		modal.style.display          = 'none';
 		document.body.style.overflow = 'auto';
+		window.resumeHeaderScroll?.();
 	}, 500);
 }
 
@@ -953,7 +957,7 @@ function initMenuHamburguesa() {
 					<span class="menu-nav-text">Encargues</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
-				<a class="menu-nav-item" href="#">
+				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
 					<span class="menu-nav-num">04</span>
 					<span class="menu-nav-text">Contacto</span>
 					<span class="menu-nav-arrow">→</span>
@@ -1005,6 +1009,7 @@ function initMenuHamburguesa() {
 		document.body.appendChild(ov);
 		document.body.appendChild(panel);
 		document.body.classList.add('carrito-abierto', 'menu-open');
+		window.pauseHeaderScroll?.();
 
 		ov.addEventListener('click', cerrarMenu);
 		requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1017,6 +1022,14 @@ function initMenuHamburguesa() {
 				e.preventDefault();
 			});
 		});
+
+		const contactoBtn = panel.querySelector('.menu-nav-item-contacto');
+		if (contactoBtn) {
+			contactoBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				abrirContactoPanel();
+			});
+		}
 	}
 
 	function cerrarMenu() {
@@ -1026,11 +1039,213 @@ function initMenuHamburguesa() {
 		const panel = document.getElementById('menu-nav-panel');
 		if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 		if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
+		window.resumeHeaderScroll?.();
 	}
 
 	menuBtn.addEventListener('click', () =>
 		menuBtn.classList.contains('is-open') ? cerrarMenu() : abrirMenu()
 	);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   Panel de Contacto — formulario que se inyecta al hacer click
+   en "Contacto" desde el menú hamburguesa.
+═══════════════════════════════════════════════════════════ */
+function abrirContactoPanel() {
+	if (document.getElementById('contacto-panel')) return;
+
+	const ov = document.createElement('div');
+	ov.id        = 'contacto-overlay';
+	ov.className = 'contacto-overlay';
+
+	const panel = document.createElement('div');
+	panel.id        = 'contacto-panel';
+	panel.className = 'contacto-panel';
+
+	panel.innerHTML = `
+		<button class="contacto-cerrar" aria-label="Cerrar contacto">✕</button>
+
+		<div class="contacto-glow"></div>
+
+		<header class="contacto-header">
+			<span class="contacto-eyebrow">Hablemos</span>
+			<h2 class="contacto-titulo">Contacto</h2>
+			<p class="contacto-sub">Contanos qué tenés en mente y te respondemos a la brevedad.</p>
+		</header>
+
+		<form class="contacto-form" id="contacto-form" novalidate autocomplete="on">
+			<div class="contacto-campo">
+				<label for="contacto-nombre">Nombre</label>
+				<input id="contacto-nombre" name="nombre" type="text"
+				       required minlength="2" maxlength="60"
+				       autocomplete="name" placeholder="Tu nombre" />
+				<span class="contacto-error" data-error-for="nombre"></span>
+			</div>
+
+			<div class="contacto-campo">
+				<label for="contacto-email">Correo electrónico</label>
+				<input id="contacto-email" name="email" type="email"
+				       required maxlength="120"
+				       autocomplete="email" placeholder="tucorreo@dominio.com" />
+				<span class="contacto-error" data-error-for="email"></span>
+			</div>
+
+			<div class="contacto-campo">
+				<label for="contacto-mensaje">Mensaje</label>
+				<textarea id="contacto-mensaje" name="mensaje" rows="5"
+				          required minlength="5" maxlength="1000"
+				          placeholder="Escribí tu mensaje..."></textarea>
+				<span class="contacto-error" data-error-for="mensaje"></span>
+			</div>
+
+			<!-- Honeypot anti-spam (oculto al usuario) -->
+			<div class="contacto-hp" aria-hidden="true">
+				<label>No completar
+					<input type="text" name="_honey" tabindex="-1" autocomplete="off" />
+				</label>
+			</div>
+
+			<button type="submit" class="contacto-submit">
+				<span class="contacto-submit-text">Enviar mensaje</span>
+				<span class="contacto-submit-loader" aria-hidden="true"></span>
+			</button>
+
+			<p class="contacto-status" role="status" aria-live="polite"></p>
+		</form>
+
+		<div class="contacto-pattern" aria-hidden="true"></div>
+	`;
+
+	document.body.appendChild(ov);
+	document.body.appendChild(panel);
+	document.body.classList.add('contacto-abierto');
+	window.pauseHeaderScroll?.();
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov.classList.add('is-active');
+		panel.classList.add('is-active');
+	}));
+
+	ov.addEventListener('click', cerrarContactoPanel);
+	panel.querySelector('.contacto-cerrar').addEventListener('click', cerrarContactoPanel);
+
+	const form = panel.querySelector('#contacto-form');
+	form.addEventListener('submit', manejarEnvioContacto);
+
+	form.querySelectorAll('input, textarea').forEach(el => {
+		el.addEventListener('input', () => limpiarErrorCampo(el));
+	});
+}
+
+function cerrarContactoPanel() {
+	const ov    = document.getElementById('contacto-overlay');
+	const panel = document.getElementById('contacto-panel');
+	document.body.classList.remove('contacto-abierto');
+	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
+	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
+	window.resumeHeaderScroll?.();
+}
+
+function limpiarErrorCampo(el) {
+	const err = el.closest('.contacto-campo')?.querySelector('.contacto-error');
+	if (err) err.textContent = '';
+	el.classList.remove('is-invalid');
+}
+
+function validarContacto({ nombre, email, mensaje }) {
+	const errores = {};
+	const nombreRe = /^[a-zA-ZÀ-ÿñÑ\s'\-\.]{2,60}$/;
+	const emailRe  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+	if (!nombre || nombre.length < 2) errores.nombre = 'Ingresá tu nombre.';
+	else if (nombre.length > 60) errores.nombre = 'Máximo 60 caracteres.';
+	else if (!nombreRe.test(nombre)) errores.nombre = 'El nombre contiene caracteres no permitidos.';
+
+	if (!email) errores.email = 'Ingresá tu correo electrónico.';
+	else if (email.length > 120) errores.email = 'Máximo 120 caracteres.';
+	else if (!emailRe.test(email)) errores.email = 'Correo electrónico inválido.';
+
+	if (!mensaje || mensaje.length < 5) errores.mensaje = 'El mensaje es demasiado corto.';
+	else if (mensaje.length > 1000) errores.mensaje = 'Máximo 1000 caracteres.';
+
+	return errores;
+}
+
+async function manejarEnvioContacto(e) {
+	e.preventDefault();
+	const form = e.currentTarget;
+	const status = form.querySelector('.contacto-status');
+	const submitBtn = form.querySelector('.contacto-submit');
+
+	const honey = form.querySelector('input[name="_honey"]');
+	if (honey && honey.value.trim() !== '') {
+		// Bot detectado — fingir éxito sin enviar
+		status.textContent = '¡Mensaje enviado! Te respondemos pronto.';
+		status.className = 'contacto-status is-ok';
+		form.reset();
+		return;
+	}
+
+	const nombre  = form.nombre.value.trim();
+	const email   = form.email.value.trim();
+	const mensaje = form.mensaje.value.trim();
+
+	// Limpiar errores previos
+	form.querySelectorAll('.contacto-error').forEach(el => el.textContent = '');
+	form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+	status.textContent = '';
+	status.className = 'contacto-status';
+
+	const errores = validarContacto({ nombre, email, mensaje });
+	if (Object.keys(errores).length > 0) {
+		Object.entries(errores).forEach(([campo, msg]) => {
+			const errEl = form.querySelector(`[data-error-for="${campo}"]`);
+			const inputEl = form.querySelector(`[name="${campo}"]`);
+			if (errEl) errEl.textContent = msg;
+			if (inputEl) inputEl.classList.add('is-invalid');
+		});
+		const primerInvalido = form.querySelector('.is-invalid');
+		if (primerInvalido) primerInvalido.focus();
+		return;
+	}
+
+	submitBtn.disabled = true;
+	submitBtn.classList.add('is-loading');
+
+	try {
+		const res = await fetch('https://formsubmit.co/ajax/luisernesto.cuellar164@gmail.com', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json'
+			},
+			body: JSON.stringify({
+				nombre,
+				email,
+				mensaje,
+				_subject: `Nuevo contacto de ${nombre} — Lévitad`,
+				_template: 'table',
+				_captcha: 'false'
+			})
+		});
+
+		const data = await res.json().catch(() => ({}));
+
+		if (res.ok && (data.success === 'true' || data.success === true)) {
+			status.textContent = '¡Mensaje enviado! Te responderemos a la brevedad.';
+			status.className = 'contacto-status is-ok';
+			form.reset();
+		} else {
+			throw new Error(data.message || 'Error al enviar el mensaje');
+		}
+	} catch (err) {
+		status.textContent = 'No se pudo enviar el mensaje. Probá de nuevo en unos minutos.';
+		status.className = 'contacto-status is-error';
+	} finally {
+		submitBtn.disabled = false;
+		submitBtn.classList.remove('is-loading');
+	}
 }
 
 
@@ -1200,8 +1415,18 @@ if (header) {
 	const H_SMALL = 70; // px — altura colapsada
 	const H_BIG_VH = 0.30; // 30vh — altura expandida
 
+	// ── Cache de viewport ───────────────────────────────────────────────
+	// En mobile, la barra de URL del navegador se muestra/oculta al scrollear,
+	// lo que cambia window.innerHeight constantemente y genera "saltos" en la
+	// animación si recalculamos hBig en cada frame. Cacheamos hBig y solo lo
+	// recalculamos cuando cambia el ANCHO (rotación / cambio real de viewport).
+	let lastWidth   = window.innerWidth;
+	let vhCached    = window.innerHeight;
+	let hBigCached  = vhCached * H_BIG_VH;
+
 	let lastP    = -1; // evita recalcular si el progreso no cambió
 	let ticking  = false;
+	let pausado  = false;
 
 	function applyHeaderStyles(p) {
 		if (Math.abs(p - lastP) < 0.001) return; // sin cambio visible
@@ -1217,9 +1442,9 @@ if (header) {
 		if (isCollapsed)     headerWasCollapsed = true;
 		else if (isExpanded) headerWasCollapsed = false;
 
-		// ── Altura del header
-		const hBig = window.innerHeight * H_BIG_VH;
-		header.style.height = `${hBig - (hBig - H_SMALL) * p}px`;
+		// ── Altura del header (usa hBigCached, no window.innerHeight, para evitar jitter por la barra del navegador móvil)
+		header.style.height = `${hBigCached - (hBigCached - H_SMALL) * p}px`;
+		header.style.setProperty('--p', p.toFixed(3));
 
 		// ── Fondo y borde
 		header.style.background       = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
@@ -1246,11 +1471,7 @@ if (header) {
 				headerContainer.style.paddingBottom = '';
 			}
 			if (logoArea)  logoArea.style.transform  = '';
-			if (h1El) {
-				h1El.style.fontSize      = '';
-				h1El.style.letterSpacing = '';
-				h1El.style.transform     = '';
-			}
+			if (h1El)      h1El.style.transform      = '';
 		} else {
 			if (headerContainer) {
 				headerContainer.style.paddingTop    = `${(6  + 10 * (1 - p)).toFixed(1)}px`;
@@ -1261,9 +1482,14 @@ if (header) {
 					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-25 * p).toFixed(2)}%)`;
 			}
 			if (h1El) {
-				h1El.style.fontSize      = `${(36 - 8 * p).toFixed(2)}px`;
-				h1El.style.letterSpacing = `${(8  - 3 * p).toFixed(2)}px`;
-				h1El.style.transform     = `translateX(${(6 * (1 - p)).toFixed(2)}px)`;
+				// Antes: animábamos font-size + letter-spacing en cada frame, lo que
+				// fuerza recálculo de LAYOUT (text shaping) — carísimo en mobile.
+				// Ahora: una única transform con scale + translate. Solo capa de
+				// compositing, sin reflow. La escala 1 → ~0.78 reproduce el cambio
+				// visual de 36px → 28px que tenía el font-size original.
+				const scale = (1 - 0.22 * p);
+				h1El.style.transform =
+					`translateX(${(6 * (1 - p)).toFixed(2)}px) scale(${scale.toFixed(3)})`;
 			}
 		}
 
@@ -1285,20 +1511,51 @@ if (header) {
 	}
 
 	function scheduleUpdate() {
-		if (ticking) return;
+		if (ticking || pausado) return;
 		ticking = true;
 		requestAnimationFrame(() => {
-			const rangoScroll = Math.max(140, window.innerHeight * 0.18);
+			const rangoScroll = Math.max(140, vhCached * 0.18);
 			const p = Math.min(1, Math.max(0, window.scrollY / rangoScroll));
 			applyHeaderStyles(p);
 			ticking = false;
 		});
 	}
 
-	window.addEventListener('scroll', scheduleUpdate, { passive: true });
-	window.addEventListener('resize', () => {
-		lastP = -1; // fuerza recalculo al cambiar tamaño de ventana
+	// ── API pública: pausar/reanudar la animación del header ───────────
+	// Se llama desde abrirModal, abrirCarrito, abrirMenu, abrirContactoPanel, etc.
+	// Cuando un panel bloquea el body con overflow:hidden o position:fixed,
+	// esto evita que cambios de viewport (barra de URL móvil, scroll-lock,
+	// teclado virtual) disparen falsamente is-collapsed/is-expanded.
+	window.pauseHeaderScroll = () => { pausado = true; };
+	window.resumeHeaderScroll = () => {
+		if (!pausado) return;
+		pausado = false;
+		lastP = -1;
 		scheduleUpdate();
-	});
+	};
+
+	window.addEventListener('scroll', scheduleUpdate, { passive: true });
+
+	// resize: en móvil, mostrar/ocultar la barra del navegador dispara resize
+	// con la MISMA anchura pero altura distinta. Eso causaba saltos visuales
+	// recalculando hBig en cada cambio. Solo recalculamos si cambió el ANCHO.
+	window.addEventListener('resize', () => {
+		const w = window.innerWidth;
+		if (w === lastWidth) return; // ignora cambios solo de altura (URL bar móvil)
+		lastWidth   = w;
+		vhCached    = window.innerHeight;
+		hBigCached  = vhCached * H_BIG_VH;
+		lastP       = -1;
+		scheduleUpdate();
+	}, { passive: true });
+
+	// orientationchange sí es un cambio real → forzamos recálculo completo
+	window.addEventListener('orientationchange', () => {
+		lastWidth   = window.innerWidth;
+		vhCached    = window.innerHeight;
+		hBigCached  = vhCached * H_BIG_VH;
+		lastP       = -1;
+		scheduleUpdate();
+	}, { passive: true });
 	scheduleUpdate(); // estado inicial
 }

@@ -723,14 +723,40 @@ svg.icono-transicion {
     justify-content: center;
     background: rgba(17, 21, 34, 0.85);       /* JS ajusta la alpha */
     backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(202, 172, 71, 0.1); /* JS ajusta la alpha */
     position: sticky;
     top: 0;
     z-index: 100;
+    /* overflow: clip evita crear un nuevo contexto de scroll —
+       a diferencia de overflow: hidden — y no rompe position: sticky en mobile.
+       Fallback automático a hidden en navegadores antiguos. */
     overflow: hidden;
+    overflow: clip;
     padding: 0 20px;
     transition: background 0.2s ease;
     margin-bottom: 10px;
+    /* Promovemos el header a su propia capa de compositing para que el
+       backdrop-filter no fuerce repaints del documento entero al scrollear. */
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+/* En mobile, backdrop-filter es uno de los efectos más caros del pipeline
+   (especialmente en Android/Chromium). Lo reducimos progresivamente:
+   - tablets/mobile grande: blur más liviano
+   - mobile chico: lo eliminamos y compensamos subiendo la opacidad del fondo */
+@media (max-width: 768px) {
+    #header {
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+}
+@media (max-width: 480px) {
+    #header {
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+    }
 }
 .header-container {
     display: flex;
@@ -751,6 +777,7 @@ svg.icono-transicion {
     transform: translateY(24px); /* JS interpola: translateY(24*(1-p)px) translateX(-25%*p) */
     transition: transform 0.1s linear;
     width: 100%;
+    will-change: transform;
 }
 
 /* El h1 se agranda y mueve a la derecha al inicio */
@@ -759,12 +786,17 @@ h1 {
     align-items: center;
     justify-content: center;
     width: fit-content;
-    font-size: 36px;        /* JS interpola: 36 - 8*p px */
-    letter-spacing: 8px;   /* JS interpola: 8 - 3*p px */
-    transform: translateX(6px); /* JS interpola: translateX(6*(1-p)px) */
-    transition: all 0.1s linear;
+    font-size: 36px;
+    letter-spacing: 8px;
+    /* JS interpola: translateX(6*(1-p)px) scale(1 - 0.22*p)
+       (antes animaba font-size + letter-spacing — ahora todo via transform
+       para que sea trabajo de compositor, sin recálculo de layout/text-shaping) */
+    transform: translateX(6px);
+    transform-origin: center center;
+    transition: transform 0.1s linear;
     isolation: isolate;
     z-index: 100;
+    will-change: transform;
 }
 
 h1 .logo-a,
@@ -853,6 +885,7 @@ h1 .logo-text {
     transform: translateY(-40%) scale(0.92); /* JS interpola con iconP */
     transform-origin: right center;
     transition: opacity 0.15s ease, transform 0.15s ease;
+    will-change: transform, opacity;
     pointer-events: none;
 }
 
@@ -2852,3 +2885,350 @@ body.is-encargue .footer-red:active     {
 .footer-dev-link:hover { opacity: 1; }
 
 body.is-encargue .footer-dev-link { color: var(--acento-encargue); }
+
+
+/* ═══════════════════════════════════════════════════════════
+   PANEL DE CONTACTO
+═══════════════════════════════════════════════════════════ */
+.contacto-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    z-index: 2400;
+    opacity: 0;
+    transition: background 0.35s ease, backdrop-filter 0.35s ease, opacity 0.35s ease;
+    pointer-events: none;
+}
+.contacto-overlay.is-active {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    opacity: 1;
+    pointer-events: auto;
+}
+.contacto-overlay.is-closing {
+    background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(0px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.contacto-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: min(92vw, 460px);
+    max-height: min(92dvh, 720px);
+    transform: translate(-50%, -50%) scale(0.92);
+    background: linear-gradient(170deg, #141a29 0%, #0c111c 70%, #08111f 100%);
+    border: 1px solid var(--borde-dorado);
+    border-radius: 22px;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(202, 172, 71, 0.05) inset;
+    z-index: 2410;
+    opacity: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease, border-color 0.35s ease;
+    font-family: 'Quicksand', sans-serif;
+}
+.contacto-panel.is-active {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+.contacto-panel.is-closing {
+    transform: translate(-50%, -50%) scale(0.94);
+    opacity: 0;
+}
+body.is-encargue .contacto-panel {
+    border-color: rgba(93, 114, 233, 0.28);
+}
+
+.contacto-glow {
+    position: absolute;
+    top: -80px;
+    left: -60px;
+    width: 280px;
+    height: 280px;
+    background: radial-gradient(ellipse, rgba(202, 172, 71, 0.18) 0%, transparent 65%);
+    pointer-events: none;
+    transition: background 0.35s ease;
+    z-index: 0;
+}
+body.is-encargue .contacto-glow {
+    background: radial-gradient(ellipse, rgba(93, 114, 233, 0.18) 0%, transparent 65%);
+}
+
+.contacto-cerrar {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--borde-dorado);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--texto-brillante);
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 5;
+    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.contacto-cerrar:hover {
+    color: var(--acento-dorado);
+    border-color: rgba(202, 172, 71, 0.45);
+    background: rgba(202, 172, 71, 0.06);
+    transform: rotate(90deg);
+}
+body.is-encargue .contacto-cerrar:hover {
+    color: var(--acento-encargue);
+    border-color: rgba(93, 114, 233, 0.45);
+    background: rgba(93, 114, 233, 0.06);
+}
+
+.contacto-header {
+    position: relative;
+    z-index: 2;
+    padding: 28px 28px 8px;
+    text-align: left;
+}
+.contacto-eyebrow {
+    display: inline-block;
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--acento-dorado);
+    margin-bottom: 6px;
+    transition: color 0.35s ease;
+}
+body.is-encargue .contacto-eyebrow {
+    color: var(--acento-encargue);
+}
+.contacto-titulo {
+    font-family: 'Elegante', serif;
+    font-size: 30px;
+    color: var(--texto-brillante);
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+}
+.contacto-sub {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px;
+    color: var(--texto-secundario);
+    margin: 0;
+    line-height: 1.4;
+}
+
+.contacto-form {
+    position: relative;
+    z-index: 2;
+    padding: 18px 28px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.contacto-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.contacto-campo label {
+    font-family: 'drink', sans-serif;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+}
+.contacto-campo input,
+.contacto-campo textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--borde-dorado);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--texto-brillante);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+.contacto-campo textarea {
+    resize: vertical;
+    min-height: 96px;
+    max-height: 220px;
+    line-height: 1.45;
+    font-family: 'Quicksand', sans-serif;
+}
+.contacto-campo input::placeholder,
+.contacto-campo textarea::placeholder {
+    color: rgba(155, 164, 181, 0.45);
+}
+.contacto-campo input:focus,
+.contacto-campo textarea:focus {
+    border-color: var(--acento-dorado);
+    background: rgba(202, 172, 71, 0.04);
+    box-shadow: 0 0 0 3px rgba(202, 172, 71, 0.10);
+}
+body.is-encargue .contacto-campo input:focus,
+body.is-encargue .contacto-campo textarea:focus {
+    border-color: var(--acento-encargue);
+    background: rgba(93, 114, 233, 0.05);
+    box-shadow: 0 0 0 3px rgba(93, 114, 233, 0.12);
+}
+.contacto-campo input.is-invalid,
+.contacto-campo textarea.is-invalid {
+    border-color: #d96a6a;
+    box-shadow: 0 0 0 3px rgba(217, 106, 106, 0.12);
+}
+
+.contacto-error {
+    min-height: 14px;
+    font-size: 11px;
+    color: #d96a6a;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.2px;
+}
+
+/* Honeypot oculto */
+.contacto-hp {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.contacto-submit {
+    margin-top: 4px;
+    position: relative;
+    background: linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%);
+    color: var(--fondo-oscuro);
+    border: none;
+    border-radius: 999px;
+    padding: 13px 22px;
+    font-family: 'drink', sans-serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.25s ease, filter 0.25s ease, background 0.35s ease;
+    box-shadow: 0 6px 18px rgba(202, 172, 71, 0.30);
+    -webkit-tap-highlight-color: transparent;
+}
+.contacto-submit:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(202, 172, 71, 0.40);
+}
+.contacto-submit:active:not(:disabled) {
+    transform: translateY(0);
+}
+.contacto-submit:disabled {
+    cursor: progress;
+    filter: saturate(0.6) brightness(0.85);
+}
+body.is-encargue .contacto-submit {
+    background: linear-gradient(135deg, #7b8dff 0%, #5d72e9 50%, #3040b8 100%);
+    box-shadow: 0 6px 18px rgba(93, 114, 233, 0.35);
+    color: var(--texto-brillante);
+}
+body.is-encargue .contacto-submit:hover:not(:disabled) {
+    box-shadow: 0 10px 24px rgba(93, 114, 233, 0.45);
+}
+
+.contacto-submit-loader {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    border-top-color: rgba(0, 0, 0, 0.85);
+    border-radius: 50%;
+    margin-left: 10px;
+    vertical-align: -2px;
+    animation: contactoSpin 0.7s linear infinite;
+}
+.contacto-submit.is-loading .contacto-submit-loader {
+    display: inline-block;
+}
+.contacto-submit.is-loading .contacto-submit-text::after {
+    content: '...';
+}
+@keyframes contactoSpin {
+    to { transform: rotate(360deg); }
+}
+
+.contacto-status {
+    margin: 4px 0 0;
+    min-height: 18px;
+    font-size: 12.5px;
+    font-family: 'Quicksand', sans-serif;
+    text-align: center;
+    color: var(--texto-secundario);
+    transition: color 0.25s ease;
+}
+.contacto-status.is-ok {
+    color: #7fd194;
+}
+.contacto-status.is-error {
+    color: #d96a6a;
+}
+
+/* Patrón de fondo con logos repetidos — abajo, fade hacia arriba */
+.contacto-pattern {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 30%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.55;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'><g fill='none' stroke='%23caac47' stroke-width='2' stroke-linecap='round'><path d='M10,28 A22,9 0 1,1 52,24'/><path d='M68,58 A20,8 0 1,1 110,54'/></g><g fill='%23caac47'><circle cx='25' cy='62' r='1.6'/><circle cx='92' cy='18' r='1.4'/><circle cx='60' cy='42' r='1'/><circle cx='15' cy='10' r='1'/><circle cx='105' cy='38' r='1.2'/></g></svg>");
+    background-repeat: repeat;
+    background-size: 120px 80px;
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.45) 65%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.85) 25%, rgba(0,0,0,0.45) 65%, rgba(0,0,0,0) 100%);
+    animation: contactoPatternMove 22s linear infinite;
+    transition: opacity 0.35s ease;
+}
+body.is-encargue .contacto-pattern {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80' viewBox='0 0 120 80'><g fill='none' stroke='%235d72e9' stroke-width='2' stroke-linecap='round'><path d='M10,28 A22,9 0 1,1 52,24'/><path d='M68,58 A20,8 0 1,1 110,54'/></g><g fill='%235d72e9'><circle cx='25' cy='62' r='1.6'/><circle cx='92' cy='18' r='1.4'/><circle cx='60' cy='42' r='1'/><circle cx='15' cy='10' r='1'/><circle cx='105' cy='38' r='1.2'/></g></svg>");
+    opacity: 0.5;
+}
+
+@keyframes contactoPatternMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 120px -80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contacto-pattern { animation: none; }
+}
+
+/* Scroll bonito para el form */
+.contacto-form::-webkit-scrollbar {
+    width: 6px;
+}
+.contacto-form::-webkit-scrollbar-thumb {
+    background: rgba(202, 172, 71, 0.25);
+    border-radius: 3px;
+}
+body.is-encargue .contacto-form::-webkit-scrollbar-thumb {
+    background: rgba(93, 114, 233, 0.30);
+}
+
+/* Bloquear scroll del body cuando el panel está abierto */
+body.contacto-abierto {
+    overflow: hidden;
+}
