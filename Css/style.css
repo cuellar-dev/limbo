@@ -445,7 +445,6 @@ body.is-encargue #menu-hamb g {
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
 .btn-anadir:active {
-
     transform: scale(0.98);
 }
 
@@ -1555,7 +1554,7 @@ body.is-encargue .filter-btn:active {
     background: rgba(17, 21, 34, 0.96);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    z-index: 99;             /* justo por debajo del header (z:100) */
+    z-index: 999;             /* justo por debajo del header (z:100) */
     border-bottom: 1px solid var(--borde-dorado);
     overflow: hidden;
     opacity: 0;

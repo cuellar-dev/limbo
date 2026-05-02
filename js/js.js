@@ -1060,7 +1060,7 @@ function initFooter() {
 
 			<!-- Columna redes -->
 			<div class="footer-col footer-col-redes">
-				<p class="footer-col-titulo">Seguinos</p>
+				<p class="footer-col-titulo">Síguenos</p>
 				<div class="footer-redes">
 					<a href="https://instagram.com/levitad" target="_blank" rel="noopener noreferrer"
 					   class="footer-red" aria-label="Instagram">
@@ -1070,13 +1070,6 @@ function initFooter() {
 							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
 						</svg>
 						<span>Instagram</span>
-					</a>
-					<a href="https://tiktok.com/@levitad" target="_blank" rel="noopener noreferrer"
-					   class="footer-red" aria-label="TikTok">
-						<svg viewBox="0 0 24 24" fill="none">
-							<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-						<span>TikTok</span>
 					</a>
 					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
 					   class="footer-red" aria-label="WhatsApp">
