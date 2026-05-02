@@ -575,20 +575,20 @@ function crearModalEncargue() {
 			</div>
 
 			<h2 id="modal-encargue-titulo" class="modal-encargue-titulo">Modo Encargue</h2>
-			<p class="modal-encargue-subtitulo">Un espacio para pedir piezas a tu medida</p>
+			<p class="modal-encargue-subtitulo">Un espacio para pedir la ropa que anheles</p>
 
 			<ul class="modal-encargue-lista">
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Prendas hechas especialmente para vos, en el color, talla y material que elijas</span>
+					<span>Prendas pedidas por usted, buscando alimentar sus Outifits</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Diseños únicos que no encontrás en el stock habitual</span>
+					<span>Diseños únicos que no tenemos en el stock habitual, pero pueden ser suyas</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Coordinamos por WhatsApp para que cada detalle sea perfecto</span>
+					<span>Coordinamos por WhatsApp para cuadrar todos los detalles</span>
 				</li>
 			</ul>
 
@@ -977,13 +977,6 @@ function initMenuHamburguesa() {
 						</svg>
 						<span>Instagram</span>
 					</a>
-					<a href="https://tiktok.com/@levitad" target="_blank" rel="noopener noreferrer"
-					   class="menu-nav-red" aria-label="TikTok">
-						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-						</svg>
-						<span>TikTok</span>
-					</a>
 					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
 					   class="menu-nav-red" aria-label="WhatsApp">
 						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1000,7 +993,7 @@ function initMenuHamburguesa() {
 				<!-- Créditos -->
 				<div class="menu-nav-creditos">
 					<span class="menu-nav-dev">
-						Hecho con ✦ por
+						Hecho con ♡ desde
 						<a href="#" class="menu-nav-dev-link">La Casita</a>
 					</span>
 					<span class="menu-nav-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
@@ -1008,7 +1001,7 @@ function initMenuHamburguesa() {
 
 			</footer>
 		`;
-
+		
 		document.body.appendChild(ov);
 		document.body.appendChild(panel);
 		document.body.classList.add('carrito-abierto', 'menu-open');
@@ -1018,6 +1011,12 @@ function initMenuHamburguesa() {
 			ov.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
+		itemsNoTocar = document.querySelectorAll('.menu-nav-item');
+		itemsNoTocar.forEach(item => {
+			item.addEventListener('contextmenu', function(e) {
+				e.preventDefault();
+			});
+		});
 	}
 
 	function cerrarMenu() {
@@ -1054,7 +1053,22 @@ function initFooter() {
 
 			<!-- Columna marca -->
 			<div class="footer-col footer-col-marca">
-				<h2 class="footer-logo">LÉVITAD</h2>
+				<h2 class="footer-logo">LÉVIT<span class="logo-a">A
+                        <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <filter id="halo-glow" x="-50%" y="-50%" width="200%" height="200%">
+                                    <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                                    <feFlood class="halo-glow-color" result="glow-color"/>
+                                    <feComposite in="glow-color" in2="blur" operator="in" result="colored-blur"/>
+                                    <feMerge>
+                                        <feMergeNode in="colored-blur"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                    </feMerge>
+                                </filter>
+                            </defs>
+                            <path class="halo-path" d="M20,25 A30,12 0 1,1 75,22" fill="none" stroke-width="8" stroke-linecap="round" filter="url(#halo-glow)" />
+                        </svg>
+                    </span>D</h2>
 				<p class="footer-slogan">Prendas que elevan.</p>
 			</div>
 
