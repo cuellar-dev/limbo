@@ -1075,6 +1075,21 @@ function initMenuHamburguesa() {
 				</a>
 			</nav>
 
+			<!-- TOGGLE TEMA -->
+			<div class="menu-tema-row">
+				<span class="menu-tema-label">Tema</span>
+				<button class="menu-tema-toggle" id="tema-toggle" aria-label="Cambiar tema" type="button">
+					<span class="menu-tema-thumb">
+						<span class="tema-luna">
+							<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="color:#5d72e9"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+						</span>
+						<span class="tema-sol">
+							<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:#caac47"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
+						</span>
+					</span>
+				</button>
+			</div>
+
 			<!-- FOOTER DEL MENÚ -->
 			<footer class="menu-nav-footer">
 
@@ -1139,6 +1154,15 @@ function initMenuHamburguesa() {
 			contactoBtn.addEventListener('click', (e) => {
 				e.preventDefault();
 				abrirContactoPanel();
+			});
+		}
+
+		const temaToggle = panel.querySelector('#tema-toggle');
+		if (temaToggle) {
+			temaToggle.addEventListener('click', () => {
+				const esClaro = document.body.classList.toggle('is-light');
+				localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
+				window.refreshHeaderTheme?.();
 			});
 		}
 	}
@@ -1438,7 +1462,14 @@ function initFooter() {
 }
 
 /* ─── INIT ─── */
+function initTema() {
+	if (localStorage.getItem('levitad-tema') === 'light') {
+		document.body.classList.add('is-light');
+	}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+	initTema();
 	cargarCarritoGuardado();
 	renderizarCarrito();
 	cargarProductos();
@@ -1560,9 +1591,14 @@ if (header) {
 		header.style.height = `${hBigCached - (hBigCached - H_SMALL) * p}px`;
 		header.style.setProperty('--p', p.toFixed(3));
 
-		// ── Fondo y borde
-		header.style.background       = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
-		header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
+		// ── Fondo y borde (condicional por tema)
+		if (document.body.classList.contains('is-light')) {
+			header.style.background        = `rgba(240, 242, 247, ${(0.90 + 0.10 * p).toFixed(3)})`;
+			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.12 + 0.18 * p).toFixed(3)})`;
+		} else {
+			header.style.background        = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
+			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
+		}
 
 		// ── Nav-links: desaparecen rápido
 		if (headerNav) {
@@ -1637,6 +1673,12 @@ if (header) {
 	window.resumeHeaderScroll = () => {
 		if (!pausado) return;
 		pausado = false;
+		lastP = -1;
+		scheduleUpdate();
+	};
+
+	// Fuerza re-aplicación del header al cambiar de tema (resetea lastP para recalcular colores)
+	window.refreshHeaderTheme = () => {
 		lastP = -1;
 		scheduleUpdate();
 	};
