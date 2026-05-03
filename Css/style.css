@@ -849,7 +849,6 @@ h1 .logo-text {
 /* Eslogan */
 .header-slogan {
     font-family: 'Quicksand', sans-serif;
-    font-weight: 600;
     color: rgba(226, 226, 226, 0.28);
     font-size: 9px;
     letter-spacing: 6px;
@@ -858,16 +857,22 @@ h1 .logo-text {
     display: block;
 }
 
-/* Separador vertical puntual */
+/* Wrapper que da contexto de ancho al separador dentro del flex column */
+.header-nav-sep {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
+}
+
 .header-nav-divider {
-    width: 1px;
-    height: 20px;
-    background: linear-gradient(to bottom, transparent, rgba(202, 172, 71, 0.3), transparent);
-    margin: 12px auto;
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(202, 172, 71, 0.35), transparent);
 }
 
 body.is-encargue .header-nav-divider {
-    background: linear-gradient(to bottom, transparent, rgba(93, 114, 233, 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgba(93, 114, 233, 0.35), transparent);
 }
 
 /* Grid 2×2 de tarjetas */
@@ -901,7 +906,6 @@ body.is-encargue .header-nav-divider {
     transition: transform 0.25s ease, border-color 0.25s ease,
                 box-shadow 0.25s ease, background 0.25s ease;
     font-family: 'Quicksand', sans-serif;
-    font-weight: 700;
     font-size: 12px;
     letter-spacing: 1.8px;
     text-transform: uppercase;
