@@ -13,6 +13,45 @@ const STORAGE_KEY_CARRITO_ENCARGUE = 'levitad-carrito-encargue';
 const STORAGE_KEY_MODAL_ENCARGUE   = 'levitad-modal-encargue-visto';
 const WHATSAPP_OWNER_NUMBER        = '+5359271359';
 
+/* ─── LOCK / UNLOCK BODY SCROLL ────────────────────────────────────────────
+   Función centralizada para bloquear el scroll de fondo cuando un modal
+   o panel está abierto. Guarda scrollY y compensa con padding-right para
+   que el contenido no "brinque" al desaparecer la barra de scroll.
+   Referencia de conteo: soporta apertura apilada (modal dentro de carrito, etc.)
+─────────────────────────────────────────────────────────────────────────── */
+let _scrollLockCount = 0;
+let _scrollLockY     = 0;
+
+function lockBodyScroll() {
+	if (_scrollLockCount === 0) {
+		_scrollLockY = window.scrollY;
+		const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
+		document.body.style.overflow   = 'hidden';
+		document.body.style.position   = 'fixed';
+		document.body.style.top        = `-${_scrollLockY}px`;
+		document.body.style.width      = '100%';
+		if (scrollbarW > 0) {
+			document.body.style.paddingRight = `${scrollbarW}px`;
+		}
+	}
+	_scrollLockCount++;
+	window.pauseHeaderScroll?.();
+}
+
+function unlockBodyScroll() {
+	if (_scrollLockCount <= 0) return;
+	_scrollLockCount--;
+	if (_scrollLockCount === 0) {
+		document.body.style.overflow    = '';
+		document.body.style.position    = '';
+		document.body.style.top         = '';
+		document.body.style.width       = '';
+		document.body.style.paddingRight = '';
+		window.scrollTo({ top: _scrollLockY, behavior: 'instant' });
+		window.resumeHeaderScroll?.();
+	}
+}
+
 /* ─── ICONOS ─── */
 const iconoCarrito = `
 	<svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" class="carrito-add">
@@ -214,7 +253,7 @@ function abrirCarrito() {
 	overlay.setAttribute('aria-hidden', 'false');
 	panel.setAttribute('aria-hidden',   'false');
 	document.body.classList.add('carrito-abierto');
-	window.pauseHeaderScroll?.();
+	lockBodyScroll();
 }
 
 function cerrarCarrito() {
@@ -226,7 +265,7 @@ function cerrarCarrito() {
 	overlay.setAttribute('aria-hidden', 'true');
 	panel.setAttribute('aria-hidden',   'true');
 	document.body.classList.remove('carrito-abierto');
-	window.resumeHeaderScroll?.();
+	unlockBodyScroll();
 }
 
 function animarBotonAnadir(boton) {
@@ -292,24 +331,71 @@ function agregarAlCarrito(producto, boton) {
 	renderizarCarrito();
 }
 
-function eliminarDelCarrito(index) {
+function eliminarDelCarrito(index, itemEl) {
 	const carrito = carritoActivo();
 	if (!Number.isInteger(index) || index < 0 || index >= carrito.length) return;
 
 	const productoEliminado = carrito[index];
-	carrito.splice(index, 1);
 
+	// Si viene el elemento DOM, lo animamos antes de volver a renderizar
+	if (itemEl) {
+		itemEl.classList.add('is-removing');
+		// Esperamos que la animación CSS termine (200ms) antes de actualizar la lista
+		setTimeout(() => {
+			carrito.splice(index, 1);
+			desmarcarProductoEnGrid(productoEliminado.nombre);
+			renderizarCarrito();
+		}, 210);
+	} else {
+		carrito.splice(index, 1);
+		desmarcarProductoEnGrid(productoEliminado.nombre);
+		renderizarCarrito();
+	}
+}
+
+function desmarcarProductoEnGrid(nombre) {
 	const isEncargue = modoActual() === 'encargue';
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
 		const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
-		if (producto && producto.nombre === productoEliminado.nombre) {
+		if (producto && producto.nombre === nombre) {
 			desmarcarBotonAgregado(btn, isEncargue);
 		}
 	});
+}
 
-	renderizarCarrito();
+function vaciarCarrito() {
+	const carrito = carritoActivo();
+	if (!carrito.length) return;
+
+	const lista = document.getElementById('carrito-lista');
+	if (lista) {
+		// Animamos todos los items a la vez con un pequeño escalonado
+		const items = lista.querySelectorAll('.carrito-item');
+		items.forEach((el, i) => {
+			setTimeout(() => el.classList.add('is-removing'), i * 40);
+		});
+		const delay = items.length * 40 + 210;
+		setTimeout(() => {
+			const isEncargue = modoActual() === 'encargue';
+			carrito.forEach(item => {
+				document.querySelectorAll('.btn-anadir').forEach(btn => {
+					const tarjeta = btn.closest('.tarjeta-producto');
+					if (!tarjeta) return;
+					const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+					if (producto && producto.nombre === item.nombre) {
+						desmarcarBotonAgregado(btn, isEncargue);
+					}
+				});
+			});
+			carrito.length = 0;
+			renderizarCarrito();
+		}, delay);
+	} else {
+		carrito.length = 0;
+		renderizarCarrito();
+	}
 }
 
 function construirMensajeWhatsApp() {
@@ -334,7 +420,7 @@ if (carritoLista) {
 		if (!botonEliminar) return;
 		const item  = botonEliminar.closest('.carrito-item');
 		const index = Number(item?.dataset.carritoIndex);
-		eliminarDelCarrito(index);
+		eliminarDelCarrito(index, item);
 	});
 }
 
@@ -425,6 +511,7 @@ function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
 	searchBar.classList.remove('is-closing', 'is-header-hidden', 'is-scroll-hidden');
 	searchBar.classList.add('is-active');
 	actualizarBotonBusqueda(searchSubmitBtn);
+	window.scrollToHeaderCollapsed?.();
 	setTimeout(() => searchInput.focus(), 150);
 }
 
@@ -445,6 +532,8 @@ function renderizarProductos(productos, opciones = {}) {
 	const grid = document.querySelector('.grid-productos');
 	if (!grid) return;
 
+	const savedY = window.scrollY;
+
 	grid.innerHTML = `
 		<div class="grid-sizer"></div>
 		<div class="gutter-sizer"></div>
@@ -452,6 +541,15 @@ function renderizarProductos(productos, opciones = {}) {
 	`;
 	mostrarEstadoSinResultados(mostrarVacio);
 	inicializarMasonry();
+
+	// Restaurar scroll: el rebuild del DOM puede forzar al navegador a volver al top
+	if (savedY > 0) {
+		requestAnimationFrame(() =>
+			requestAnimationFrame(() =>
+				window.scrollTo({ top: savedY, behavior: 'instant' })
+			)
+		);
+	}
 }
 
 // --------- LA FUNCION DEL ALGORITMO DE PESO ----------//
@@ -709,16 +807,14 @@ function abrirDetalles(datos) {
 
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
-	document.body.style.overflow = 'hidden';
-	window.pauseHeaderScroll?.();
+	lockBodyScroll();
 }
 
 function cerrarModal() {
 	modal.classList.remove('is-active');
 	setTimeout(() => {
-		modal.style.display          = 'none';
-		document.body.style.overflow = 'auto';
-		window.resumeHeaderScroll?.();
+		modal.style.display = 'none';
+		unlockBodyScroll();
 	}, 500);
 }
 
@@ -784,6 +880,7 @@ function aplicarFiltros() {
 function filtrarProductos(termino) {
 	estadoFiltros.termino = termino.trim();
 	aplicarFiltros();
+	actualizarIndicadorBusqueda();
 }
 
 function actualizarIndicadorFiltros() {
@@ -797,6 +894,20 @@ function actualizarIndicadorFiltros() {
 		dot.className = 'filter-dot';
 		filterBtn.appendChild(dot);
 	} else if (!hayFiltros && dot) {
+		dot.remove();
+	}
+}
+
+function actualizarIndicadorBusqueda() {
+	const buscarBtn = document.getElementById('buscar-btn');
+	if (!buscarBtn) return;
+	const hayBusqueda = !!estadoFiltros.termino;
+	let dot = buscarBtn.querySelector('.search-dot');
+	if (hayBusqueda && !dot) {
+		dot = document.createElement('span');
+		dot.className = 'search-dot';
+		buscarBtn.appendChild(dot);
+	} else if (!hayBusqueda && dot) {
 		dot.remove();
 	}
 }
@@ -1009,7 +1120,7 @@ function initMenuHamburguesa() {
 		document.body.appendChild(ov);
 		document.body.appendChild(panel);
 		document.body.classList.add('carrito-abierto', 'menu-open');
-		window.pauseHeaderScroll?.();
+		lockBodyScroll();
 
 		ov.addEventListener('click', cerrarMenu);
 		requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1039,7 +1150,7 @@ function initMenuHamburguesa() {
 		const panel = document.getElementById('menu-nav-panel');
 		if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 		if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
-		window.resumeHeaderScroll?.();
+		unlockBodyScroll();
 	}
 
 	menuBtn.addEventListener('click', () =>
@@ -1120,7 +1231,7 @@ function abrirContactoPanel() {
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
 	document.body.classList.add('contacto-abierto');
-	window.pauseHeaderScroll?.();
+	lockBodyScroll();
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		ov.classList.add('is-active');
@@ -1144,7 +1255,7 @@ function cerrarContactoPanel() {
 	document.body.classList.remove('contacto-abierto');
 	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
-	window.resumeHeaderScroll?.();
+	unlockBodyScroll();
 }
 
 function limpiarErrorCampo(el) {
@@ -1347,7 +1458,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	if (buscarBtn && searchBar && searchInput && searchSubmitBtn) {
 		buscarBtn.addEventListener('click', () => {
-			if (!searchBar.classList.contains('is-active')) {
+			const barHidden = !searchBar.classList.contains('is-active') ||
+			                   searchBar.classList.contains('is-scroll-hidden');
+			if (barHidden) {
 				abrirBuscador(searchBar, searchInput, searchSubmitBtn);
 				return;
 			}
@@ -1374,6 +1487,9 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (carritoOverlay)  carritoOverlay.addEventListener('click',  cerrarCarrito);
 	if (carritoCerrar)   carritoCerrar.addEventListener('click',   cerrarCarrito);
 	if (carritoWhatsapp) carritoWhatsapp.addEventListener('click', enviarPedidoWhatsApp);
+
+	const carritoVaciar = document.getElementById('carrito-vaciar');
+	if (carritoVaciar) carritoVaciar.addEventListener('click', vaciarCarrito);
 
 	if (btnComprarAhora) {
 		btnComprarAhora.addEventListener('click', () => {
@@ -1408,12 +1524,10 @@ if (header) {
 	const headerNav        = header.querySelector('.header-nav');
 	const iconosContainer  = header.querySelector('.iconos-container');
 	const searchBar        = document.getElementById('search-bar');
-	const searchInput      = document.getElementById('search-input');
-	const searchSubmitBtn  = document.getElementById('search-submit-btn');
 
 	// Constantes de altura (equivalen a las antiguas variables CSS --h-grande / --h-pequena)
 	const H_SMALL = 70; // px — altura colapsada
-	const H_BIG_VH = 0.30; // 30vh — altura expandida
+	const H_BIG_VH = 0.45; // 45vh — altura expandida
 
 	// ── Cache de viewport ───────────────────────────────────────────────
 	// En mobile, la barra de URL del navegador se muestra/oculta al scrollear,
@@ -1493,17 +1607,10 @@ if (header) {
 			}
 		}
 
-		// ── Buscador: se oculta cuando el header colapsa
+		// ── Buscador: se oculta visualmente al scrollear pero no borra la búsqueda
 		if (searchBar) {
 			if (p > 0.2) {
-				if (searchBar.classList.contains('is-active') &&
-				    !searchBar.classList.contains('is-closing')) {
-					cerrarBuscador(searchBar, searchInput, searchSubmitBtn);
-				}
-				// Solo ocultar si el buscador no está abierto por el usuario
-				if (!searchBar.classList.contains('is-active')) {
-					searchBar.classList.add('is-scroll-hidden');
-				}
+				searchBar.classList.add('is-scroll-hidden');
 			} else {
 				searchBar.classList.remove('is-scroll-hidden');
 			}
@@ -1532,6 +1639,14 @@ if (header) {
 		pausado = false;
 		lastP = -1;
 		scheduleUpdate();
+	};
+
+	// Scroll exacto al punto donde termina la animación del header (header en modo normal)
+	window.scrollToHeaderCollapsed = () => {
+		const threshold = Math.max(140, vhCached * 0.18);
+		if (window.scrollY < threshold) {
+			window.scrollTo({ top: threshold, behavior: 'smooth' });
+		}
 	};
 
 	window.addEventListener('scroll', scheduleUpdate, { passive: true });
