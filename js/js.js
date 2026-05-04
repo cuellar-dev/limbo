@@ -1620,7 +1620,10 @@ if (header) {
 				headerContainer.style.paddingTop    = '';
 				headerContainer.style.paddingBottom = '';
 			}
-			if (logoArea)  logoArea.style.transform  = '';
+			// Valor explícito en lugar de limpiar el inline style.
+			// Limpiar caería al CSS por defecto translateY(24px), generando
+			// un salto visible desde la posición real del logo (p≈0.9 → ~2px).
+			if (logoArea)  logoArea.style.transform  = 'translateY(0px) translateX(-25%)';
 			if (h1El)      h1El.style.transform      = '';
 		} else {
 			if (headerContainer) {
@@ -1691,6 +1694,16 @@ if (header) {
 		}
 	};
 
+	// Aplicación SÍNCRONA del estado inicial — elimina el flash de 1 frame
+	// donde el browser pinta el CSS height:45vh antes de que el rAF de
+	// scheduleUpdate() se ejecute. En mobile, vh != window.innerHeight
+	// (barra URL visible), así que sin esto hay un salto visible al arrancar.
+	{
+		const _initRango = Math.max(140, vhCached * 0.18);
+		const _initP = Math.min(1, Math.max(0, window.scrollY / _initRango));
+		applyHeaderStyles(_initP);
+	}
+
 	window.addEventListener('scroll', scheduleUpdate, { passive: true });
 
 	// resize: en móvil, mostrar/ocultar la barra del navegador dispara resize
@@ -1714,5 +1727,7 @@ if (header) {
 		lastP       = -1;
 		scheduleUpdate();
 	}, { passive: true });
-	scheduleUpdate(); // estado inicial
+	// El estado inicial ya se aplica síncronamente arriba; este scheduleUpdate
+	// es un seguro por si el scroll cambió entre la inicialización y el primer frame.
+	scheduleUpdate();
 }

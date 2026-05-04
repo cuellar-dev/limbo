@@ -739,38 +739,39 @@ svg.icono-transicion {
     flex-direction: column;
     justify-content: center;
     background: rgba(17, 21, 34, 0.85);       /* JS ajusta la alpha */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* backdrop-filter eliminado del estado animado: mientras height cambia
+       cada frame, el GPU tiene que recapturar + re-blur la región entera
+       en cada frame → la causa principal del salto en mobile.
+       Solo se activa en .is-collapsed, donde el tamaño ya es fijo. */
     border-bottom: 1px solid rgba(202, 172, 71, 0.1); /* JS ajusta la alpha */
     position: sticky;
     top: 0;
     z-index: 100;
-    /* overflow: clip evita crear un nuevo contexto de scroll —
-       a diferencia de overflow: hidden — y no rompe position: sticky en mobile.
-       Fallback automático a hidden en navegadores antiguos. */
     overflow: hidden;
     overflow: clip;
     padding: 0 20px;
-    transition: background 0.2s ease;
+    /* transition: background eliminado — JS sobreescribe este valor cada frame
+       de todas formas; la transition solo crea interferencia. */
     margin-bottom: 10px;
-    /* Promovemos el header a su propia capa de compositing para que el
-       backdrop-filter no fuerce repaints del documento entero al scrollear. */
     will-change: transform;
     transform: translateZ(0);
 }
 
-/* En mobile, backdrop-filter es uno de los efectos más caros del pipeline
-   (especialmente en Android/Chromium). Lo reducimos progresivamente:
-   - tablets/mobile grande: blur más liviano
-   - mobile chico: lo eliminamos y compensamos subiendo la opacidad del fondo */
+/* backdrop-filter solo cuando el header ya está colapsado y quieto —
+   aquí el tamaño es fijo (70px), no hay resize de textura GPU. */
+#header.is-collapsed {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
 @media (max-width: 768px) {
-    #header {
+    #header.is-collapsed {
         backdrop-filter: blur(4px);
         -webkit-backdrop-filter: blur(4px);
     }
 }
 @media (max-width: 480px) {
-    #header {
+    #header.is-collapsed {
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
     }
@@ -791,8 +792,7 @@ svg.icono-transicion {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transform: translateY(24px); /* JS interpola: translateY(24*(1-p)px) translateX(-25%*p) */
-    transition: transform 0.1s linear;
+    transform: translateY(24px); /* JS controla este valor en cada frame — sin CSS transition */
     width: 100%;
     will-change: transform;
 }
