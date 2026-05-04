@@ -585,9 +585,12 @@ async function cargarProductos() {
 	try {
 		const response = await fetch('datos/datos.json');
 		if (!response.ok) throw new Error(`No se pudo leer datos.json (${response.status})`);
-		const productos = await response.json();
-		const productosSeguros = Array.isArray(productos) ? productos : [];
-		estadoTienda.productos = ordenarPorPesoAleatorio(productosSeguros);
+		const data = await response.json();
+		// Compat: acepta el formato viejo (array) o el nuevo ({productos, outfits})
+		const productos = Array.isArray(data) ? data : (data.productos || []);
+		const outfits   = Array.isArray(data) ? []   : (data.outfits   || []);
+		estadoTienda.productos = ordenarPorPesoAleatorio(productos);
+		estadoTienda.outfits   = outfits;
 
 		renderizarProductos(estadoTienda.productos);
 	} catch (error) {
@@ -1055,17 +1058,17 @@ function initMenuHamburguesa() {
 			<nav class="menu-nav-links">
 				<a class="menu-nav-item" href="#">
 					<span class="menu-nav-num">01</span>
-					<span class="menu-nav-text">Productos</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
-				<a class="menu-nav-item" href="#">
-					<span class="menu-nav-num">02</span>
 					<span class="menu-nav-text">Colecciones</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
 				<a class="menu-nav-item" href="#">
-					<span class="menu-nav-num">03</span>
+					<span class="menu-nav-num">02</span>
 					<span class="menu-nav-text">Encargues</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item menu-nav-item-outfits" href="#" data-action="outfits">
+					<span class="menu-nav-num">03</span>
+					<span class="menu-nav-text">Outfits</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
 				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
@@ -1144,16 +1147,26 @@ function initMenuHamburguesa() {
 		}));
 		itemsNoTocar = document.querySelectorAll('.menu-nav-item');
 		itemsNoTocar.forEach(item => {
-			item.addEventListener('contextmenu', function(e) {
+			item.addEventListener('contextmenu', (e) => e.preventDefault());
+			// Cualquier opción del menú cierra el panel al tocarse
+			item.addEventListener('click', (e) => {
 				e.preventDefault();
+				cerrarMenu();
 			});
 		});
 
+		// Después del cierre, abre el panel correspondiente
 		const contactoBtn = panel.querySelector('.menu-nav-item-contacto');
 		if (contactoBtn) {
-			contactoBtn.addEventListener('click', (e) => {
-				e.preventDefault();
-				abrirContactoPanel();
+			contactoBtn.addEventListener('click', () => {
+				setTimeout(() => abrirContactoPanel(), 400);
+			});
+		}
+
+		const outfitsBtn = panel.querySelector('.menu-nav-item-outfits');
+		if (outfitsBtn) {
+			outfitsBtn.addEventListener('click', () => {
+				setTimeout(() => abrirOutfitsPanel(), 400);
 			});
 		}
 
@@ -1385,6 +1398,255 @@ async function manejarEnvioContacto(e) {
 
 
 /* ═══════════════════════════════════════════════════════════
+   Panel de Outfits — mostruario tipo lookbook.
+   ───────────────────────────────────────────────────────────
+   LÓGICA:
+   - Cada outfit en datos.json tiene { imagen, prendas[] }, donde cada
+     prenda referencia un producto por nombre + un punto (puntoX/Y en
+     porcentaje) sobre la imagen.
+   - El panel arma un carrusel horizontal (un slide por outfit). Cada
+     slide divide la pantalla en dos: imagen a la izquierda con
+     marcadores numerados sobre los puntos indicados, y a la derecha
+     una columna con las cards de los productos del look.
+   - Líneas punteadas SVG conectan cada marcador con su card. Se
+     recalculan al renderizar, al hacer resize, y al cambiar de slide.
+     En mobile (<= 720px) la imagen va arriba y las cards abajo, sin
+     conectores — los marcadores se reemplazan por números visibles
+     que coinciden con la numeración de las cards.
+   - Click en una card abre el modal de detalle existente (abrirDetalles)
+     reusando la lógica de carrito/precio/etc. Si el producto referenciado
+     en datos.json no existe en estadoTienda.productos, la card se
+     muestra como placeholder no clickable (no rompe).
+   - El dorado de los marcadores y conectores usa var(--color-alas-principal)
+     para que cambie automáticamente al activar encargues, y los fondos
+     usan variables temáticas para alternar oscuro/claro.
+
+   NOTA SOBRE PERSONAJE 2D vs FOTO:
+   Decidí mantener foto real (o mockup tipo editorial) en lugar de
+   personaje 2D. Un personaje cartoon rompe el lenguaje premium del
+   resto de la web (tipografías serif, dorados envejecidos, paleta
+   sobria). El campo `imagen` es solo una URL — cuando haya producción
+   fotográfica real, se reemplaza sin tocar lógica.
+═══════════════════════════════════════════════════════════ */
+function abrirOutfitsPanel() {
+	if (document.getElementById('outfits-panel')) return;
+
+	const outfits = (estadoTienda.outfits || []);
+	if (!outfits.length) return;
+
+	const ov = document.createElement('div');
+	ov.id = 'outfits-overlay';
+	ov.className = 'outfits-overlay';
+
+	const panel = document.createElement('div');
+	panel.id = 'outfits-panel';
+	panel.className = 'outfits-panel';
+
+	// Mapa rápido nombre → producto (para cards y para abrir el detalle)
+	const mapaProductos = new Map(
+		(estadoTienda.productos || []).map(p => [p.nombre, p])
+	);
+
+	// HTML de cada slide ─────────────────────────────────────────
+	const slidesHTML = outfits.map((outfit, idx) => {
+		const markersHTML = outfit.prendas.map((pr, i) => `
+			<span class="outfit-marker" data-idx="${i}"
+			      style="left:${pr.puntoX}%;top:${pr.puntoY}%">
+				<span class="outfit-marker-num">${i + 1}</span>
+			</span>
+		`).join('');
+
+		const cardsHTML = outfit.prendas.map((pr, i) => {
+			const prod = mapaProductos.get(pr.producto);
+			const img  = prod?.imagen || 'imagenes/sudadera.jpg';
+			const nom  = prod?.nombre || pr.producto;
+			const cat  = prod?.categoria ? prod.categoria.charAt(0).toUpperCase() + prod.categoria.slice(1) : (pr.etiqueta || '');
+			const prec = prod ? formatPrecio(prod.precio) : '';
+			const noProd = prod ? '' : 'is-placeholder';
+			return `
+				<button class="outfit-prenda ${noProd}" data-idx="${i}"
+				        data-producto="${nom.replace(/"/g, '&quot;')}"
+				        ${prod ? '' : 'disabled aria-disabled="true"'}>
+					<span class="outfit-prenda-num">${i + 1}</span>
+					<span class="outfit-prenda-img" style="background-image:url('${img}')"></span>
+					<span class="outfit-prenda-info">
+						<span class="outfit-prenda-cat">${cat}</span>
+						<span class="outfit-prenda-nombre">${nom}</span>
+						${prec ? `<span class="outfit-prenda-precio">${prec}</span>` : ''}
+					</span>
+					<span class="outfit-prenda-arrow">→</span>
+				</button>
+			`;
+		}).join('');
+
+		return `
+			<article class="outfit-slide" data-outfit-id="${outfit.id}" data-slide="${idx}">
+				<div class="outfit-imagen-wrap">
+					<div class="outfit-imagen" style="background-image:url('${outfit.imagen}')"></div>
+					<div class="outfit-markers">${markersHTML}</div>
+				</div>
+
+				<aside class="outfit-detalle">
+					<header class="outfit-detalle-head">
+						<span class="outfit-detalle-eyebrow">Look ${String(idx + 1).padStart(2, '0')}</span>
+						<h3 class="outfit-detalle-titulo">${outfit.nombre}</h3>
+						<p class="outfit-detalle-estilo">${outfit.estilo}</p>
+						<p class="outfit-detalle-desc">${outfit.descripcion}</p>
+					</header>
+					<div class="outfit-prendas-lista">${cardsHTML}</div>
+				</aside>
+
+				<svg class="outfit-conectores" aria-hidden="true"></svg>
+			</article>
+		`;
+	}).join('');
+
+	const dotsHTML = outfits.map((_, i) =>
+		`<button class="outfits-dot ${i === 0 ? 'is-active' : ''}" data-go="${i}" aria-label="Ir al look ${i + 1}"></button>`
+	).join('');
+
+	panel.innerHTML = `
+		<button class="outfits-cerrar" aria-label="Cerrar outfits">✕</button>
+		<div class="outfits-glow"></div>
+
+		<header class="outfits-header">
+			<span class="outfits-eyebrow">Looks completos</span>
+			<h2 class="outfits-titulo">Outfits</h2>
+			<p class="outfits-sub">Inspiración armada con prendas reales de la tienda.</p>
+		</header>
+
+		<div class="outfits-carousel">
+			<button class="outfits-nav outfits-prev" aria-label="Anterior">‹</button>
+			<div class="outfits-viewport">
+				<div class="outfits-track">${slidesHTML}</div>
+			</div>
+			<button class="outfits-nav outfits-next" aria-label="Siguiente">›</button>
+		</div>
+
+		<div class="outfits-dots">${dotsHTML}</div>
+	`;
+
+	document.body.appendChild(ov);
+	document.body.appendChild(panel);
+	document.body.classList.add('outfits-abierto');
+	lockBodyScroll();
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov.classList.add('is-active');
+		panel.classList.add('is-active');
+	}));
+
+	// ─── Carrusel ──────────────────────────────────────────────
+	const track = panel.querySelector('.outfits-track');
+	const dots  = panel.querySelectorAll('.outfits-dot');
+	let idxActual = 0;
+
+	function irA(i) {
+		idxActual = Math.max(0, Math.min(outfits.length - 1, i));
+		track.style.transform = `translateX(-${idxActual * 100}%)`;
+		dots.forEach((d, di) => d.classList.toggle('is-active', di === idxActual));
+		// Re-dibuja conectores tras la transición
+		setTimeout(dibujarConectoresActivo, 380);
+	}
+
+	panel.querySelector('.outfits-prev').addEventListener('click', () => irA(idxActual - 1));
+	panel.querySelector('.outfits-next').addEventListener('click', () => irA(idxActual + 1));
+	dots.forEach(d => d.addEventListener('click', () => irA(Number(d.dataset.go))));
+
+	// ─── Conectores SVG ────────────────────────────────────────
+	function dibujarConectores(slide) {
+		const svg = slide.querySelector('.outfit-conectores');
+		const markers = slide.querySelectorAll('.outfit-marker');
+		const cards   = slide.querySelectorAll('.outfit-prenda');
+		if (!svg || !markers.length) return;
+
+		// En mobile no dibujamos conectores (layout vertical, números bastan)
+		if (window.matchMedia('(max-width: 720px)').matches) {
+			svg.innerHTML = '';
+			return;
+		}
+
+		const slideRect = slide.getBoundingClientRect();
+		svg.setAttribute('viewBox', `0 0 ${slideRect.width} ${slideRect.height}`);
+		svg.setAttribute('width',  slideRect.width);
+		svg.setAttribute('height', slideRect.height);
+
+		let lineas = '';
+		markers.forEach((m, i) => {
+			const card = cards[i];
+			if (!card) return;
+			const mr = m.getBoundingClientRect();
+			const cr = card.getBoundingClientRect();
+			const x1 = mr.left + mr.width / 2  - slideRect.left;
+			const y1 = mr.top  + mr.height / 2 - slideRect.top;
+			const x2 = cr.left                  - slideRect.left + 4;
+			const y2 = cr.top  + cr.height / 2  - slideRect.top;
+			// Línea punteada con quiebre suave (curva Bézier sutil)
+			const cx = (x1 + x2) / 2;
+			lineas += `
+				<path d="M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}"
+				      fill="none" stroke="var(--color-alas-principal)"
+				      stroke-width="1.4" stroke-dasharray="4 5" opacity="0.85"/>
+				<circle cx="${x1}" cy="${y1}" r="3" fill="var(--color-alas-principal)" />
+			`;
+		});
+		svg.innerHTML = lineas;
+	}
+
+	function dibujarConectoresActivo() {
+		const slide = track.children[idxActual];
+		if (slide) dibujarConectores(slide);
+	}
+
+	// Dibujo inicial: tras dos rAF (panel ya está en pantalla y con dimensiones)
+	requestAnimationFrame(() => requestAnimationFrame(dibujarConectoresActivo));
+
+	const onResize = () => dibujarConectoresActivo();
+	window.addEventListener('resize', onResize);
+
+	// ─── Click en card → abre el detalle del producto ─────────
+	track.addEventListener('click', (e) => {
+		const card = e.target.closest('.outfit-prenda');
+		if (!card || card.disabled) return;
+		const nombre = card.dataset.producto;
+		const prod = mapaProductos.get(nombre);
+		if (!prod) return;
+		// Cerrar el panel para que el modal quede limpio encima
+		cerrarOutfitsPanel();
+		setTimeout(() => abrirDetalles(prod), 280);
+	});
+
+	// ─── Cerrar ───────────────────────────────────────────────
+	function cerrarConCleanup() {
+		window.removeEventListener('resize', onResize);
+		cerrarOutfitsPanel();
+	}
+	ov.addEventListener('click', cerrarConCleanup);
+	panel.querySelector('.outfits-cerrar').addEventListener('click', cerrarConCleanup);
+
+	// ─── Swipe táctil para móviles ────────────────────────────
+	let touchX0 = null;
+	const viewport = panel.querySelector('.outfits-viewport');
+	viewport.addEventListener('touchstart', (e) => { touchX0 = e.touches[0].clientX; }, { passive: true });
+	viewport.addEventListener('touchend',   (e) => {
+		if (touchX0 == null) return;
+		const dx = e.changedTouches[0].clientX - touchX0;
+		if (Math.abs(dx) > 50) irA(idxActual + (dx < 0 ? 1 : -1));
+		touchX0 = null;
+	});
+}
+
+function cerrarOutfitsPanel() {
+	const ov    = document.getElementById('outfits-overlay');
+	const panel = document.getElementById('outfits-panel');
+	document.body.classList.remove('outfits-abierto');
+	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
+	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
+	unlockBodyScroll();
+}
+
+
+/* ═══════════════════════════════════════════════════════════
    Footer de página — se inyecta dinámicamente al cargar.
    Llamá initFooter() dentro de DOMContentLoaded.
 ═══════════════════════════════════════════════════════════ */
@@ -1565,9 +1827,10 @@ if (header) {
 	// lo que cambia window.innerHeight constantemente y genera "saltos" en la
 	// animación si recalculamos hBig en cada frame. Cacheamos hBig y solo lo
 	// recalculamos cuando cambia el ANCHO (rotación / cambio real de viewport).
-	let lastWidth   = window.innerWidth;
-	let vhCached    = window.innerHeight;
-	let hBigCached  = vhCached * H_BIG_VH;
+	let lastWidth          = window.innerWidth;
+	let vhCached           = window.innerHeight;
+	let hBigCached         = vhCached * H_BIG_VH;
+	let headerWidthCached  = header.clientWidth; // px — para translateX en px, evita la discontinuidad del %
 
 	let lastP    = -1; // evita recalcular si el progreso no cambió
 	let ticking  = false;
@@ -1575,13 +1838,15 @@ if (header) {
 
 	function applyHeaderStyles(p) {
 		if (Math.abs(p - lastP) < 0.001) return; // sin cambio visible
+		const prevP = lastP;
 		lastP = p;
 
-		// Umbral subido a 0.98: los cambios CSS estructurales de .is-collapsed
-		// (flex-direction:row, font-size, etc.) ahora solo se disparan cuando
-		// el header ya está a ~71px — casi en su tamaño final — en vez de a
-		// ~88px (p=0.9), donde el cambio de layout era visible como un salto.
-		const isCollapsed = p >= 0.98;
+		// Histéresis en isCollapsed: entra al 0.98 pero solo sale al bajar de 0.85.
+		// Evita que scroll rápido hacia arriba haga oscilar la clase entre frames
+		// (y con ello los cambios de layout CSS que producen el salto visible).
+		const goingDown = p > prevP;
+		const collapseThreshold = (headerWasCollapsed && !goingDown) ? 0.85 : 0.98;
+		const isCollapsed = p >= collapseThreshold;
 		const isExpanded  = p <= 0.18;
 
 		// ── Clases de estado (para estilos CSS estructurales: flex-direction, etc.)
@@ -1624,10 +1889,10 @@ if (header) {
 				headerContainer.style.paddingTop    = '';
 				headerContainer.style.paddingBottom = '';
 			}
-			// Valor explícito en lugar de limpiar el inline style.
-			// Limpiar caería al CSS por defecto translateY(24px), generando
-			// un salto visible desde la posición real del logo (p≈0.9 → ~2px).
-			if (logoArea)  logoArea.style.transform  = 'translateY(0px) translateX(-25%)';
+			// translateY(0px) explícito: evita caer al CSS default translateY(24px).
+			// translateX(0px): el CSS is-collapsed posiciona el logo a la izquierda
+			// con flex/space-between; no se necesita desplazamiento adicional en X.
+			if (logoArea)  logoArea.style.transform  = 'translateY(0px) translateX(0px)';
 			if (h1El)      h1El.style.transform      = '';
 		} else {
 			if (headerContainer) {
@@ -1636,7 +1901,7 @@ if (header) {
 			}
 			if (logoArea) {
 				logoArea.style.transform =
-					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-25 * p).toFixed(2)}%)`;
+					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-headerWidthCached * 0.25 * p).toFixed(2)}px)`;
 			}
 			if (h1El) {
 				// Antes: animábamos font-size + letter-spacing en cada frame, lo que
@@ -1664,10 +1929,11 @@ if (header) {
 		if (ticking || pausado) return;
 		ticking = true;
 		requestAnimationFrame(() => {
+			ticking = false;
+			if (pausado) return; // rAF encolado antes de pausar — abortar
 			const rangoScroll = Math.max(140, vhCached * 0.18);
 			const p = Math.min(1, Math.max(0, window.scrollY / rangoScroll));
 			applyHeaderStyles(p);
-			ticking = false;
 		});
 	}
 
@@ -1681,7 +1947,8 @@ if (header) {
 		if (!pausado) return;
 		pausado = false;
 		lastP = -1;
-		scheduleUpdate();
+		// Un frame extra para que scrollTo({behavior:'instant'}) termine antes de leer scrollY
+		requestAnimationFrame(() => scheduleUpdate());
 	};
 
 	// Fuerza re-aplicación del header al cambiar de tema (resetea lastP para recalcular colores)
@@ -1716,19 +1983,21 @@ if (header) {
 	window.addEventListener('resize', () => {
 		const w = window.innerWidth;
 		if (w === lastWidth) return; // ignora cambios solo de altura (URL bar móvil)
-		lastWidth   = w;
-		vhCached    = window.innerHeight;
-		hBigCached  = vhCached * H_BIG_VH;
-		lastP       = -1;
+		lastWidth          = w;
+		vhCached           = window.innerHeight;
+		hBigCached         = vhCached * H_BIG_VH;
+		headerWidthCached  = header.clientWidth;
+		lastP              = -1;
 		scheduleUpdate();
 	}, { passive: true });
 
 	// orientationchange sí es un cambio real → forzamos recálculo completo
 	window.addEventListener('orientationchange', () => {
-		lastWidth   = window.innerWidth;
-		vhCached    = window.innerHeight;
-		hBigCached  = vhCached * H_BIG_VH;
-		lastP       = -1;
+		lastWidth          = window.innerWidth;
+		vhCached           = window.innerHeight;
+		hBigCached         = vhCached * H_BIG_VH;
+		headerWidthCached  = header.clientWidth;
+		lastP              = -1;
 		scheduleUpdate();
 	}, { passive: true });
 	// El estado inicial ya se aplica síncronamente arriba; este scheduleUpdate

@@ -814,7 +814,6 @@ h1 {
        para que sea trabajo de compositor, sin recálculo de layout/text-shaping) */
     transform: translateX(6px);
     transform-origin: center center;
-    transition: transform 0.1s linear;
     isolation: isolate;
     z-index: 100;
     will-change: transform;
@@ -1369,10 +1368,11 @@ body.carrito-abierto {
         height: fit-content;
         transform: none;
         width: fit-content;
+        transform: translateX(0);
     }
     /* Ajustes del h1 cuando el header se recoge */
     #header.is-collapsed h1 {
-        transform: translateX(0);
+
         font-size: 30px;
     }
     #header.is-collapsed nav{
@@ -3573,8 +3573,8 @@ body.is-light {
     --bg-radial:       radial-gradient(circle at top center, #E8EDF5 0%, #F7F8FA 60%);
 
     /* Inputs */
-    --input-bg:            rgba(255, 255, 255, 0.82);
-    --input-bg-focus:      rgba(255, 255, 255, 0.97);
+    --input-bg:            rgba(225, 229, 236, 0.90);
+    --input-bg-focus:      rgba(225, 229, 236, 0.98);
 
     /* Botones icon y controles de vidrio */
     --glass-btn-bg:        rgba(43, 47, 51, 0.06);
@@ -3592,7 +3592,7 @@ body.is-light {
 
     /* Panel contacto */
     --contacto-panel-bg:   linear-gradient(170deg, #F5F7FC 0%, #EDF1F8 70%, #E8EEF7 100%);
-    --form-field-bg:       rgba(255, 255, 255, 0.78);
+    --form-field-bg:       rgba(218, 224, 233, 0.88);
 }
 
 /* h1 text-shadow */
@@ -3719,3 +3719,399 @@ body.is-light .contacto-campo input::placeholder,
 body.is-light .contacto-campo textarea::placeholder {
     color: rgba(43, 47, 51, 0.35);
 }
+
+
+/* ═══════════════════════════════════════════════════════════
+   PANEL DE OUTFITS — Lookbook con conectores SVG.
+   Usa --color-alas-principal (cambia con encargues) y vars de
+   tema (--tarjeta-fondo, --texto-brillante, etc.) para responder
+   a oscuro/claro automáticamente.
+═══════════════════════════════════════════════════════════ */
+.outfits-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    opacity: 0;
+    transition: opacity 0.38s ease;
+    z-index: 1200;
+}
+body.is-light .outfits-overlay { background: rgba(220, 226, 236, 0.55); }
+.outfits-overlay.is-active  { opacity: 1; }
+.outfits-overlay.is-closing { opacity: 0; }
+
+.outfits-panel {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -48%) scale(0.97);
+    width: min(1100px, 94vw);
+    max-height: 92vh;
+    overflow: hidden;
+    z-index: 1210;
+    border-radius: 22px;
+    background: var(--contacto-panel-bg);
+    border: 1px solid var(--borde-dorado);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+}
+.outfits-panel.is-active  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.outfits-panel.is-closing { opacity: 0; transform: translate(-50%, -52%) scale(0.97); }
+
+.outfits-glow {
+    position: absolute;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 380px; height: 220px;
+    background: radial-gradient(circle, rgba(202, 172, 71, 0.18), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+body.is-encargue .outfits-glow {
+    background: radial-gradient(circle, rgba(93, 114, 233, 0.22), transparent 70%);
+}
+
+.outfits-cerrar {
+    position: absolute;
+    top: 14px; right: 16px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--glass-btn-bg);
+    border: 1px solid var(--borde-dorado);
+    color: var(--texto-brillante);
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 5;
+    transition: background 0.25s ease, transform 0.25s ease;
+}
+.outfits-cerrar:hover { background: rgba(202, 172, 71, 0.18); transform: rotate(90deg); }
+
+.outfits-header {
+    text-align: center;
+    padding: 28px 24px 14px;
+    position: relative;
+    z-index: 2;
+}
+.outfits-eyebrow {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-alas-principal);
+    opacity: 0.85;
+    margin-bottom: 6px;
+}
+.outfits-titulo {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 38px;
+    color: var(--texto-brillante);
+    margin: 0 0 6px;
+    letter-spacing: 1px;
+}
+.outfits-sub {
+    color: var(--texto-secundario);
+    font-size: 13px;
+    margin: 0;
+}
+
+/* ─── Carrusel ──────────────────────────────────────────── */
+.outfits-carousel {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
+    padding: 6px 8px;
+}
+.outfits-viewport {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 16px;
+}
+.outfits-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.outfit-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 12px 18px 18px;
+    box-sizing: border-box;
+}
+
+/* Imagen del outfit */
+.outfit-imagen-wrap {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--tarjeta-fondo);
+    border: 1px solid var(--borde-dorado);
+    aspect-ratio: 3 / 4;
+    max-height: 56vh;
+    margin: auto;
+    justify-self: center;
+    align-self: center;
+    width: 100%;
+    max-width: calc(56vh * 3 / 4);
+}
+.outfit-imagen {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+.outfit-imagen::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, transparent 60%, rgba(0, 0, 0, 0.35));
+    pointer-events: none;
+}
+body.is-light .outfit-imagen::after {
+    background: linear-gradient(160deg, transparent 60%, rgba(43, 47, 51, 0.18));
+}
+
+/* Markers numerados sobre la imagen */
+.outfit-markers { position: absolute; inset: 0; pointer-events: none; }
+.outfit-marker {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--color-alas-principal);
+    box-shadow: 0 0 0 4px rgba(202, 172, 71, 0.18),
+                0 0 12px rgba(202, 172, 71, 0.45);
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: auto;
+    animation: outfitMarkerPulse 2.4s ease-in-out infinite;
+}
+body.is-encargue .outfit-marker {
+    box-shadow: 0 0 0 4px rgba(93, 114, 233, 0.20),
+                0 0 12px rgba(93, 114, 233, 0.50);
+}
+.outfit-marker-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: #0E131D;
+    font-family: 'Quicksand', sans-serif;
+}
+body.is-light .outfit-marker-num { color: #2B2F33; }
+@keyframes outfitMarkerPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%      { transform: translate(-50%, -50%) scale(1.12); }
+}
+
+/* Conectores SVG */
+.outfit-conectores {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ─── Lado derecho: detalles del outfit ──────────────────── */
+.outfit-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    padding: 4px 4px 4px 0;
+}
+.outfit-detalle-head {
+    padding: 4px 0 8px;
+    border-bottom: 1px dashed var(--borde-dorado);
+}
+.outfit-detalle-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-alas-principal);
+    opacity: 0.85;
+}
+.outfit-detalle-titulo {
+    font-family: 'drink', serif;
+    font-size: 26px;
+    color: var(--texto-brillante);
+    margin: 4px 0 2px;
+    letter-spacing: 0.5px;
+}
+.outfit-detalle-estilo {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+    margin: 0 0 6px;
+}
+.outfit-detalle-desc {
+    font-size: 13px;
+    color: var(--texto-secundario);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.outfit-prendas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 4px;
+}
+
+/* Card de prenda */
+.outfit-prenda {
+    display: grid;
+    grid-template-columns: 28px 56px 1fr 18px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px 10px 10px;
+    background: var(--detalle-item-bg);
+    border: 1px solid var(--borde-dorado);
+    border-radius: 12px;
+    cursor: pointer;
+    text-align: left;
+    color: inherit;
+    font-family: inherit;
+    transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease;
+    position: relative;
+    z-index: 2;
+}
+.outfit-prenda:not(:disabled):hover {
+    background: var(--input-bg-focus);
+    border-color: var(--color-alas-principal);
+    transform: translateX(-2px);
+}
+.outfit-prenda.is-placeholder { opacity: 0.55; cursor: default; }
+
+.outfit-prenda-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--color-alas-principal);
+    color: var(--color-alas-principal);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    font-family: 'Quicksand', sans-serif;
+}
+.outfit-prenda-img {
+    width: 56px; height: 56px;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: var(--tarjeta-fondo);
+    border: 1px solid var(--borde-dorado);
+}
+.outfit-prenda-info {
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.outfit-prenda-cat {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--texto-secundario);
+}
+.outfit-prenda-nombre {
+    font-size: 13px;
+    color: var(--texto-brillante);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.outfit-prenda-precio {
+    font-size: 12px;
+    color: var(--color-alas-principal);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+.outfit-prenda-arrow {
+    color: var(--color-alas-principal);
+    font-size: 14px;
+    opacity: 0.7;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+.outfit-prenda:hover .outfit-prenda-arrow { opacity: 1; transform: translateX(3px); }
+
+/* ─── Navegación lateral del carrusel ────────────────────── */
+.outfits-nav {
+    flex-shrink: 0;
+    width: 38px;
+    align-self: center;
+    height: 56px;
+    background: var(--glass-btn-bg);
+    border: 1px solid var(--borde-dorado);
+    color: var(--texto-brillante);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    margin: 0 4px;
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+    z-index: 3;
+}
+.outfits-nav:hover {
+    background: var(--color-alas-principal);
+    color: #0E131D;
+    border-color: var(--color-alas-principal);
+}
+body.is-light .outfits-nav:hover { color: #F7F8FA; }
+
+/* Dots */
+.outfits-dots {
+    display: flex; justify-content: center; gap: 8px;
+    padding: 10px 0 18px;
+}
+.outfits-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--drag-pill-bg);
+    border: none;
+    cursor: pointer;
+    transition: width 0.3s ease, background 0.3s ease;
+}
+.outfits-dot.is-active {
+    width: 22px;
+    border-radius: 4px;
+    background: var(--color-alas-principal);
+}
+
+/* ─── Mobile: layout vertical, sin conectores ─────────────── */
+@media (max-width: 720px) {
+    .outfits-panel { width: 96vw; max-height: 94vh; border-radius: 18px; }
+    .outfits-header { padding: 22px 18px 10px; }
+    .outfits-titulo { font-size: 30px; }
+
+    .outfits-carousel { padding: 4px 4px; }
+    .outfits-nav { display: none; }
+
+    .outfit-slide {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        padding: 8px 12px 12px;
+    }
+    .outfit-imagen-wrap {
+        max-height: 38vh;
+        aspect-ratio: 4 / 3;
+    }
+    .outfit-conectores { display: none; }
+
+    .outfit-detalle { max-height: 38vh; }
+    .outfit-detalle-titulo { font-size: 22px; }
+}
+
+@media (max-width: 480px) {
+    .outfits-panel { border-radius: 14px; }
+    .outfits-titulo { font-size: 26px; }
+    .outfit-imagen-wrap { aspect-ratio: 1 / 1; max-height: 32vh; }
+    .outfit-prenda { grid-template-columns: 24px 48px 1fr 16px; gap: 10px; padding: 8px 12px 8px 8px; }
+    .outfit-prenda-img { width: 48px; height: 48px; }
+}
+
+/* Bloquea scroll del body cuando el panel de outfits está abierto */
+body.outfits-abierto { overflow: hidden; }
