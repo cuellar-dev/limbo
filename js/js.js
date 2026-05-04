@@ -1577,7 +1577,11 @@ if (header) {
 		if (Math.abs(p - lastP) < 0.001) return; // sin cambio visible
 		lastP = p;
 
-		const isCollapsed = p >= 0.9;
+		// Umbral subido a 0.98: los cambios CSS estructurales de .is-collapsed
+		// (flex-direction:row, font-size, etc.) ahora solo se disparan cuando
+		// el header ya está a ~71px — casi en su tamaño final — en vez de a
+		// ~88px (p=0.9), donde el cambio de layout era visible como un salto.
+		const isCollapsed = p >= 0.98;
 		const isExpanded  = p <= 0.18;
 
 		// ── Clases de estado (para estilos CSS estructurales: flex-direction, etc.)

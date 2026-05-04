@@ -753,8 +753,12 @@ svg.icono-transicion {
     /* transition: background eliminado — JS sobreescribe este valor cada frame
        de todas formas; la transition solo crea interferencia. */
     margin-bottom: 10px;
-    will-change: transform;
-    transform: translateZ(0);
+    /* will-change: transform y transform: translateZ(0) eliminados:
+       forzaban una capa GPU propia, y cuando height cambia cada frame
+       el GPU debe recrear la textura → muestra la textura vieja 1-2 frames
+       → salto visual. Sin ellos el height va por CPU paint (síncrono).
+       .is-collapsed activa backdrop-filter que crea su propia capa cuando
+       el header ya está quieto en 70px fijo. */
 }
 
 /* backdrop-filter solo cuando el header ya está colapsado y quieto —
