@@ -1794,9 +1794,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 });
 
-/* ─── HEADER SCROLL ─── */
+/* ─── HEADER SCROLL (GSAP + ScrollTrigger) ─── */
 const header = document.getElementById('header');
-let headerWasCollapsed = false;
 
 const title     = header?.querySelector('h1');
 const leftWing  = document.querySelector('.ala-izquierda');
@@ -1810,53 +1809,43 @@ if (title && leftWing && rightWing) {
 }
 
 if (header) {
-	// Referencias cacheadas — se leen una sola vez para no hacer querySelector en cada frame
-	const logoArea         = header.querySelector('.logo-area');
-	const h1El             = header.querySelector('h1');
-	const headerNav        = header.querySelector('.header-nav');
-	const iconosContainer  = header.querySelector('.iconos-container');
-	const searchBar        = document.getElementById('search-bar');
+	gsap.registerPlugin(ScrollTrigger);
 
-	const H_BIG_VH = 0.45; // 45vh — altura expandida (H_SMALL = 70px vive en el CSS)
+	const logoArea        = header.querySelector('.logo-area');
+	const h1El            = header.querySelector('h1');
+	const headerNav       = header.querySelector('.header-nav');
+	const iconosContainer = header.querySelector('.iconos-container');
+	const searchBar       = document.getElementById('search-bar');
 
-	// ── Cache de viewport ───────────────────────────────────────────────
-	// En mobile, la barra de URL del navegador se muestra/oculta al scrollear,
-	// lo que cambia window.innerHeight constantemente y genera "saltos" en la
-	// animación si recalculamos hBig en cada frame. Cacheamos hBig y solo lo
-	// recalculamos cuando cambia el ANCHO (rotación / cambio real de viewport).
-	let lastWidth          = window.innerWidth;
-	let vhCached           = window.innerHeight;
-	let hBigCached         = vhCached * H_BIG_VH;
-	let headerWidthCached  = header.clientWidth; // px — para translateX en px, evita la discontinuidad del %
+	const H_BIG_VH = 0.45;
 
-	let lastP    = -1; // evita recalcular si el progreso no cambió
-	let ticking  = false;
-	let pausado  = false;
+	let lastWidth         = window.innerWidth;
+	let vhCached          = window.innerHeight;
+	let hBigCached        = vhCached * H_BIG_VH;
+	let headerWidthCached = header.clientWidth;
+	let lastP             = -1;
+	let isCollapsedState  = false;
+
+	function getRango() { return Math.max(140, vhCached * 0.18); }
 
 	function applyHeaderStyles(p) {
-		if (Math.abs(p - lastP) < 0.001) return; // sin cambio visible
+		if (Math.abs(p - lastP) < 0.001) return;
 		const prevP = lastP;
 		lastP = p;
 
-		// Histéresis en isCollapsed: entra al 0.98 pero solo sale al bajar de 0.85.
-		// Evita que scroll rápido hacia arriba haga oscilar la clase entre frames
-		// (y con ello los cambios de layout CSS que producen el salto visible).
-		const goingDown = p > prevP;
-		const collapseThreshold = (headerWasCollapsed && !goingDown) ? 0.85 : 0.98;
-		const isCollapsed = p >= collapseThreshold;
-		const isExpanded  = p <= 0.18;
+		const goingDown       = p > prevP;
+		const collapseThresh  = (isCollapsedState && !goingDown) ? 0.85 : 0.98;
+		const isCollapsed     = p >= collapseThresh;
+		const isExpanded      = p <= 0.18;
 
-		// ── Clases de estado (para estilos CSS estructurales: flex-direction, etc.)
+		if (isCollapsed)     isCollapsedState = true;
+		else if (isExpanded) isCollapsedState = false;
+
 		header.classList.toggle('is-collapsed', isCollapsed);
 		header.classList.toggle('is-expanded',  isExpanded);
 
-		if (isCollapsed)     headerWasCollapsed = true;
-		else if (isExpanded) headerWasCollapsed = false;
-
-		// ── Progreso: JS solo actualiza --p; CSS calcula height y padding con calc()
 		header.style.setProperty('--p', p.toFixed(3));
 
-		// ── Fondo y borde (condicional por tema)
 		if (document.body.classList.contains('is-light')) {
 			header.style.background        = `rgba(240, 242, 247, ${(0.90 + 0.10 * p).toFixed(3)})`;
 			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.12 + 0.18 * p).toFixed(3)})`;
@@ -1865,135 +1854,83 @@ if (header) {
 			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
 		}
 
-		// ── Nav-links: desaparecen rápido
 		if (headerNav) {
 			headerNav.style.opacity = Math.max(0, 1 - p * 2.5).toFixed(3);
 		}
 
-		// ── Iconos: aparecen después de que empieza el scroll
 		if (iconosContainer) {
-			const ip = Math.min(1, Math.max(0, (p - 0.18) / 0.82)); // 0→1 entre p=0.18 y p=1
+			const ip = Math.min(1, Math.max(0, (p - 0.18) / 0.82));
 			iconosContainer.style.opacity   = ip.toFixed(3);
 			iconosContainer.style.transform =
 				`translateY(${(-50 + 10 * (1 - ip)).toFixed(2)}%) scale(${(0.92 + 0.08 * ip).toFixed(3)})`;
 		}
 
-		// ── Transforms del logo/h1 (compositor-only, sin reflow)
-		//    El padding lo maneja CSS calc(var(--p)) — no se toca desde JS.
-		//    En is-collapsed el CSS de la clase sobreescribe el calc con padding: 0.
 		if (isCollapsed) {
-			// translateY(0px) explícito: evita caer al CSS default translateY(24px).
-			// translateX(0px): CSS is-collapsed posiciona el logo con flex/space-between.
-			if (logoArea)  logoArea.style.transform  = 'translateY(0px) translateX(0px)';
-			if (h1El)      h1El.style.transform      = '';
+			if (logoArea) logoArea.style.transform = 'translateY(0px) translateX(0px)';
+			if (h1El)     h1El.style.transform     = '';
 		} else {
 			if (logoArea) {
 				logoArea.style.transform =
 					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-headerWidthCached * 0.25 * p).toFixed(2)}px)`;
 			}
 			if (h1El) {
-				// Antes: animábamos font-size + letter-spacing en cada frame, lo que
-				// fuerza recálculo de LAYOUT (text shaping) — carísimo en mobile.
-				// Ahora: una única transform con scale + translate. Solo capa de
-				// compositing, sin reflow. La escala 1 → ~0.78 reproduce el cambio
-				// visual de 36px → 28px que tenía el font-size original.
-				const scale = (1 - 0.22 * p);
 				h1El.style.transform =
-					`translateX(${(6 * (1 - p)).toFixed(2)}px) scale(${scale.toFixed(3)})`;
+					`translateX(${(6 * (1 - p)).toFixed(2)}px) scale(${(1 - 0.22 * p).toFixed(3)})`;
 			}
 		}
 
-		// ── Buscador: se oculta visualmente al scrollear pero no borra la búsqueda
 		if (searchBar) {
-			if (p > 0.2) {
-				searchBar.classList.add('is-scroll-hidden');
-			} else {
-				searchBar.classList.remove('is-scroll-hidden');
-			}
+			searchBar.classList.toggle('is-scroll-hidden', p > 0.2);
 		}
 	}
 
-	function scheduleUpdate() {
-		if (ticking || pausado) return;
-		ticking = true;
-		requestAnimationFrame(() => {
-			ticking = false;
-			if (pausado) return; // rAF encolado antes de pausar — abortar
-			const rangoScroll = Math.max(140, vhCached * 0.18);
-			const p = Math.min(1, Math.max(0, window.scrollY / rangoScroll));
-			applyHeaderStyles(p);
-		});
-	}
+	header.style.setProperty('--h-big', hBigCached + 'px');
+	applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())));
 
-	// ── API pública: pausar/reanudar la animación del header ───────────
-	// Se llama desde abrirModal, abrirCarrito, abrirMenu, abrirContactoPanel, etc.
-	// Cuando un panel bloquea el body con overflow:hidden o position:fixed,
-	// esto evita que cambios de viewport (barra de URL móvil, scroll-lock,
-	// teclado virtual) disparen falsamente is-collapsed/is-expanded.
-	window.pauseHeaderScroll = () => { pausado = true; };
-	window.resumeHeaderScroll = () => {
-		if (!pausado) return;
-		pausado = false;
+	const st = ScrollTrigger.create({
+		trigger: document.documentElement,
+		start: 'top top',
+		end: () => `+=${getRango()}`,
+		onUpdate: (self) => applyHeaderStyles(self.progress),
+		invalidateOnRefresh: true,
+	});
+
+	window.pauseHeaderScroll   = () => st.disable(false);
+	window.resumeHeaderScroll  = () => {
+		st.enable();
 		lastP = -1;
-		// Un frame extra para que scrollTo({behavior:'instant'}) termine antes de leer scrollY
-		requestAnimationFrame(() => scheduleUpdate());
+		requestAnimationFrame(() =>
+			applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())))
+		);
 	};
-
-	// Fuerza re-aplicación del header al cambiar de tema (resetea lastP para recalcular colores)
-	window.refreshHeaderTheme = () => {
+	window.refreshHeaderTheme  = () => {
 		lastP = -1;
-		scheduleUpdate();
+		applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())));
 	};
-
-	// Scroll exacto al punto donde termina la animación del header (header en modo normal)
 	window.scrollToHeaderCollapsed = () => {
-		const threshold = Math.max(140, vhCached * 0.18);
-		if (window.scrollY < threshold) {
-			window.scrollTo({ top: threshold, behavior: 'smooth' });
-		}
+		const threshold = getRango();
+		if (window.scrollY < threshold) window.scrollTo({ top: threshold, behavior: 'smooth' });
 	};
 
-	// Aplicación SÍNCRONA del estado inicial — elimina el flash de 1 frame
-	// donde el browser pinta el CSS height:45vh antes de que el rAF de
-	// scheduleUpdate() se ejecute. En mobile, vh != window.innerHeight
-	// (barra URL visible), así que sin esto hay un salto visible al arrancar.
-	{
-		// --h-big fija la altura máxima en px para que CSS calc() use el valor
-		// cacheado (sin jitter de la barra URL móvil) en lugar de 45vh directo.
-		header.style.setProperty('--h-big', hBigCached + 'px');
-		const _initRango = Math.max(140, vhCached * 0.18);
-		const _initP = Math.min(1, Math.max(0, window.scrollY / _initRango));
-		applyHeaderStyles(_initP);
-	}
-
-	window.addEventListener('scroll', scheduleUpdate, { passive: true });
-
-	// resize: en móvil, mostrar/ocultar la barra del navegador dispara resize
-	// con la MISMA anchura pero altura distinta. Eso causaba saltos visuales
-	// recalculando hBig en cada cambio. Solo recalculamos si cambió el ANCHO.
 	window.addEventListener('resize', () => {
 		const w = window.innerWidth;
-		if (w === lastWidth) return; // ignora cambios solo de altura (URL bar móvil)
-		lastWidth          = w;
-		vhCached           = window.innerHeight;
-		hBigCached         = vhCached * H_BIG_VH;
-		headerWidthCached  = header.clientWidth;
+		if (w === lastWidth) return;
+		lastWidth         = w;
+		vhCached          = window.innerHeight;
+		hBigCached        = vhCached * H_BIG_VH;
+		headerWidthCached = header.clientWidth;
 		header.style.setProperty('--h-big', hBigCached + 'px');
-		lastP              = -1;
-		scheduleUpdate();
+		lastP = -1;
+		st.refresh();
 	}, { passive: true });
 
-	// orientationchange sí es un cambio real → forzamos recálculo completo
 	window.addEventListener('orientationchange', () => {
-		lastWidth          = window.innerWidth;
-		vhCached           = window.innerHeight;
-		hBigCached         = vhCached * H_BIG_VH;
-		headerWidthCached  = header.clientWidth;
+		lastWidth         = window.innerWidth;
+		vhCached          = window.innerHeight;
+		hBigCached        = vhCached * H_BIG_VH;
+		headerWidthCached = header.clientWidth;
 		header.style.setProperty('--h-big', hBigCached + 'px');
-		lastP              = -1;
-		scheduleUpdate();
+		lastP = -1;
+		st.refresh();
 	}, { passive: true });
-	// El estado inicial ya se aplica síncronamente arriba; este scheduleUpdate
-	// es un seguro por si el scroll cambió entre la inicialización y el primer frame.
-	scheduleUpdate();
 }
