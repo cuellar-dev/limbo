@@ -1794,7 +1794,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 });
 
-/* ─── HEADER SCROLL (GSAP + ScrollTrigger) ─── */
+/* ─── HEADER SCROLL ─── */
 const header = document.getElementById('header');
 
 const title     = header?.querySelector('h1');
@@ -1811,41 +1811,121 @@ if (title && leftWing && rightWing) {
 if (header) {
 	gsap.registerPlugin(ScrollTrigger);
 
+	// Normaliza el scroll en iOS: evita que la barra de URL afecte la posición de scroll
+	// e impide que el comportamiento "rubber-band" dispare eventos de scroll falsos.
+	ScrollTrigger.normalizeScroll(true);
+
+	// Ignora resize causados por la barra de URL móvil (solo cambia altura, no ancho).
+	ScrollTrigger.config({ ignoreMobileResize: true });
+
+	const headerContainer = header.querySelector('.header-container');
 	const logoArea        = header.querySelector('.logo-area');
 	const h1El            = header.querySelector('h1');
 	const headerNav       = header.querySelector('.header-nav');
 	const iconosContainer = header.querySelector('.iconos-container');
 	const searchBar       = document.getElementById('search-bar');
 
-	const H_BIG_VH = 0.45;
+	// Caché del ancho del header para el translateX del logo (en px, no %)
+	let headerW = header.clientWidth;
 
-	let lastWidth         = window.innerWidth;
-	let vhCached          = window.innerHeight;
-	let hBigCached        = vhCached * H_BIG_VH;
-	let headerWidthCached = header.clientWidth;
-	let lastP             = -1;
-	let isCollapsedState  = false;
+	// Altura expandida en px — se cachea para evitar jitter de la barra URL móvil.
+	// Se recalcula solo cuando cambia el ANCHO (orientación real).
+	let expandedH = window.innerHeight * 0.45;
 
-	function getRango() { return Math.max(140, vhCached * 0.18); }
+	// Distancia de scroll en px que cubre toda la animación
+	const getScrollDist = () => Math.max(140, window.innerHeight * 0.18);
 
-	function applyHeaderStyles(p) {
-		if (Math.abs(p - lastP) < 0.001) return;
-		const prevP = lastP;
-		lastP = p;
+	// Aplica la altura inicial en px antes de que GSAP arranque,
+	// así el primer frame ya tiene el valor correcto (no el vh dinámico del CSS).
+	gsap.set(header, { height: expandedH });
 
-		const goingDown       = p > prevP;
-		const collapseThresh  = (isCollapsedState && !goingDown) ? 0.85 : 0.98;
-		const isCollapsed     = p >= collapseThresh;
-		const isExpanded      = p <= 0.18;
+	// ── Timeline scrubbed ────────────────────────────────────────────────────────
+	// scrub:0.5 → GSAP interpola hacia el progreso del scroll con ~0.5s de inercia.
+	// Esto suaviza los saltos de scroll jerky en mobile sin usar rAF manual.
+	const tl = gsap.timeline({
+		defaults: { ease: 'none' },
+		scrollTrigger: {
+			trigger: document.documentElement,
+			start:   'top top',
+			end:     () => `+=${getScrollDist()}`,
+			scrub:   0.5,
+			invalidateOnRefresh: true,
 
-		if (isCollapsed)     isCollapsedState = true;
-		else if (isExpanded) isCollapsedState = false;
+			// is-collapsed SOLO se agrega cuando la animación está completa (p=1).
+			// Esto evita el "brinco" de agregar la clase a mitad de la animación.
+			// El único efecto de is-collapsed ahora es backdrop-filter (cosmético).
+			onEnter:     () => header.classList.add('is-collapsed'),
+			onLeaveBack: () => header.classList.remove('is-collapsed'),
 
-		header.classList.toggle('is-collapsed', isCollapsed);
-		header.classList.toggle('is-expanded',  isExpanded);
+			onUpdate: (self) => {
+				const p = self.progress;
 
-		header.style.setProperty('--p', p.toFixed(3));
+				// Fondo y borde (condicionado por el tema)
+				if (document.body.classList.contains('is-light')) {
+					header.style.background        = `rgba(240, 242, 247, ${(0.90 + 0.10 * p).toFixed(3)})`;
+					header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.12 + 0.18 * p).toFixed(3)})`;
+				} else {
+					header.style.background        = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
+					header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
+				}
 
+				// is-expanded: activa las alas decorativas
+				header.classList.toggle('is-expanded', p <= 0.18);
+
+				// Buscador
+				if (searchBar) searchBar.classList.toggle('is-scroll-hidden', p > 0.2);
+			},
+		},
+	});
+
+	// Altura: expandedH → 70px
+	tl.to(header, { height: 70 }, 0);
+
+	// Padding del contenedor: 16px/28px → 0/0
+	tl.fromTo(headerContainer,
+		{ paddingTop: 16, paddingBottom: 28 },
+		{ paddingTop: 0,  paddingBottom: 0 },
+		0
+	);
+
+	// Logo: baja desde y:24 (expandido) a y:0, y se desplaza a la izquierda
+	tl.fromTo(logoArea,
+		{ y: 24, x: 0 },
+		{ y: 0,  x: () => -headerW * 0.25 },
+		0
+	);
+
+	// h1: se desplaza ligeramente y escala
+	tl.fromTo(h1El,
+		{ x: 6, scale: 1   },
+		{ x: 0, scale: 0.78 },
+		0
+	);
+
+	// Nav: desaparece en la primera mitad del scroll
+	if (headerNav) {
+		tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
+	}
+
+	// Iconos: aparecen y se centran verticalmente
+	if (iconosContainer) {
+		tl.fromTo(iconosContainer,
+			{ opacity: 0, yPercent: -40, scale: 0.92 },
+			{ opacity: 1, yPercent: -50, scale: 1    },
+			0
+		);
+	}
+
+	// ── API pública ──────────────────────────────────────────────────────────────
+	const st = tl.scrollTrigger;
+
+	window.pauseHeaderScroll = () => st.disable(false);
+	window.resumeHeaderScroll = () => {
+		st.enable();
+		st.update();
+	};
+	window.refreshHeaderTheme = () => {
+		const p = st.progress;
 		if (document.body.classList.contains('is-light')) {
 			header.style.background        = `rgba(240, 242, 247, ${(0.90 + 0.10 * p).toFixed(3)})`;
 			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.12 + 0.18 * p).toFixed(3)})`;
@@ -1853,84 +1933,28 @@ if (header) {
 			header.style.background        = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
 			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
 		}
-
-		if (headerNav) {
-			headerNav.style.opacity = Math.max(0, 1 - p * 2.5).toFixed(3);
-		}
-
-		if (iconosContainer) {
-			const ip = Math.min(1, Math.max(0, (p - 0.18) / 0.82));
-			iconosContainer.style.opacity   = ip.toFixed(3);
-			iconosContainer.style.transform =
-				`translateY(${(-50 + 10 * (1 - ip)).toFixed(2)}%) scale(${(0.92 + 0.08 * ip).toFixed(3)})`;
-		}
-
-		if (isCollapsed) {
-			if (logoArea) logoArea.style.transform = 'translateY(0px) translateX(0px)';
-			if (h1El)     h1El.style.transform     = '';
-		} else {
-			if (logoArea) {
-				logoArea.style.transform =
-					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-headerWidthCached * 0.25 * p).toFixed(2)}px)`;
-			}
-			if (h1El) {
-				h1El.style.transform =
-					`translateX(${(6 * (1 - p)).toFixed(2)}px) scale(${(1 - 0.22 * p).toFixed(3)})`;
-			}
-		}
-
-		if (searchBar) {
-			searchBar.classList.toggle('is-scroll-hidden', p > 0.2);
-		}
-	}
-
-	header.style.setProperty('--h-big', hBigCached + 'px');
-	applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())));
-
-	const st = ScrollTrigger.create({
-		trigger: document.documentElement,
-		start: 'top top',
-		end: () => `+=${getRango()}`,
-		onUpdate: (self) => applyHeaderStyles(self.progress),
-		invalidateOnRefresh: true,
-	});
-
-	window.pauseHeaderScroll   = () => st.disable(false);
-	window.resumeHeaderScroll  = () => {
-		st.enable();
-		lastP = -1;
-		requestAnimationFrame(() =>
-			applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())))
-		);
-	};
-	window.refreshHeaderTheme  = () => {
-		lastP = -1;
-		applyHeaderStyles(Math.min(1, Math.max(0, window.scrollY / getRango())));
 	};
 	window.scrollToHeaderCollapsed = () => {
-		const threshold = getRango();
-		if (window.scrollY < threshold) window.scrollTo({ top: threshold, behavior: 'smooth' });
+		if (window.scrollY < getScrollDist()) window.scrollTo({ top: getScrollDist(), behavior: 'smooth' });
 	};
 
+	// Solo recalcula si cambió el ANCHO — no la altura (barra URL móvil)
+	let lastW = window.innerWidth;
 	window.addEventListener('resize', () => {
 		const w = window.innerWidth;
-		if (w === lastWidth) return;
-		lastWidth         = w;
-		vhCached          = window.innerHeight;
-		hBigCached        = vhCached * H_BIG_VH;
-		headerWidthCached = header.clientWidth;
-		header.style.setProperty('--h-big', hBigCached + 'px');
-		lastP = -1;
+		if (w === lastW) return;
+		lastW      = w;
+		headerW    = header.clientWidth;
+		expandedH  = window.innerHeight * 0.45;
+		gsap.set(header, { height: expandedH });
 		st.refresh();
 	}, { passive: true });
 
 	window.addEventListener('orientationchange', () => {
-		lastWidth         = window.innerWidth;
-		vhCached          = window.innerHeight;
-		hBigCached        = vhCached * H_BIG_VH;
-		headerWidthCached = header.clientWidth;
-		header.style.setProperty('--h-big', hBigCached + 'px');
-		lastP = -1;
+		lastW     = window.innerWidth;
+		headerW   = header.clientWidth;
+		expandedH = window.innerHeight * 0.45;
+		gsap.set(header, { height: expandedH });
 		st.refresh();
 	}, { passive: true });
 }
