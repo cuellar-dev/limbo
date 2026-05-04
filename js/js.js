@@ -1811,16 +1811,13 @@ if (title && leftWing && rightWing) {
 
 if (header) {
 	// Referencias cacheadas — se leen una sola vez para no hacer querySelector en cada frame
-	const headerContainer  = header.querySelector('.header-container');
 	const logoArea         = header.querySelector('.logo-area');
 	const h1El             = header.querySelector('h1');
 	const headerNav        = header.querySelector('.header-nav');
 	const iconosContainer  = header.querySelector('.iconos-container');
 	const searchBar        = document.getElementById('search-bar');
 
-	// Constantes de altura (equivalen a las antiguas variables CSS --h-grande / --h-pequena)
-	const H_SMALL = 70; // px — altura colapsada
-	const H_BIG_VH = 0.45; // 45vh — altura expandida
+	const H_BIG_VH = 0.45; // 45vh — altura expandida (H_SMALL = 70px vive en el CSS)
 
 	// ── Cache de viewport ───────────────────────────────────────────────
 	// En mobile, la barra de URL del navegador se muestra/oculta al scrollear,
@@ -1856,8 +1853,7 @@ if (header) {
 		if (isCollapsed)     headerWasCollapsed = true;
 		else if (isExpanded) headerWasCollapsed = false;
 
-		// ── Altura del header (usa hBigCached, no window.innerHeight, para evitar jitter por la barra del navegador móvil)
-		header.style.height = `${hBigCached - (hBigCached - H_SMALL) * p}px`;
+		// ── Progreso: JS solo actualiza --p; CSS calcula height y padding con calc()
 		header.style.setProperty('--p', p.toFixed(3));
 
 		// ── Fondo y borde (condicional por tema)
@@ -1882,23 +1878,15 @@ if (header) {
 				`translateY(${(-50 + 10 * (1 - ip)).toFixed(2)}%) scale(${(0.92 + 0.08 * ip).toFixed(3)})`;
 		}
 
-		// ── Propiedades que cambian sólo en el rango no-colapsado
-		//    Cuando is-collapsed, se borran los estilos inline y el CSS de la clase toma el control
+		// ── Transforms del logo/h1 (compositor-only, sin reflow)
+		//    El padding lo maneja CSS calc(var(--p)) — no se toca desde JS.
+		//    En is-collapsed el CSS de la clase sobreescribe el calc con padding: 0.
 		if (isCollapsed) {
-			if (headerContainer) {
-				headerContainer.style.paddingTop    = '';
-				headerContainer.style.paddingBottom = '';
-			}
 			// translateY(0px) explícito: evita caer al CSS default translateY(24px).
-			// translateX(0px): el CSS is-collapsed posiciona el logo a la izquierda
-			// con flex/space-between; no se necesita desplazamiento adicional en X.
+			// translateX(0px): CSS is-collapsed posiciona el logo con flex/space-between.
 			if (logoArea)  logoArea.style.transform  = 'translateY(0px) translateX(0px)';
 			if (h1El)      h1El.style.transform      = '';
 		} else {
-			if (headerContainer) {
-				headerContainer.style.paddingTop    = `${(6  + 10 * (1 - p)).toFixed(1)}px`;
-				headerContainer.style.paddingBottom = `${(10 + 18 * (1 - p)).toFixed(1)}px`;
-			}
 			if (logoArea) {
 				logoArea.style.transform =
 					`translateY(${(24 * (1 - p)).toFixed(2)}px) translateX(${(-headerWidthCached * 0.25 * p).toFixed(2)}px)`;
@@ -1970,6 +1958,9 @@ if (header) {
 	// scheduleUpdate() se ejecute. En mobile, vh != window.innerHeight
 	// (barra URL visible), así que sin esto hay un salto visible al arrancar.
 	{
+		// --h-big fija la altura máxima en px para que CSS calc() use el valor
+		// cacheado (sin jitter de la barra URL móvil) en lugar de 45vh directo.
+		header.style.setProperty('--h-big', hBigCached + 'px');
 		const _initRango = Math.max(140, vhCached * 0.18);
 		const _initP = Math.min(1, Math.max(0, window.scrollY / _initRango));
 		applyHeaderStyles(_initP);
@@ -1987,6 +1978,7 @@ if (header) {
 		vhCached           = window.innerHeight;
 		hBigCached         = vhCached * H_BIG_VH;
 		headerWidthCached  = header.clientWidth;
+		header.style.setProperty('--h-big', hBigCached + 'px');
 		lastP              = -1;
 		scheduleUpdate();
 	}, { passive: true });
@@ -1997,6 +1989,7 @@ if (header) {
 		vhCached           = window.innerHeight;
 		hBigCached         = vhCached * H_BIG_VH;
 		headerWidthCached  = header.clientWidth;
+		header.style.setProperty('--h-big', hBigCached + 'px');
 		lastP              = -1;
 		scheduleUpdate();
 	}, { passive: true });

@@ -733,7 +733,9 @@ svg.icono-transicion {
     transform: scale(0.95);
 }
 #header {
-    height: 45vh;           /* JS actualiza en cada scroll */
+    /* JS solo actualiza --p y --h-big; el browser recalcula height en una
+       única invalidación CSS en lugar de tres mutaciones de layout separadas. */
+    height: calc(var(--h-big, 45vh) - (var(--h-big, 45vh) - 70px) * var(--p, 0));
     min-height: 70px;
     display: flex;
     flex-direction: column;
@@ -787,8 +789,8 @@ svg.icono-transicion {
     justify-content: center;
     height: 100%;
     position: relative;
-    padding-top: 16px;    /* JS interpola: 6px + 10*(1-p) */
-    padding-bottom: 28px; /* JS interpola: 10px + 18*(1-p) */
+    padding-top:    calc(6px  + 10px * (1 - var(--p, 0)));
+    padding-bottom: calc(10px + 18px * (1 - var(--p, 0)));
 }
 
 /* Transición del área del logo */
@@ -1010,7 +1012,9 @@ body.is-encargue .header-nav li:hover {
     opacity: 0;                               /* JS interpola: clamp(0,(p-0.18)/0.82,1) */
     transform: translateY(-40%) scale(0.92); /* JS interpola con iconP */
     transform-origin: right center;
-    transition: opacity 0.15s ease, transform 0.15s ease;
+    /* transition eliminada: JS sobreescribe opacity y transform cada rAF;
+       la transition creaba un "perpetual chase" donde el render siempre
+       estaba 150ms detrás del valor real. 60fps de rAF ya da suavidad suficiente. */
     will-change: transform, opacity;
     pointer-events: none;
 }
