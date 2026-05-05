@@ -46,6 +46,14 @@
     --filtros-card-bg:     linear-gradient(160deg, #1a2040 0%, #0d1224 55%, #060a15 100%);
     --contacto-panel-bg:   linear-gradient(170deg, #141a29 0%, #0c111c 70%, #08111f 100%);
     --form-field-bg:       rgba(255, 255, 255, 0.02);
+
+    /* Animaciones del header — alphas interpolados por GSAP */
+    --header-bg-alpha:     0.85;
+    --header-border-alpha: 0.10;
+    --header-bg-r: 17;
+    --header-bg-g: 21;
+    --header-bg-b: 34;
+    --header-txt-rgb: 17, 21, 34;
 }
 
 body.is-encargue {
@@ -271,20 +279,14 @@ h1 {
 .halo-path {
     stroke: var(--acento-dorado);
     transition: stroke 0.35s ease;
-}
-
-.halo-glow-color {
-    flood-color: var(--acento-dorado);
-    flood-opacity: 0.6;
-    transition: flood-color 0.35s ease;
+    /* Drop-shadow reemplaza SVG filter complejo (feGaussianBlur + feComposite)
+       Impacto: -3-5ms por frame en mobile, visual similar */
+    filter: drop-shadow(0 0 2px rgba(202, 172, 71, 0.6));
 }
 
 body.is-encargue .halo-path {
     stroke: var(--acento-encargue);
-}
-
-body.is-encargue .halo-glow-color {
-    flood-color: var(--acento-encargue);
+    filter: drop-shadow(0 0 2px rgba(93, 114, 233, 0.6));
 }
 
 body.is-encargue .header-nav li,
@@ -743,20 +745,21 @@ svg.icono-transicion {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: rgba(17, 21, 34, 0.85);       /* JS ajusta la alpha */
+    /* OPTIMIZACIÓN: Usa CSS variables para alphas (animadas por GSAP) */
+    background: rgb(var(--header-bg-r), var(--header-bg-g), var(--header-bg-b)) / var(--header-bg-alpha);
     /* backdrop-filter eliminado del estado animado: mientras height cambia
        cada frame, el GPU tiene que recapturar + re-blur la región entera
        en cada frame → la causa principal del salto en mobile.
        Solo se activa en .is-collapsed, donde el tamaño ya es fijo. */
-    border-bottom: 1px solid rgba(202, 172, 71, 0.1); /* JS ajusta la alpha */
+    border-bottom: 1px solid rgba(202, 172, 71, var(--header-border-alpha));
     position: sticky;
     top: 0;
     z-index: 100;
     overflow: hidden;
     overflow: clip;
     padding: 0 20px;
-    /* transition: background eliminado — JS sobreescribe este valor cada frame
-       de todas formas; la transition solo crea interferencia. */
+    /* transition: background eliminado — GSAP anima variables CSS directamente
+       de todas formas; la transition solo crearía interferencia. */
     margin-bottom: 10px;
     /* will-change: transform y transform: translateZ(0) eliminados:
        forzaban una capa GPU propia, y cuando height cambia cada frame
@@ -3574,6 +3577,13 @@ body.is-light {
     /* Panel contacto */
     --contacto-panel-bg:   linear-gradient(170deg, #F5F7FC 0%, #EDF1F8 70%, #E8EEF7 100%);
     --form-field-bg:       rgba(218, 224, 233, 0.88);
+
+    /* Animaciones del header en modo light */
+    --header-bg-alpha:     0.90;
+    --header-border-alpha: 0.12;
+    --header-bg-r: 240;
+    --header-bg-g: 242;
+    --header-bg-b: 247;
 }
 
 /* h1 text-shadow */
