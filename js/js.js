@@ -1837,7 +1837,6 @@ if (header) {
 	// Ignora resize causados por la barra de URL móvil (solo cambia altura, no ancho).
 	ScrollTrigger.config({ ignoreMobileResize: true });
 
-	const headerContainer = header.querySelector('.header-container');
 	const logoArea        = header.querySelector('.logo-area');
 	const h1El            = header.querySelector('h1');
 	const headerNav       = header.querySelector('.header-nav');
@@ -1847,16 +1846,22 @@ if (header) {
 	// Caché del ancho del header para el translateX del logo (en px, no %)
 	let headerW = header.clientWidth;
 
-	// Altura expandida en px — se cachea para evitar jitter de la barra URL móvil.
-	// Se recalcula solo cuando cambia el ANCHO (orientación real).
+	// Altura expandida en px (cacheada para evitar lecturas dinámicas).
+	// El header en CSS está fijo en 45vh — JS no la anima ya.
 	let expandedH = window.innerHeight * 0.45;
 
-	// Distancia de scroll en px que cubre toda la animación
-	const getScrollDist = () => Math.max(140, window.innerHeight * 0.18);
+	// scrollDist coincide con la distancia natural hasta que el sticky se ancla
+	// (CSS top: calc(70px - 45vh)). Así la animación termina justo cuando el header
+	// se queda fijo arriba con solo 70px visibles. Evita un "salto" al final.
+	const getScrollDist = () => Math.max(140, expandedH - 70);
 
-	// Aplica la altura inicial en px antes de que GSAP arranque,
-	// así el primer frame ya tiene el valor correcto (no el vh dinámico del CSS).
-	gsap.set(header, { height: expandedH });
+	// Y final para los hijos: desplazamiento desde el centro del header (45vh)
+	// hasta el centro de los 70px visibles cuando está pegado en el top.
+	const collapsedYOffset = () => (header.offsetHeight - 70) / 2;
+
+	// Ajuste fino para logo-area: compensa el padding asimétrico 16/28 de
+	// .header-container (la flex-centering real no está en el centro exacto).
+	const logoYOffset = () => (header.offsetHeight - 58) / 2;
 
 	// Caché del tema actual — se actualiza cuando body cambia de clase
 	// Esto evita DOM read (classList.contains) en cada frame del onUpdate
@@ -1867,101 +1872,98 @@ if (header) {
 		currentThemeIsLight = document.body.classList.contains('is-light');
 	}).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
+	// Caché de booleanos de threshold para evitar classList.toggle redundante cada frame
+	let lastExpandedState = null;
+	let lastSearchHidden  = null;
+
 	// ── Timeline scrubbed ────────────────────────────────────────────────────────
-	// scrub:0.5 → GSAP interpola hacia el progreso del scroll con ~0.5s de inercia.
-	// Esto suaviza los saltos de scroll jerky en mobile sin usar rAF manual.
+	// scrub:0.3 → con animaciones puramente GPU (transforms+opacity) podemos usar
+	// un scrub más ajustado sin lag. Antes 0.5 compensaba el reflow del height.
 	const tl = gsap.timeline({
 		defaults: { ease: 'none' },
 		scrollTrigger: {
 			trigger: document.documentElement,
 			start:   'top top',
 			end:     () => `+=${getScrollDist()}`,
-			scrub:   0.5,
+			scrub:   0.3,
 			invalidateOnRefresh: true,
 
-			// is-collapsed SOLO se agrega cuando la animación está completa (p=1).
-			// Esto evita el "brinco" de agregar la clase a mitad de la animación.
-			// El único efecto de is-collapsed ahora es backdrop-filter (cosmético).
 			onEnter:     () => header.classList.add('is-collapsed'),
 			onLeaveBack: () => header.classList.remove('is-collapsed'),
 
 			onUpdate: (self) => {
 				const p = self.progress;
 
-				// OPTIMIZACIÓN: Anima CSS variables en lugar de style.background
-				// Esto evita 2 DOM writes (background + borderBottomColor) cada frame
-				// Impacto: -2-3ms por frame al reducir repaints
+				// CSS variables para el alpha del fondo y borde (computa el browser).
 				if (currentThemeIsLight) {
-					// Light theme: rgba(240, 242, 247, 0.90→1.0)
-					const bgAlpha = 0.90 + 0.10 * p;
-					const borderAlpha = 0.12 + 0.18 * p;
-					header.style.setProperty('--header-bg-alpha', bgAlpha.toFixed(3));
-					header.style.setProperty('--header-border-alpha', borderAlpha.toFixed(3));
+					header.style.setProperty('--header-bg-alpha',     (0.90 + 0.10 * p).toFixed(3));
+					header.style.setProperty('--header-border-alpha', (0.12 + 0.18 * p).toFixed(3));
 				} else {
-					// Dark theme: rgba(17, 21, 34, 0.85→1.0)
-					const bgAlpha = 0.85 + 0.15 * p;
-					const borderAlpha = 0.10 + 0.20 * p;
-					header.style.setProperty('--header-bg-alpha', bgAlpha.toFixed(3));
-					header.style.setProperty('--header-border-alpha', borderAlpha.toFixed(3));
+					header.style.setProperty('--header-bg-alpha',     (0.85 + 0.15 * p).toFixed(3));
+					header.style.setProperty('--header-border-alpha', (0.10 + 0.20 * p).toFixed(3));
 				}
 
-				// is-expanded: activa las alas decorativas
-				header.classList.toggle('is-expanded', p <= 0.18);
+				// is-expanded (alas decorativas): toggle solo cuando cruza el threshold
+				const expanded = p <= 0.18;
+				if (expanded !== lastExpandedState) {
+					lastExpandedState = expanded;
+					header.classList.toggle('is-expanded', expanded);
+				}
 
-				// Buscador
-				if (searchBar) searchBar.classList.toggle('is-scroll-hidden', p > 0.2);
+				// Buscador: toggle solo cuando cruza el threshold
+				const searchHidden = p > 0.2;
+				if (searchBar && searchHidden !== lastSearchHidden) {
+					lastSearchHidden = searchHidden;
+					searchBar.classList.toggle('is-scroll-hidden', searchHidden);
+				}
 			},
 		},
 	});
 
-	// Altura: expandedH → 70px
-	tl.to(header, { height: 70 }, 0);
+	// ── Animaciones GPU-only (transforms + opacity) ──────────────────────────────
+	// ANTES: animábamos `height` y `paddingTop/paddingBottom` → reflow del documento
+	//        entero cada frame. Masonry abajo tenía que recalcular posiciones,
+	//        causando lag del scroll mientras la animación corría.
+	// AHORA: el header tiene `height: 45vh` fijo y `top: calc(70px - 45vh)` sticky,
+	//        así que se ancla naturalmente cuando solo quedan 70px visibles.
+	//        Solo animamos transforms y opacity → 100% GPU compositing, cero reflow.
 
-	// Padding del contenedor: 16px/28px → 0/0
-	tl.fromTo(headerContainer,
-		{ paddingTop: 16, paddingBottom: 28 },
-		{ paddingTop: 0,  paddingBottom: 0 },
-		0
-	);
-
-	// Logo: baja desde y:24 (expandido) y se desplaza a la izquierda.
-	// El y final compensa el espacio que el nav invisible sigue ocupando en layout:
-	// sin el offset, flex-centering ubica el logo-area con top negativo y el h1
-	// queda fuera del header visible. Con el offset, el h1 queda centrado en los 70px.
+	// Logo: traslada hacia abajo (zona visible al colapsar) + a la izquierda.
+	// El offset compensa el alto entero del header para llevar al h1 al centro
+	// de los 70px visibles, más el ajuste por el nav que ocupa layout abajo.
 	tl.fromTo(logoArea,
 		{ y: 24, x: 0 },
 		{
-			y: () => (logoArea.offsetHeight - h1El.offsetHeight) / 2,
+			y: () => logoYOffset() + (logoArea.offsetHeight - h1El.offsetHeight) / 2,
 			x: () => -headerW * 0.25,
 		},
 		0
 	);
 
-	// h1: desplazamiento horizontal y escala (el centrado vertical lo maneja logoArea.y)
+	// h1: desplazamiento horizontal y escala (eje vertical lo maneja logoArea)
 	tl.fromTo(h1El,
 		{ x: 6, scale: 1    },
 		{ x: 0, scale: 0.78 },
 		0
 	);
 
-	// Nav: desaparece en la primera mitad del scroll
+	// Nav: opacity fade out
 	if (headerNav) {
 		tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
 	}
 
-	// Iconos: aparecen y se centran verticalmente.
-	// Usamos y en px (medido en runtime) en lugar de yPercent para que el cálculo
-	// sea exacto independientemente del tamaño real del container.
+	// Iconos: aparecen y se centran en los 70px visibles inferiores.
+	// Sumamos collapsedYOffset al cálculo original (-40% / -50% en px).
 	if (iconosContainer) {
 		tl.fromTo(iconosContainer,
 			{
 				opacity: 0,
-				y: () => -iconosContainer.offsetHeight * 0.4,
+				y: () => collapsedYOffset() - iconosContainer.offsetHeight * 0.4,
 				scale: 0.92,
 			},
 			{
 				opacity: 1,
-				y: () => -iconosContainer.offsetHeight / 2,
+				y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2,
 				scale: 1,
 			},
 			0
@@ -1976,11 +1978,11 @@ if (header) {
 	window.refreshHeaderTheme = () => {
 		const p = st.progress;
 		if (document.body.classList.contains('is-light')) {
-			header.style.background        = `rgba(240, 242, 247, ${(0.90 + 0.10 * p).toFixed(3)})`;
-			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.12 + 0.18 * p).toFixed(3)})`;
+			header.style.setProperty('--header-bg-alpha',     (0.90 + 0.10 * p).toFixed(3));
+			header.style.setProperty('--header-border-alpha', (0.12 + 0.18 * p).toFixed(3));
 		} else {
-			header.style.background        = `rgba(17, 21, 34, ${(0.85 + 0.15 * p).toFixed(3)})`;
-			header.style.borderBottomColor = `rgba(202, 172, 71, ${(0.10 + 0.20 * p).toFixed(3)})`;
+			header.style.setProperty('--header-bg-alpha',     (0.85 + 0.15 * p).toFixed(3));
+			header.style.setProperty('--header-border-alpha', (0.10 + 0.20 * p).toFixed(3));
 		}
 	};
 	window.scrollToHeaderCollapsed = () => {
@@ -1995,7 +1997,6 @@ if (header) {
 		lastW      = w;
 		headerW    = header.clientWidth;
 		expandedH  = window.innerHeight * 0.45;
-		gsap.set(header, { height: expandedH });
 		st.refresh();
 	}, { passive: true });
 
@@ -2003,7 +2004,6 @@ if (header) {
 		lastW     = window.innerWidth;
 		headerW   = header.clientWidth;
 		expandedH = window.innerHeight * 0.45;
-		gsap.set(header, { height: expandedH });
 		st.refresh();
 	}, { passive: true });
 }

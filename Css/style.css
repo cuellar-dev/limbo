@@ -746,14 +746,17 @@ svg.icono-transicion {
     flex-direction: column;
     justify-content: center;
     /* OPTIMIZACIÓN: Usa CSS variables para alphas (animadas por GSAP) */
-    background: rgb(var(--header-bg-r), var(--header-bg-g), var(--header-bg-b)) / var(--header-bg-alpha);
+    background: rgb(var(--header-bg-r) var(--header-bg-g) var(--header-bg-b) / var(--header-bg-alpha));
     /* backdrop-filter eliminado del estado animado: mientras height cambia
        cada frame, el GPU tiene que recapturar + re-blur la región entera
        en cada frame → la causa principal del salto en mobile.
        Solo se activa en .is-collapsed, donde el tamaño ya es fijo. */
     border-bottom: 1px solid rgba(202, 172, 71, var(--header-border-alpha));
     position: sticky;
-    top: 0;
+    /* Sticky offset negativo: el header se ancla SOLO cuando solo quedan 70px visibles.
+       Hasta entonces se desplaza naturalmente con el scroll. Esto reemplaza la animación
+       de height (que causaba reflow del documento entero cada frame). */
+    top: min(0px, calc(70px - 45vh));
     z-index: 100;
     overflow: hidden;
     overflow: clip;
