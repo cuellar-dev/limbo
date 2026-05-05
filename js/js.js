@@ -48,7 +48,10 @@ function unlockBodyScroll() {
 		document.body.style.width       = '';
 		document.body.style.paddingRight = '';
 		window.scrollTo({ top: _scrollLockY, behavior: 'instant' });
-		window.resumeHeaderScroll?.();
+		// Un frame de margen para que normalizeScroll de GSAP procese la restauración
+		// del scroll antes de que st.enable() + st.update() lean window.scrollY.
+		// Sin esto, GSAP ve scrollY=0 y salta el header a estado expandido.
+		requestAnimationFrame(() => window.resumeHeaderScroll?.());
 	}
 }
 
@@ -340,12 +343,11 @@ function eliminarDelCarrito(index, itemEl) {
 	// Si viene el elemento DOM, lo animamos antes de volver a renderizar
 	if (itemEl) {
 		itemEl.classList.add('is-removing');
-		// Esperamos que la animación CSS termine (200ms) antes de actualizar la lista
 		setTimeout(() => {
 			carrito.splice(index, 1);
 			desmarcarProductoEnGrid(productoEliminado.nombre);
 			renderizarCarrito();
-		}, 210);
+		}, 300); // 300ms > 280ms del transition más largo (max-height/margin)
 	} else {
 		carrito.splice(index, 1);
 		desmarcarProductoEnGrid(productoEliminado.nombre);
@@ -471,7 +473,11 @@ function inicializarMasonry() {
 		transitionDuration: '0.25s'
 	});
 
-	const relayout = () => requestAnimationFrame(() => estadoTienda.masonry?.layout());
+	const relayout = () => requestAnimationFrame(() => {
+		estadoTienda.masonry?.layout();
+		// Sincroniza ScrollTrigger con el nuevo layout del grid
+		requestAnimationFrame(() => { if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh(); });
+	});
 	window.addEventListener('load',   relayout);
 	window.addEventListener('resize', relayout);
 	document.fonts?.ready.then(relayout);
@@ -806,6 +812,19 @@ function abrirDetalles(datos) {
 		modalImg.style.backgroundPosition = 'center';
 	} else {
 		modalImg.style.backgroundImage = 'none';
+	}
+
+	// Sincroniza el botón con el estado real del carrito para este producto.
+	// Sin esto, si el producto anterior se agregó, el botón queda disabled=true
+	// y bloqueado para cualquier producto siguiente que se abra.
+	const btnModal = document.getElementById('btn-comprar-ahora');
+	if (btnModal) {
+		const isEncargue = modoActual() === 'encargue';
+		if (obtenerProductoEnCarrito(datos.nombre)) {
+			marcarBotonComoAgregado(btnModal, isEncargue);
+		} else {
+			desmarcarBotonAgregado(btnModal, isEncargue);
+		}
 	}
 
 	modal.style.display = 'flex';
@@ -1888,16 +1907,22 @@ if (header) {
 		0
 	);
 
-	// Logo: baja desde y:24 (expandido) a y:0, y se desplaza a la izquierda
+	// Logo: baja desde y:24 (expandido) y se desplaza a la izquierda.
+	// El y final compensa el espacio que el nav invisible sigue ocupando en layout:
+	// sin el offset, flex-centering ubica el logo-area con top negativo y el h1
+	// queda fuera del header visible. Con el offset, el h1 queda centrado en los 70px.
 	tl.fromTo(logoArea,
 		{ y: 24, x: 0 },
-		{ y: 0,  x: () => -headerW * 0.25 },
+		{
+			y: () => (logoArea.offsetHeight - h1El.offsetHeight) / 2,
+			x: () => -headerW * 0.25,
+		},
 		0
 	);
 
-	// h1: se desplaza ligeramente y escala
+	// h1: desplazamiento horizontal y escala (el centrado vertical lo maneja logoArea.y)
 	tl.fromTo(h1El,
-		{ x: 6, scale: 1   },
+		{ x: 6, scale: 1    },
 		{ x: 0, scale: 0.78 },
 		0
 	);
@@ -1907,11 +1932,21 @@ if (header) {
 		tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
 	}
 
-	// Iconos: aparecen y se centran verticalmente
+	// Iconos: aparecen y se centran verticalmente.
+	// Usamos y en px (medido en runtime) en lugar de yPercent para que el cálculo
+	// sea exacto independientemente del tamaño real del container.
 	if (iconosContainer) {
 		tl.fromTo(iconosContainer,
-			{ opacity: 0, yPercent: -40, scale: 0.92 },
-			{ opacity: 1, yPercent: -50, scale: 1    },
+			{
+				opacity: 0,
+				y: () => -iconosContainer.offsetHeight * 0.4,
+				scale: 0.92,
+			},
+			{
+				opacity: 1,
+				y: () => -iconosContainer.offsetHeight / 2,
+				scale: 1,
+			},
 			0
 		);
 	}
@@ -1919,11 +1954,8 @@ if (header) {
 	// ── API pública ──────────────────────────────────────────────────────────────
 	const st = tl.scrollTrigger;
 
-	window.pauseHeaderScroll = () => st.disable(false);
-	window.resumeHeaderScroll = () => {
-		st.enable();
-		st.update();
-	};
+	window.pauseHeaderScroll = () => { if (st.vars) st.disable(false); };
+	window.resumeHeaderScroll = () => { if (st.vars) { st.enable(); st.update(); } };
 	window.refreshHeaderTheme = () => {
 		const p = st.progress;
 		if (document.body.classList.contains('is-light')) {

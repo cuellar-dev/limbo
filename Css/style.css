@@ -732,6 +732,11 @@ svg.icono-transicion {
 .btn-comprar-ahora:active {
     transform: scale(0.95);
 }
+
+.btn-comprar-ahora[data-estado="agregado"] {
+    cursor: default;
+    opacity: 0.78;
+}
 #header {
     height: 45vh; /* JS sets inline px on first frame */
     min-height: 70px;
@@ -1936,9 +1941,13 @@ body.is-encargue {
     border: 1px solid var(--carrito-borde);
     background: rgba(var(--carrito-acento-rgb), 0.04);
     border-radius: 18px;
-    transition: border-color 0.3s ease, background 0.3s ease;
     position: relative;
     overflow: hidden;
+    transition: border-color 0.3s ease, background 0.3s ease,
+                max-height 0.28s ease, opacity 0.22s ease,
+                transform 0.22s ease, margin-bottom 0.28s ease,
+                padding-top 0.28s ease, padding-bottom 0.28s ease,
+                border-width 0.28s ease;
 }
 
 /* Línea de acento izquierda en cada item */
