@@ -2,6 +2,9 @@ const switchContainer = document.querySelector('.switch-container');
 const estadoTienda = {
 	productos: [],
 	masonry: null,
+	masonryRelayoutHandler: null,
+	masonryListenersBound: false,
+	headerScrollTriggerEnabled: false,
 	carrito: [],          // carrito del modo "En Stack"
 	carritoEncargue: [],  // carrito del modo "Encargue"
 	productoDetalleActual: null
@@ -416,28 +419,44 @@ function inicializarMasonry() {
 	const productosGrid = document.querySelector('.grid-productos');
 	if (!productosGrid || typeof Masonry === 'undefined') return;
 
-	if (estadoTienda.masonry) estadoTienda.masonry.destroy();
+	if (!estadoTienda.masonryRelayoutHandler) {
+		estadoTienda.masonryRelayoutHandler = () => requestAnimationFrame(() => {
+			estadoTienda.masonry?.layout();
+			// Refresca ScrollTrigger solo si el header animado está activo.
+			if (estadoTienda.headerScrollTriggerEnabled && typeof ScrollTrigger !== 'undefined') {
+				requestAnimationFrame(() => ScrollTrigger.refresh());
+			}
+		});
+	}
 
-	estadoTienda.masonry = new Masonry(productosGrid, {
-		itemSelector:       '.tarjeta-producto',
-		columnWidth:        '.grid-sizer',
-		gutter:             '.gutter-sizer',
-		percentPosition:    true,
-		resizeContainer:    true,
-		transitionDuration: '0.25s'
-	});
+	const relayout = estadoTienda.masonryRelayoutHandler;
 
-	const relayout = () => requestAnimationFrame(() => {
-		estadoTienda.masonry?.layout();
-		// Sincroniza ScrollTrigger con el nuevo layout del grid
-		requestAnimationFrame(() => { if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh(); });
-	});
-	window.addEventListener('load',   relayout);
-	window.addEventListener('resize', relayout);
-	document.fonts?.ready.then(relayout);
+	if (!estadoTienda.masonry) {
+		estadoTienda.masonry = new Masonry(productosGrid, {
+			itemSelector:       '.tarjeta-producto',
+			columnWidth:        '.grid-sizer',
+			gutter:             '.gutter-sizer',
+			percentPosition:    true,
+			resizeContainer:    true,
+			transitionDuration: '0.25s'
+		});
+	} else {
+		estadoTienda.masonry.reloadItems();
+		estadoTienda.masonry.layout();
+	}
+
+	if (!estadoTienda.masonryListenersBound) {
+		window.addEventListener('load', relayout);
+		window.addEventListener('resize', relayout);
+		document.fonts?.ready.then(relayout);
+		estadoTienda.masonryListenersBound = true;
+	}
+
+	// Reatach solo a imágenes del render actual (con once para no acumular).
 	productosGrid.querySelectorAll('.img-producto').forEach(img => {
 		if (!img.complete) img.addEventListener('load', relayout, { once: true });
 	});
+
 	setTimeout(relayout, 120);
 }
 
@@ -1781,7 +1800,20 @@ if (title && leftWing && rightWing) {
 }
 
 if (header) {
-	gsap.registerPlugin(ScrollTrigger);
+	const disableHeaderAnimation =
+		window.matchMedia('(max-width: 768px), (prefers-reduced-motion: reduce)').matches ||
+		typeof gsap === 'undefined' ||
+		typeof ScrollTrigger === 'undefined';
+
+	if (disableHeaderAnimation) {
+		estadoTienda.headerScrollTriggerEnabled = false;
+		header.classList.add('is-collapsed');
+		header.classList.remove('is-expanded');
+	}
+
+	if (!disableHeaderAnimation) {
+		gsap.registerPlugin(ScrollTrigger);
+		estadoTienda.headerScrollTriggerEnabled = true;
 
 	// Normaliza el scroll en iOS: evita que la barra de URL afecte la posición de scroll
 	// e impide que el comportamiento "rubber-band" dispare eventos de scroll falsos.
@@ -1921,6 +1953,7 @@ if (header) {
 			},
 			0
 		);
+	}
 	}
 
 }
