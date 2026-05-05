@@ -13,48 +13,6 @@ const STORAGE_KEY_CARRITO_ENCARGUE = 'levitad-carrito-encargue';
 const STORAGE_KEY_MODAL_ENCARGUE   = 'levitad-modal-encargue-visto';
 const WHATSAPP_OWNER_NUMBER        = '+5359271359';
 
-/* ─── LOCK / UNLOCK BODY SCROLL ────────────────────────────────────────────
-   Función centralizada para bloquear el scroll de fondo cuando un modal
-   o panel está abierto. Guarda scrollY y compensa con padding-right para
-   que el contenido no "brinque" al desaparecer la barra de scroll.
-   Referencia de conteo: soporta apertura apilada (modal dentro de carrito, etc.)
-─────────────────────────────────────────────────────────────────────────── */
-let _scrollLockCount = 0;
-let _scrollLockY     = 0;
-
-function lockBodyScroll() {
-	if (_scrollLockCount === 0) {
-		_scrollLockY = window.scrollY;
-		const scrollbarW = window.innerWidth - document.documentElement.clientWidth;
-		document.body.style.overflow   = 'hidden';
-		document.body.style.position   = 'fixed';
-		document.body.style.top        = `-${_scrollLockY}px`;
-		document.body.style.width      = '100%';
-		if (scrollbarW > 0) {
-			document.body.style.paddingRight = `${scrollbarW}px`;
-		}
-	}
-	_scrollLockCount++;
-	window.pauseHeaderScroll?.();
-}
-
-function unlockBodyScroll() {
-	if (_scrollLockCount <= 0) return;
-	_scrollLockCount--;
-	if (_scrollLockCount === 0) {
-		document.body.style.overflow    = '';
-		document.body.style.position    = '';
-		document.body.style.top         = '';
-		document.body.style.width       = '';
-		document.body.style.paddingRight = '';
-		window.scrollTo({ top: _scrollLockY, behavior: 'instant' });
-		// Un frame de margen para que normalizeScroll de GSAP procese la restauración
-		// del scroll antes de que st.enable() + st.update() lean window.scrollY.
-		// Sin esto, GSAP ve scrollY=0 y salta el header a estado expandido.
-		requestAnimationFrame(() => window.resumeHeaderScroll?.());
-	}
-}
-
 /* ─── ICONOS ─── */
 const iconoCarrito = `
 	<svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" class="carrito-add">
@@ -255,8 +213,6 @@ function abrirCarrito() {
 	panel.classList.add('is-active');
 	overlay.setAttribute('aria-hidden', 'false');
 	panel.setAttribute('aria-hidden',   'false');
-	document.body.classList.add('carrito-abierto');
-	lockBodyScroll();
 }
 
 function cerrarCarrito() {
@@ -267,8 +223,6 @@ function cerrarCarrito() {
 	panel.classList.remove('is-active');
 	overlay.setAttribute('aria-hidden', 'true');
 	panel.setAttribute('aria-hidden',   'true');
-	document.body.classList.remove('carrito-abierto');
-	unlockBodyScroll();
 }
 
 function animarBotonAnadir(boton) {
@@ -517,7 +471,6 @@ function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
 	searchBar.classList.remove('is-closing', 'is-header-hidden', 'is-scroll-hidden');
 	searchBar.classList.add('is-active');
 	actualizarBotonBusqueda(searchSubmitBtn);
-	window.scrollToHeaderCollapsed?.();
 	setTimeout(() => searchInput.focus(), 150);
 }
 
@@ -782,13 +735,21 @@ const btnCerrar = document.querySelector('.btn-cerrar-modal');
 function registrarInteraccion(nombreProducto) {
 	const key = 'levitad-interacciones';
 	const interacciones = JSON.parse(localStorage.getItem(key) || '{}');
-	// Sumamos 1 a la interacción de este producto
 	interacciones[nombreProducto] = (interacciones[nombreProducto] || 0) + 1;
 	localStorage.setItem(key, JSON.stringify(interacciones));
 }
 
+function registrarTagsVistos(tags) {
+	if (!Array.isArray(tags) || !tags.length) return;
+	const key = 'levitad-tags-vistos';
+	const datos = JSON.parse(localStorage.getItem(key) || '{}');
+	tags.forEach(tag => { datos[tag] = (datos[tag] || 0) + 1; });
+	localStorage.setItem(key, JSON.stringify(datos));
+}
+
 function abrirDetalles(datos) {
 	registrarInteraccion(datos.nombre);
+	registrarTagsVistos(datos.tags);
 
 	estadoTienda.productoDetalleActual = datos;
 	document.getElementById('modal-titulo').innerText = datos.nombre;
@@ -829,14 +790,12 @@ function abrirDetalles(datos) {
 
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
-	lockBodyScroll();
 }
 
 function cerrarModal() {
 	modal.classList.remove('is-active');
 	setTimeout(() => {
 		modal.style.display = 'none';
-		unlockBodyScroll();
 	}, 500);
 }
 
@@ -1080,9 +1039,9 @@ function initMenuHamburguesa() {
 					<span class="menu-nav-text">Colecciones</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
-				<a class="menu-nav-item" href="#">
+				<a class="menu-nav-item menu-nav-item-parati" href="#" data-action="parati">
 					<span class="menu-nav-num">02</span>
-					<span class="menu-nav-text">Encargues</span>
+					<span class="menu-nav-text">Para Ti</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
 				<a class="menu-nav-item menu-nav-item-outfits" href="#" data-action="outfits">
@@ -1156,8 +1115,6 @@ function initMenuHamburguesa() {
 		
 		document.body.appendChild(ov);
 		document.body.appendChild(panel);
-		document.body.classList.add('carrito-abierto', 'menu-open');
-		lockBodyScroll();
 
 		ov.addEventListener('click', cerrarMenu);
 		requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -1189,24 +1146,28 @@ function initMenuHamburguesa() {
 			});
 		}
 
+		const paraTiBtn = panel.querySelector('.menu-nav-item-parati');
+		if (paraTiBtn) {
+			paraTiBtn.addEventListener('click', () => {
+				setTimeout(() => abrirParaTiPanel(), 400);
+			});
+		}
+
 		const temaToggle = panel.querySelector('#tema-toggle');
 		if (temaToggle) {
 			temaToggle.addEventListener('click', () => {
 				const esClaro = document.body.classList.toggle('is-light');
 				localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
-				window.refreshHeaderTheme?.();
 			});
 		}
 	}
 
 	function cerrarMenu() {
 		menuBtn.classList.remove('is-open');
-		document.body.classList.remove('carrito-abierto', 'menu-open');
 		const ov    = document.getElementById('menu-nav-overlay');
 		const panel = document.getElementById('menu-nav-panel');
 		if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 		if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
-		unlockBodyScroll();
 	}
 
 	menuBtn.addEventListener('click', () =>
@@ -1286,8 +1247,6 @@ function abrirContactoPanel() {
 
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
-	document.body.classList.add('contacto-abierto');
-	lockBodyScroll();
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		ov.classList.add('is-active');
@@ -1308,10 +1267,8 @@ function abrirContactoPanel() {
 function cerrarContactoPanel() {
 	const ov    = document.getElementById('contacto-overlay');
 	const panel = document.getElementById('contacto-panel');
-	document.body.classList.remove('contacto-abierto');
 	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
-	unlockBodyScroll();
 }
 
 function limpiarErrorCampo(el) {
@@ -1547,8 +1504,6 @@ function abrirOutfitsPanel() {
 
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
-	document.body.classList.add('outfits-abierto');
-	lockBodyScroll();
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		ov.classList.add('is-active');
@@ -1658,10 +1613,8 @@ function abrirOutfitsPanel() {
 function cerrarOutfitsPanel() {
 	const ov    = document.getElementById('outfits-overlay');
 	const panel = document.getElementById('outfits-panel');
-	document.body.classList.remove('outfits-abierto');
 	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
 	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
-	unlockBodyScroll();
 }
 
 
@@ -1970,40 +1923,102 @@ if (header) {
 		);
 	}
 
-	// ── API pública ──────────────────────────────────────────────────────────────
-	const st = tl.scrollTrigger;
-
-	window.pauseHeaderScroll = () => { if (st.vars) st.disable(false); };
-	window.resumeHeaderScroll = () => { if (st.vars) { st.enable(); st.update(); } };
-	window.refreshHeaderTheme = () => {
-		const p = st.progress;
-		if (document.body.classList.contains('is-light')) {
-			header.style.setProperty('--header-bg-alpha',     (0.90 + 0.10 * p).toFixed(3));
-			header.style.setProperty('--header-border-alpha', (0.12 + 0.18 * p).toFixed(3));
-		} else {
-			header.style.setProperty('--header-bg-alpha',     (0.85 + 0.15 * p).toFixed(3));
-			header.style.setProperty('--header-border-alpha', (0.10 + 0.20 * p).toFixed(3));
-		}
-	};
-	window.scrollToHeaderCollapsed = () => {
-		if (window.scrollY < getScrollDist()) window.scrollTo({ top: getScrollDist(), behavior: 'smooth' });
-	};
-
-	// Solo recalcula si cambió el ANCHO — no la altura (barra URL móvil)
-	let lastW = window.innerWidth;
-	window.addEventListener('resize', () => {
-		const w = window.innerWidth;
-		if (w === lastW) return;
-		lastW      = w;
-		headerW    = header.clientWidth;
-		expandedH  = window.innerHeight * 0.45;
-		st.refresh();
-	}, { passive: true });
-
-	window.addEventListener('orientationchange', () => {
-		lastW     = window.innerWidth;
-		headerW   = header.clientWidth;
-		expandedH = window.innerHeight * 0.45;
-		st.refresh();
-	}, { passive: true });
 }
+
+/* ═══════════════════════════════════════════════════════════
+   Panel Para Ti — recomendaciones según actividad del usuario
+═══════════════════════════════════════════════════════════ */
+function abrirParaTiPanel() {
+	if (document.getElementById('parati-panel')) return;
+
+	const tagsRaw   = JSON.parse(localStorage.getItem('levitad-tags-vistos') || '{}');
+	const tagsOrden = Object.entries(tagsRaw)
+		.sort(([, a], [, b]) => b - a)
+		.map(([tag]) => tag);
+
+	const ov = document.createElement('div');
+	ov.id = 'parati-overlay';
+	ov.className = 'parati-overlay';
+
+	const panel = document.createElement('div');
+	panel.id = 'parati-panel';
+	panel.className = 'parati-panel';
+
+	let bodyHTML;
+	if (!tagsOrden.length) {
+		bodyHTML = `
+			<div class="parati-vacio">
+				<p class="parati-vacio-icono">✦</p>
+				<p class="parati-vacio-texto">Todavía no registramos actividad.<br>Explorá la tienda y te iremos recomendando prendas.</p>
+			</div>
+		`;
+	} else {
+		const secciones = tagsOrden.map(tag => {
+			const prods = (estadoTienda.productos || []).filter(
+				p => Array.isArray(p.tags) && p.tags.includes(tag)
+			);
+			if (!prods.length) return '';
+			const cardsHTML = prods.map(p => `
+				<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
+					<span class="parati-card-img" style="background-image:url('${p.imagen || ''}')"></span>
+					<span class="parati-card-info">
+						<span class="parati-card-nombre">${p.nombre}</span>
+						<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
+					</span>
+				</button>
+			`).join('');
+			return `
+				<section class="parati-seccion">
+					<h3 class="parati-seccion-titulo">Porque viste <span class="parati-tag">#${tag}</span></h3>
+					<div class="parati-cards">${cardsHTML}</div>
+				</section>
+			`;
+		}).filter(Boolean).join('');
+
+		bodyHTML = secciones || `
+			<div class="parati-vacio">
+				<p class="parati-vacio-icono">✦</p>
+				<p class="parati-vacio-texto">No hay prendas disponibles con esas etiquetas todavía.</p>
+			</div>
+		`;
+	}
+
+	panel.innerHTML = `
+		<button class="parati-cerrar" aria-label="Cerrar Para Ti">✕</button>
+		<div class="parati-glow"></div>
+		<header class="parati-header">
+			<span class="parati-eyebrow">Selección personal</span>
+			<h2 class="parati-titulo">Para Ti</h2>
+			<p class="parati-sub">Prendas que quizás te gusten, según la actividad que has tenido en la tienda.</p>
+		</header>
+		<div class="parati-body">${bodyHTML}</div>
+	`;
+
+	document.body.appendChild(ov);
+	document.body.appendChild(panel);
+	document.body.classList.add('parati-abierto');
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov.classList.add('is-active');
+		panel.classList.add('is-active');
+	}));
+
+	function cerrar() {
+		ov.classList.add('is-closing');
+		panel.classList.add('is-closing');
+		document.body.classList.remove('parati-abierto');
+		setTimeout(() => { ov.remove(); panel.remove(); }, 380);
+	}
+
+	panel.querySelector('.parati-cerrar').addEventListener('click', cerrar);
+	ov.addEventListener('click', cerrar);
+
+	panel.querySelectorAll('.parati-card').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const nombre = btn.dataset.producto;
+			const prod   = (estadoTienda.productos || []).find(p => p.nombre === nombre);
+			if (prod) { cerrar(); setTimeout(() => abrirDetalles(prod), 420); }
+		});
+	});
+}
+
