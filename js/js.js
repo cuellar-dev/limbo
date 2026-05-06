@@ -1800,18 +1800,20 @@ if (title && leftWing && rightWing) {
 }
 
 if (header) {
-	const disableHeaderAnimation =
-		window.matchMedia('(max-width: 768px), (prefers-reduced-motion: reduce)').matches ||
-		typeof gsap === 'undefined' ||
-		typeof ScrollTrigger === 'undefined';
+	const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const disableHeaderAnimation = prefersReducedMotion || typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined';
 
 	if (disableHeaderAnimation) {
 		estadoTienda.headerScrollTriggerEnabled = false;
-		header.classList.add('is-collapsed');
-		header.classList.remove('is-expanded');
-	}
-
-	if (!disableHeaderAnimation) {
+		if (prefersReducedMotion) {
+			// Honor reduced motion: show collapsed static header
+			header.classList.add('is-collapsed');
+			header.classList.remove('is-expanded');
+		} else {
+			// If animation libs missing, keep header in default (non-collapsed) state
+			header.classList.remove('is-expanded');
+		}
+	} else {
 		gsap.registerPlugin(ScrollTrigger);
 		estadoTienda.headerScrollTriggerEnabled = true;
 
