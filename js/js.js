@@ -212,7 +212,6 @@ function abrirCarrito() {
 	const overlay = document.getElementById('carrito-overlay');
 	const panel   = document.getElementById('carrito-panel');
 	if (!overlay || !panel) return;
-	bloquearScroll();
 	document.body.classList.add('carrito-abierto');
 	overlay.classList.add('is-active');
 	panel.classList.add('is-active');
@@ -224,7 +223,6 @@ function cerrarCarrito() {
 	const overlay = document.getElementById('carrito-overlay');
 	const panel   = document.getElementById('carrito-panel');
 	if (!overlay || !panel) return;
-	liberarScroll();
 	document.body.classList.remove('carrito-abierto');
 	overlay.classList.remove('is-active');
 	panel.classList.remove('is-active');
@@ -817,7 +815,6 @@ function abrirDetalles(datos) {
 }
 
 function cerrarModal() {
-	liberarScroll();
 	modal.classList.remove('is-active');
 	setTimeout(() => {
 		modal.style.display = 'none';
@@ -1039,7 +1036,6 @@ function initMenuHamburguesa() {
 
 	function abrirMenu() {
 		if (document.getElementById('menu-nav-panel')) return;
-		bloquearScroll();
 		menuBtn.classList.add('is-open');
 
 		const ov = document.createElement('div');
@@ -1201,7 +1197,6 @@ function initMenuHamburguesa() {
 	}
 
 	function cerrarMenu() {
-		liberarScroll();
 		menuBtn.classList.remove('is-open');
 		const ov    = document.getElementById('menu-nav-overlay');
 		const panel = document.getElementById('menu-nav-panel');
@@ -1221,7 +1216,6 @@ function initMenuHamburguesa() {
 ═══════════════════════════════════════════════════════════ */
 function abrirContactoPanel() {
 	if (document.getElementById('contacto-panel')) return;
-	bloquearScroll();
 	document.body.classList.add('contacto-abierto');
 
 	const ov = document.createElement('div');
@@ -1306,7 +1300,6 @@ function abrirContactoPanel() {
 }
 
 function cerrarContactoPanel() {
-	liberarScroll();
 	document.body.classList.remove('contacto-abierto');
 	const ov    = document.getElementById('contacto-overlay');
 	const panel = document.getElementById('contacto-panel');
@@ -1449,7 +1442,6 @@ async function manejarEnvioContacto(e) {
 ═══════════════════════════════════════════════════════════ */
 function abrirOutfitsPanel() {
 	if (document.getElementById('outfits-panel')) return;
-	bloquearScroll();
 	document.body.classList.add('outfits-abierto');
 
 	const outfits = (estadoTienda.outfits || []);
@@ -1656,7 +1648,6 @@ function abrirOutfitsPanel() {
 }
 
 function cerrarOutfitsPanel() {
-	liberarScroll();
 	document.body.classList.remove('outfits-abierto');
 	const ov    = document.getElementById('outfits-overlay');
 	const panel = document.getElementById('outfits-panel');
@@ -1747,24 +1738,6 @@ function initFooter() {
    Bloqueo de scroll del body — sin afectar el scroll interno
    de los modales. Usa position:fixed para que funcione en iOS.
 ══════════════════════════════════════════════════════════ */
-function bloquearScroll() {
-	if (document.body.dataset.scrollY !== undefined) return;
-	const y = window.scrollY;
-	document.body.style.position  = 'fixed';
-	document.body.style.top       = `-${y}px`;
-	document.body.style.left      = '0';
-	document.body.style.right     = '0';
-	document.body.dataset.scrollY = y;
-}
-function liberarScroll() {
-	const y = parseInt(document.body.dataset.scrollY ?? '0', 10);
-	document.body.style.position = '';
-	document.body.style.top      = '';
-	document.body.style.left     = '';
-	document.body.style.right    = '';
-	delete document.body.dataset.scrollY;
-	window.scrollTo(0, y);
-}
 
 function initTema() {
 	if (localStorage.getItem('levitad-tema') === 'light') {
@@ -2158,7 +2131,6 @@ function abrirParaTiPanel() {
 	}));
 
 	function cerrar() {
-		liberarScroll();
 		ov.classList.add('is-closing');
 		panel.classList.add('is-closing');
 		document.body.classList.remove('parati-abierto');
@@ -2296,7 +2268,6 @@ function abrirCategoriasPanel() {
 	}));
 
 	function cerrar() {
-		liberarScroll();
 		ov.classList.add('is-closing');
 		panel.classList.add('is-closing');
 		document.body.classList.remove('categorias-abierto');
