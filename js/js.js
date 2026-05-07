@@ -212,6 +212,8 @@ function abrirCarrito() {
 	const overlay = document.getElementById('carrito-overlay');
 	const panel   = document.getElementById('carrito-panel');
 	if (!overlay || !panel) return;
+	bloquearScroll();
+	document.body.classList.add('carrito-abierto');
 	overlay.classList.add('is-active');
 	panel.classList.add('is-active');
 	overlay.setAttribute('aria-hidden', 'false');
@@ -222,6 +224,8 @@ function cerrarCarrito() {
 	const overlay = document.getElementById('carrito-overlay');
 	const panel   = document.getElementById('carrito-panel');
 	if (!overlay || !panel) return;
+	liberarScroll();
+	document.body.classList.remove('carrito-abierto');
 	overlay.classList.remove('is-active');
 	panel.classList.remove('is-active');
 	overlay.setAttribute('aria-hidden', 'true');
@@ -807,11 +811,13 @@ function abrirDetalles(datos) {
 		}
 	}
 
+	bloquearScroll();
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
 }
 
 function cerrarModal() {
+	liberarScroll();
 	modal.classList.remove('is-active');
 	setTimeout(() => {
 		modal.style.display = 'none';
@@ -1033,6 +1039,7 @@ function initMenuHamburguesa() {
 
 	function abrirMenu() {
 		if (document.getElementById('menu-nav-panel')) return;
+		bloquearScroll();
 		menuBtn.classList.add('is-open');
 
 		const ov = document.createElement('div');
@@ -1071,6 +1078,11 @@ function initMenuHamburguesa() {
 				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
 					<span class="menu-nav-num">04</span>
 					<span class="menu-nav-text">Contacto</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item menu-nav-item-categorias" href="#" data-action="categorias">
+					<span class="menu-nav-num">05</span>
+					<span class="menu-nav-text">Categor&#237;as</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
 			</nav>
@@ -1172,6 +1184,13 @@ function initMenuHamburguesa() {
 			});
 		}
 
+		const categoriasBtn = panel.querySelector('.menu-nav-item-categorias');
+		if (categoriasBtn) {
+			categoriasBtn.addEventListener('click', () => {
+				setTimeout(() => abrirCategoriasPanel(), 400);
+			});
+		}
+
 		const temaToggle = panel.querySelector('#tema-toggle');
 		if (temaToggle) {
 			temaToggle.addEventListener('click', () => {
@@ -1182,6 +1201,7 @@ function initMenuHamburguesa() {
 	}
 
 	function cerrarMenu() {
+		liberarScroll();
 		menuBtn.classList.remove('is-open');
 		const ov    = document.getElementById('menu-nav-overlay');
 		const panel = document.getElementById('menu-nav-panel');
@@ -1201,6 +1221,8 @@ function initMenuHamburguesa() {
 ═══════════════════════════════════════════════════════════ */
 function abrirContactoPanel() {
 	if (document.getElementById('contacto-panel')) return;
+	bloquearScroll();
+	document.body.classList.add('contacto-abierto');
 
 	const ov = document.createElement('div');
 	ov.id        = 'contacto-overlay';
@@ -1284,6 +1306,8 @@ function abrirContactoPanel() {
 }
 
 function cerrarContactoPanel() {
+	liberarScroll();
+	document.body.classList.remove('contacto-abierto');
 	const ov    = document.getElementById('contacto-overlay');
 	const panel = document.getElementById('contacto-panel');
 	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
@@ -1425,6 +1449,8 @@ async function manejarEnvioContacto(e) {
 ═══════════════════════════════════════════════════════════ */
 function abrirOutfitsPanel() {
 	if (document.getElementById('outfits-panel')) return;
+	bloquearScroll();
+	document.body.classList.add('outfits-abierto');
 
 	const outfits = (estadoTienda.outfits || []);
 	if (!outfits.length) return;
@@ -1630,6 +1656,8 @@ function abrirOutfitsPanel() {
 }
 
 function cerrarOutfitsPanel() {
+	liberarScroll();
+	document.body.classList.remove('outfits-abierto');
 	const ov    = document.getElementById('outfits-overlay');
 	const panel = document.getElementById('outfits-panel');
 	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
@@ -1715,10 +1743,59 @@ function initFooter() {
 }
 
 /* ─── INIT ─── */
+/* ══════════════════════════════════════════════════════════
+   Bloqueo de scroll del body — sin afectar el scroll interno
+   de los modales. Usa position:fixed para que funcione en iOS.
+══════════════════════════════════════════════════════════ */
+function bloquearScroll() {
+	if (document.body.dataset.scrollY !== undefined) return;
+	const y = window.scrollY;
+	document.body.style.position  = 'fixed';
+	document.body.style.top       = `-${y}px`;
+	document.body.style.left      = '0';
+	document.body.style.right     = '0';
+	document.body.dataset.scrollY = y;
+}
+function liberarScroll() {
+	const y = parseInt(document.body.dataset.scrollY ?? '0', 10);
+	document.body.style.position = '';
+	document.body.style.top      = '';
+	document.body.style.left     = '';
+	document.body.style.right    = '';
+	delete document.body.dataset.scrollY;
+	window.scrollTo(0, y);
+}
+
 function initTema() {
 	if (localStorage.getItem('levitad-tema') === 'light') {
 		document.body.classList.add('is-light');
 	}
+}
+
+/* ── Header Nav Links ── */
+function initHeaderNavLinks() {
+	const navItems = document.querySelectorAll('.header-nav li');
+	if (!navItems.length) return;
+
+	navItems.forEach(item => {
+		item.addEventListener('click', (e) => {
+			e.preventDefault();
+			const text = item.textContent.trim().toUpperCase();
+			
+			// Abrir el panel correspondiente según el texto
+			setTimeout(() => {
+				if (text.includes('CATEGOR')) {
+					abrirCategoriasPanel();
+				} else if (text.includes('PARA TI')) {
+					abrirParaTiPanel();
+				} else if (text.includes('OUTFITS')) {
+					abrirOutfitsPanel();
+				} else if (text.includes('CONTACTO')) {
+					abrirContactoPanel();
+				}
+			}, 100);
+		});
+	});
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1766,6 +1843,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	initMenuHamburguesa();
+	initHeaderNavLinks();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
 	if (carritoOverlay)  carritoOverlay.addEventListener('click',  cerrarCarrito);
@@ -1788,15 +1866,40 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ─── HEADER SCROLL ─── */
 const header = document.getElementById('header');
 
-const title     = header?.querySelector('h1');
-const leftWing  = document.querySelector('.ala-izquierda');
-const rightWing = document.querySelector('.ala-derecha');
+/* Función robusta para inyectar alas: reintentos automáticos si fallan */
+function injectWingsIntoHeader() {
+	const title     = header?.querySelector('h1');
+	const leftWing  = document.querySelector('.ala-izquierda');
+	const rightWing = document.querySelector('.ala-derecha');
 
-if (title && leftWing && rightWing) {
-	leftWing.setAttribute('aria-hidden',  'true');
-	rightWing.setAttribute('aria-hidden', 'true');
-	title.insertBefore(leftWing, title.firstChild);
-	title.appendChild(rightWing);
+	// Si encuentra ambas alas, las inyecta en el h1
+	if (title && leftWing && rightWing) {
+		leftWing.setAttribute('aria-hidden',  'true');
+		rightWing.setAttribute('aria-hidden', 'true');
+		title.insertBefore(leftWing, title.firstChild);
+		title.appendChild(rightWing);
+		return true; // Éxito
+	}
+	return false; // Falló - reintentar después
+}
+
+// Intenta inyectar las alas inmediatamente
+let wingsInjected = injectWingsIntoHeader();
+
+// Si falla, reintentar cada 100ms hasta 10 veces (1 segundo máximo)
+if (!wingsInjected) {
+	let retryCount = 0;
+	const retryInterval = setInterval(() => {
+		if (injectWingsIntoHeader()) {
+			clearInterval(retryInterval);
+			wingsInjected = true;
+		}
+		retryCount++;
+		if (retryCount >= 10) {
+			clearInterval(retryInterval);
+			console.warn('⚠️ No se pudieron inyectar las alas del header después de 1 segundo. Los SVG pueden no estar parseados.');
+		}
+	}, 100);
 }
 
 if (header) {
@@ -1956,6 +2059,18 @@ if (header) {
 			0
 		);
 	}
+
+	/* ── INICIALIZACIÓN: Fuerza el estado expandido en la primera carga ── */
+	/* El header sale expandido (scroll en 0), pero GSAP aún no ha ejecutado onUpdate.
+	   Sin esto, las alas y .header-nav permanecen ocultos hasta el primer scroll.
+	   Esto simula el estado inicial correcto: p=0, por tanto expanded=true */
+	lastExpandedState = true;
+	header.classList.add('is-expanded');
+	if (searchBar) {
+		lastSearchHidden = false;
+		searchBar.classList.remove('is-scroll-hidden');
+	}
+	/* Fin: Ahora en la primera carga ya se ven alas y nav correctamente */
 	}
 
 }
@@ -1988,11 +2103,15 @@ function abrirParaTiPanel() {
 			</div>
 		`;
 	} else {
+		const productoContador = {};
+		const MAX_APARICIONES = 2;
 		const secciones = tagsOrden.map(tag => {
 			const prods = (estadoTienda.productos || []).filter(
-				p => Array.isArray(p.tags) && p.tags.includes(tag)
+				p => Array.isArray(p.tags) && p.tags.includes(tag) &&
+				     (productoContador[p.nombre] || 0) < MAX_APARICIONES
 			);
 			if (!prods.length) return '';
+			prods.forEach(p => { productoContador[p.nombre] = (productoContador[p.nombre] || 0) + 1; });
 			const cardsHTML = prods.map(p => `
 				<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
 					<span class="parati-card-img" style="background-image:url('${p.imagen || ''}')"></span>
@@ -2020,17 +2139,17 @@ function abrirParaTiPanel() {
 
 	panel.innerHTML = `
 		<button class="parati-cerrar" aria-label="Cerrar Para Ti">✕</button>
-		<div class="parati-glow"></div>
 		<header class="parati-header">
 			<span class="parati-eyebrow">Selección personal</span>
 			<h2 class="parati-titulo">Para Ti</h2>
-			<p class="parati-sub">Prendas que quizás te gusten, según la actividad que has tenido en la tienda.</p>
+			<p class="parati-sub">Prendas que quizás te gusten, según tu actividad en la tienda.</p>
 		</header>
 		<div class="parati-body">${bodyHTML}</div>
 	`;
 
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
+	bloquearScroll();
 	document.body.classList.add('parati-abierto');
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2039,6 +2158,7 @@ function abrirParaTiPanel() {
 	}));
 
 	function cerrar() {
+		liberarScroll();
 		ov.classList.add('is-closing');
 		panel.classList.add('is-closing');
 		document.body.classList.remove('parati-abierto');
@@ -2057,3 +2177,148 @@ function abrirParaTiPanel() {
 	});
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Panel Categor&#237;as — explorar prendas por categor&#237;a y ranking
+═══════════════════════════════════════════════════════════ */
+function abrirCategoriasPanel() {
+	if (document.getElementById('categorias-panel')) return;
+
+	const productos = estadoTienda.productos || [];
+
+	const masVendidos = [...productos]
+		.filter(p => (p.ventas || 0) > 0)
+		.sort((a, b) => (b.ventas || 0) - (a.ventas || 0))
+		.slice(0, 6);
+
+	const porCategoria = {};
+	productos.forEach(p => {
+		const cat = (p.categoria || 'otros').toLowerCase();
+		if (!porCategoria[cat]) porCategoria[cat] = [];
+		porCategoria[cat].push(p);
+	});
+
+	const ICONOS_CAT = {
+		buzo: '&#9671;', pantalon: '&#9645;', remera: '&#9651;', camisa: '&#9672;',
+		campera: '&#9670;', top: '&#9661;', short: '&#9641;', conjunto: '&#9673;',
+		chaleco: '&#11041;', otros: '&#10022;'
+	};
+	const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+
+	const ov = document.createElement('div');
+	ov.id = 'categorias-overlay';
+	ov.className = 'categorias-overlay';
+
+	const panel = document.createElement('div');
+	panel.id = 'categorias-panel';
+	panel.className = 'categorias-panel';
+
+	const cardHTML = (p, rank) => `
+		<button class="cat-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
+			${rank ? `<span class="cat-card-rank">#${rank}</span>` : ''}
+			<span class="cat-card-img" style="background-image:url('${p.imagen || ''}')"></span>
+			<span class="cat-card-info">
+				<span class="cat-card-nombre">${p.nombre}</span>
+				<span class="cat-card-precio">${formatPrecio(p.precio)}</span>
+			</span>
+		</button>
+	`;
+
+	let bodyHTML = '';
+
+	if (!productos.length) {
+		bodyHTML = `
+			<div class="cat-vacio">
+				<p class="cat-vacio-icono">&#10022;</p>
+				<p class="cat-vacio-texto">A&#250;n no hay prendas para mostrar.</p>
+			</div>
+		`;
+	} else {
+		const categorias = Object.keys(porCategoria).sort();
+
+		const masVendidosHTML = masVendidos.length ? `
+			<section class="cat-seccion cat-seccion-destacada">
+				<div class="cat-seccion-head">
+					<span class="cat-seccion-icon">&#9733;</span>
+					<h3 class="cat-seccion-titulo">M&#225;s vendidos</h3>
+					<span class="cat-seccion-meta">Top ${masVendidos.length}</span>
+				</div>
+				<div class="cat-cards">
+					${masVendidos.map((p, i) => cardHTML(p, i + 1)).join('')}
+				</div>
+			</section>
+		` : '';
+
+		const chipsHTML = `
+			<nav class="cat-chips" aria-label="Saltar a categor&#237;a">
+				${categorias.map(c => `
+					<button class="cat-chip" data-target="cat-sec-${c}">${cap(c)}</button>
+				`).join('')}
+			</nav>
+		`;
+
+		const seccionesHTML = categorias.map(c => {
+			const items = porCategoria[c];
+			return `
+				<section class="cat-seccion" id="cat-sec-${c}">
+					<div class="cat-seccion-head">
+						<span class="cat-seccion-icon">${ICONOS_CAT[c] || ICONOS_CAT.otros}</span>
+						<h3 class="cat-seccion-titulo">${cap(c)}</h3>
+						<span class="cat-seccion-meta">${items.length} ${items.length === 1 ? 'prenda' : 'prendas'}</span>
+					</div>
+					<div class="cat-cards">
+						${items.map(p => cardHTML(p)).join('')}
+					</div>
+				</section>
+			`;
+		}).join('');
+
+		bodyHTML = masVendidosHTML + chipsHTML + seccionesHTML;
+	}
+
+	panel.innerHTML = `
+		<button class="cat-cerrar" aria-label="Cerrar">&#10005;</button>
+		<header class="cat-header">
+			<span class="cat-eyebrow">Explorar</span>
+			<h2 class="cat-titulo">Categor&#237;as</h2>
+			<p class="cat-sub">Descubr&#237; prendas por estilo y popularidad.</p>
+		</header>
+		<div class="cat-body">${bodyHTML}</div>
+	`;
+
+	document.body.appendChild(ov);
+	document.body.appendChild(panel);
+	bloquearScroll();
+	document.body.classList.add('categorias-abierto');
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov.classList.add('is-active');
+		panel.classList.add('is-active');
+	}));
+
+	function cerrar() {
+		liberarScroll();
+		ov.classList.add('is-closing');
+		panel.classList.add('is-closing');
+		document.body.classList.remove('categorias-abierto');
+		setTimeout(() => { ov.remove(); panel.remove(); }, 380);
+	}
+
+	panel.querySelector('.cat-cerrar').addEventListener('click', cerrar);
+	ov.addEventListener('click', cerrar);
+
+	const body = panel.querySelector('.cat-body');
+	panel.querySelectorAll('.cat-chip').forEach(chip => {
+		chip.addEventListener('click', () => {
+			const target = panel.querySelector('#' + chip.dataset.target);
+			if (target && body) body.scrollTo({ top: target.offsetTop - 8, behavior: 'smooth' });
+		});
+	});
+
+	panel.querySelectorAll('.cat-card').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const nombre = btn.dataset.producto;
+			const prod   = (estadoTienda.productos || []).find(p => p.nombre === nombre);
+			if (prod) { cerrar(); setTimeout(() => abrirDetalles(prod), 420); }
+		});
+	});
+}

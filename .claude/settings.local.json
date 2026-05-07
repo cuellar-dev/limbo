@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"d:/diseñoWeb/pinchas/Lévitad\" diff --stat)",
+      "Bash(git -C \"d:/diseñoWeb/pinchas/Lévitad\" diff js/js.js)"
+    ]
+  }
+}
