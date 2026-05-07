@@ -809,7 +809,6 @@ function abrirDetalles(datos) {
 		}
 	}
 
-	bloquearScroll();
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
 }
@@ -1734,10 +1733,6 @@ function initFooter() {
 }
 
 /* ─── INIT ─── */
-/* ══════════════════════════════════════════════════════════
-   Bloqueo de scroll del body — sin afectar el scroll interno
-   de los modales. Usa position:fixed para que funcione en iOS.
-══════════════════════════════════════════════════════════ */
 
 function initTema() {
 	if (localStorage.getItem('levitad-tema') === 'light') {
@@ -2122,7 +2117,6 @@ function abrirParaTiPanel() {
 
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
-	bloquearScroll();
 	document.body.classList.add('parati-abierto');
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2259,7 +2253,6 @@ function abrirCategoriasPanel() {
 
 	document.body.appendChild(ov);
 	document.body.appendChild(panel);
-	bloquearScroll();
 	document.body.classList.add('categorias-abierto');
 
 	requestAnimationFrame(() => requestAnimationFrame(() => {
