@@ -236,7 +236,7 @@ h1 {
     position: absolute;
     z-index: 10;
     /* Transición elástica tipo iOS */
-    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background 0.35s ease, box-shadow 0.35s ease;
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), background 0.35s ease, box-shadow 0.35s ease;
     box-shadow: 0 4px 15px rgba(202, 172, 71, 0.4);
 }
 
@@ -462,6 +462,21 @@ body.is-encargue #menu-hamb g {
     position: relative;
     overflow: hidden;
 }
+
+/* Wrappers de icono duales — CSS controla cuál es visible según el modo */
+.icono-stack,
+.icono-encargue {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.15s ease-out;
+}
+.icono-encargue {
+    position: absolute;
+    opacity: 0;
+}
+body.is-encargue .btn-anadir .icono-stack   { opacity: 0; }
+body.is-encargue .btn-anadir .icono-encargue { opacity: 1; }
 
 /* Efecto al tocar la pantalla (Active en lugar de Hover) */
 .btn-anadir:active {

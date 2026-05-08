@@ -258,30 +258,46 @@ function obtenerProductoEnCarrito(nombre) {
 	return carritoActivo().find(item => item.nombre === nombre);
 }
 
-function marcarBotonComoAgregado(boton, isEncargue) {
+function marcarBotonComoAgregado(boton) {
 	if (!boton) return;
 	boton.classList.add('is-agregado');
 	boton.disabled = true;
-	const svg = boton.querySelector('svg');
-	if (svg) {
-		svg.classList.add('icono-transicion');
+	const stackEl    = boton.querySelector('.icono-stack');
+	const encargueEl = boton.querySelector('.icono-encargue');
+	if (stackEl) {
+		stackEl.querySelector('svg')?.classList.add('icono-transicion');
 		setTimeout(() => {
-			boton.innerHTML = isEncargue ? iconoAnadirConViento : iconoCarritoCheck;
-			boton.querySelector('svg')?.classList.add('icono-transicion');
+			stackEl.innerHTML = iconoCarritoCheck;
+			stackEl.querySelector('svg')?.classList.add('icono-transicion');
+		}, 100);
+	}
+	if (encargueEl) {
+		encargueEl.querySelector('svg')?.classList.add('icono-transicion');
+		setTimeout(() => {
+			encargueEl.innerHTML = iconoAnadirConViento;
+			encargueEl.querySelector('svg')?.classList.add('icono-transicion');
 		}, 100);
 	}
 }
 
-function desmarcarBotonAgregado(boton, isEncargue) {
+function desmarcarBotonAgregado(boton) {
 	if (!boton) return;
 	boton.classList.remove('is-agregado');
 	boton.disabled = false;
-	const svg = boton.querySelector('svg');
-	if (svg) {
-		svg.classList.add('icono-transicion');
+	const stackEl    = boton.querySelector('.icono-stack');
+	const encargueEl = boton.querySelector('.icono-encargue');
+	if (stackEl) {
+		stackEl.querySelector('svg')?.classList.add('icono-transicion');
 		setTimeout(() => {
-			boton.innerHTML = isEncargue ? iconoAnadir : iconoCarrito;
-			boton.querySelector('svg')?.classList.add('icono-transicion');
+			stackEl.innerHTML = iconoCarrito;
+			stackEl.querySelector('svg')?.classList.add('icono-transicion');
+		}, 100);
+	}
+	if (encargueEl) {
+		encargueEl.querySelector('svg')?.classList.add('icono-transicion');
+		setTimeout(() => {
+			encargueEl.innerHTML = iconoAnadir;
+			encargueEl.querySelector('svg')?.classList.add('icono-transicion');
 		}, 100);
 	}
 }
@@ -398,11 +414,9 @@ function crearTarjetaProducto(producto, index) {
 	const etiquetas   = Array.isArray(producto.tags)
 		? producto.tags.map(tag => `<p class="etiquetas">#${tag}</p>`).join('')
 		: '';
-	const isEncargue  = modoActual() === 'encargue';
-	const yaEnCarrito = Boolean(obtenerProductoEnCarrito(producto.nombre));
-	const iconoBoton  = yaEnCarrito
-		? (isEncargue ? iconoAnadirConViento : iconoCarritoCheck)
-		: (isEncargue ? iconoAnadir          : iconoCarrito);
+	const yaEnCarrito   = Boolean(obtenerProductoEnCarrito(producto.nombre));
+	const iconoStack    = yaEnCarrito ? iconoCarritoCheck    : iconoCarrito;
+	const iconoEncargue = yaEnCarrito ? iconoAnadirConViento : iconoAnadir;
 	const clasesBoton   = yaEnCarrito ? 'btn-anadir is-agregado' : 'btn-anadir';
 	const deshabilitado = yaEnCarrito ? 'disabled' : '';
 
@@ -418,7 +432,8 @@ function crearTarjetaProducto(producto, index) {
 				<div class="contenedor-row">
 					<span class="precio">${formatPrecio(producto.precio)}</span>
 					<button class="${clasesBoton}" type="button" aria-label="Agregar ${producto.nombre}" ${deshabilitado}>
-						${iconoBoton}
+						<span class="icono-stack">${iconoStack}</span>
+						<span class="icono-encargue">${iconoEncargue}</span>
 					</button>
 				</div>
 			</div>
@@ -588,20 +603,8 @@ async function cargarProductos() {
 }
 
 function cambiarIconosEncargue(isEncargue) {
-	document.querySelectorAll('.btn-anadir').forEach(btn => {
-		const svg = btn.querySelector('svg');
-		if (!svg) return;
-		svg.classList.add('icono-transicion');
-		setTimeout(() => {
-			if (btn.classList.contains('is-agregado')) {
-				btn.innerHTML = isEncargue ? iconoAnadirConViento : iconoCarritoCheck;
-			} else {
-				btn.innerHTML = isEncargue ? iconoAnadir : iconoCarrito;
-			}
-			btn.querySelector('svg')?.classList.add('icono-transicion');
-		}, 150);
-	});
-
+	// Los iconos de los botones de producto son gestionados por CSS (body.is-encargue).
+	// Solo actualizamos el icono del carrito en la barra de iconos.
 	const carritoBtn = document.getElementById('carrito-btn');
 	const carritoSvg = carritoBtn?.closest('svg');
 	if (carritoBtn && carritoSvg) {
@@ -723,16 +726,18 @@ if (switchContainer) {
 	const setActiveSwitch = (button) => {
 		if (!switchIndicator || !button) return;
 
-		switchButtons.forEach(btn => btn.classList.remove('is-active'));
-		button.classList.add('is-active');
-
-		const isEncargue    = switchButtons.indexOf(button) === 1;
-		switchContainer.classList.toggle('is-encargue', isEncargue);
-		document.body.classList.toggle('is-encargue',   isEncargue);
-
+		// Reads primero — antes de cualquier write para evitar forced sync layout
 		const containerRect = switchContainer.getBoundingClientRect();
 		const buttonRect    = button.getBoundingClientRect();
 		const indicadorX    = buttonRect.left - containerRect.left;
+
+		// Writes
+		switchButtons.forEach(btn => btn.classList.remove('is-active'));
+		button.classList.add('is-active');
+
+		const isEncargue = switchButtons.indexOf(button) === 1;
+		switchContainer.classList.toggle('is-encargue', isEncargue);
+		document.body.classList.toggle('is-encargue',   isEncargue);
 
 		switchIndicator.style.width     = `${buttonRect.width}px`;
 		switchIndicator.style.transform = `translate(${indicadorX}px, -50%)`;
