@@ -1,4 +1,13 @@
+/*IIIIIIIIIIIIIII*/
+
+
 const switchContainer = document.querySelector('.switch-container');
+
+function debounce(fn, delay) {
+	let t;
+	return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), delay); };
+}
+
 const estadoTienda = {
 	productos: [],
 	masonry: null,
@@ -306,7 +315,7 @@ function eliminarDelCarrito(index, itemEl) {
 			carrito.splice(index, 1);
 			desmarcarProductoEnGrid(productoEliminado.nombre);
 			renderizarCarrito();
-		}, 300); // 300ms > 280ms del transition más largo (max-height/margin)
+		}, 220); // 220ms > 200ms del transition más largo (transform)
 	} else {
 		carrito.splice(index, 1);
 		desmarcarProductoEnGrid(productoEliminado.nombre);
@@ -449,7 +458,7 @@ function inicializarMasonry() {
 
 	if (!estadoTienda.masonryListenersBound) {
 		window.addEventListener('load', relayout);
-		window.addEventListener('resize', relayout);
+		window.addEventListener('resize', debounce(relayout, 150));
 		document.fonts?.ready.then(relayout);
 		estadoTienda.masonryListenersBound = true;
 	}
@@ -743,10 +752,10 @@ if (switchContainer) {
 
 	if (switchButtons.length > 0) setActiveSwitch(switchButtons[0]);
 
-	window.addEventListener('resize', () => {
+	window.addEventListener('resize', debounce(() => {
 		const active = switchContainer.querySelector('button.is-active') || switchButtons[0];
 		if (active) setActiveSwitch(active);
-	});
+	}, 150));
 }
 
 /* ─── MODAL DETALLE PRODUCTO ─── */
@@ -1555,64 +1564,11 @@ function abrirOutfitsPanel() {
 		idxActual = Math.max(0, Math.min(outfits.length - 1, i));
 		track.style.transform = `translateX(-${idxActual * 100}%)`;
 		dots.forEach((d, di) => d.classList.toggle('is-active', di === idxActual));
-		// Re-dibuja conectores tras la transición
-		setTimeout(dibujarConectoresActivo, 380);
 	}
 
 	panel.querySelector('.outfits-prev').addEventListener('click', () => irA(idxActual - 1));
 	panel.querySelector('.outfits-next').addEventListener('click', () => irA(idxActual + 1));
 	dots.forEach(d => d.addEventListener('click', () => irA(Number(d.dataset.go))));
-
-	// ─── Conectores SVG ────────────────────────────────────────
-	function dibujarConectores(slide) {
-		const svg = slide.querySelector('.outfit-conectores');
-		const markers = slide.querySelectorAll('.outfit-marker');
-		const cards   = slide.querySelectorAll('.outfit-prenda');
-		if (!svg || !markers.length) return;
-
-		// En mobile no dibujamos conectores (layout vertical, números bastan)
-		if (window.matchMedia('(max-width: 720px)').matches) {
-			svg.innerHTML = '';
-			return;
-		}
-
-		const slideRect = slide.getBoundingClientRect();
-		svg.setAttribute('viewBox', `0 0 ${slideRect.width} ${slideRect.height}`);
-		svg.setAttribute('width',  slideRect.width);
-		svg.setAttribute('height', slideRect.height);
-
-		let lineas = '';
-		markers.forEach((m, i) => {
-			const card = cards[i];
-			if (!card) return;
-			const mr = m.getBoundingClientRect();
-			const cr = card.getBoundingClientRect();
-			const x1 = mr.left + mr.width / 2  - slideRect.left;
-			const y1 = mr.top  + mr.height / 2 - slideRect.top;
-			const x2 = cr.left                  - slideRect.left + 4;
-			const y2 = cr.top  + cr.height / 2  - slideRect.top;
-			// Línea punteada con quiebre suave (curva Bézier sutil)
-			const cx = (x1 + x2) / 2;
-			lineas += `
-				<path d="M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}"
-				      fill="none" stroke="var(--color-alas-principal)"
-				      stroke-width="1.4" stroke-dasharray="4 5" opacity="0.85"/>
-				<circle cx="${x1}" cy="${y1}" r="3" fill="var(--color-alas-principal)" />
-			`;
-		});
-		svg.innerHTML = lineas;
-	}
-
-	function dibujarConectoresActivo() {
-		const slide = track.children[idxActual];
-		if (slide) dibujarConectores(slide);
-	}
-
-	// Dibujo inicial: tras dos rAF (panel ya está en pantalla y con dimensiones)
-	requestAnimationFrame(() => requestAnimationFrame(dibujarConectoresActivo));
-
-	const onResize = () => dibujarConectoresActivo();
-	window.addEventListener('resize', onResize);
 
 	// ─── Click en card → abre el detalle del producto ─────────
 	track.addEventListener('click', (e) => {
@@ -1627,12 +1583,8 @@ function abrirOutfitsPanel() {
 	});
 
 	// ─── Cerrar ───────────────────────────────────────────────
-	function cerrarConCleanup() {
-		window.removeEventListener('resize', onResize);
-		cerrarOutfitsPanel();
-	}
-	ov.addEventListener('click', cerrarConCleanup);
-	panel.querySelector('.outfits-cerrar').addEventListener('click', cerrarConCleanup);
+	ov.addEventListener('click', cerrarOutfitsPanel);
+	panel.querySelector('.outfits-cerrar').addEventListener('click', cerrarOutfitsPanel);
 
 	// ─── Swipe táctil para móviles ────────────────────────────
 	let touchX0 = null;
