@@ -1890,7 +1890,9 @@ if (header) {
 
 	// Normaliza el scroll en iOS: evita que la barra de URL afecte la posición de scroll
 	// e impide que el comportamiento "rubber-band" dispare eventos de scroll falsos.
-	ScrollTrigger.normalizeScroll(true);
+	ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
+	// Después:
+
 
 	// Ignora resize causados por la barra de URL móvil (solo cambia altura, no ancho).
 	ScrollTrigger.config({ ignoreMobileResize: true });

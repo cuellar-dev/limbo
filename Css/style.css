@@ -110,7 +110,7 @@ body {
     font-family: system-ui, -apple-system, sans-serif; 
     color: var(--texto-secundario);
     /* Degradado celestial: Luz azul noche arriba que se funde a negro puro abajo */
-    background-image: var(--bg-radial);
+
     background-attachment: fixed;
     background-repeat: no-repeat;
     scrollbar-width: none;
@@ -579,17 +579,22 @@ svg.icono-transicion {
     transform: translateY(100%);
     transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     display: flex;
-.btn-anadir.is-agregado {
+    flex-direction: column;
+    border-top: 1px solid var(--borde-dorado);
+    overflow: hidden;
+    min-height: 0;
+    overscroll-behavior: contain; /* el scroll muere aquí, no se propaga */
+}
+
+.is-agregado {
      cursor: not-allowed;
      opacity: 0.6;
 }
 
-.btn-anadir.is-agregado:active {
-     background-color: transparent;
-     transform: scale(1);
-}
-    flex-direction: column;
-    border-top: 1px solid var(--borde-dorado);
+.is-agregado:active {
+    background-color: transparent;
+    transform: scale(1);
+    
 }
 
 .modal-overlay.is-active .modal-sheet {
@@ -597,13 +602,14 @@ svg.icono-transicion {
 }
 
 .modal-indicator {
-    width: 40px;
+    width: 60px;
     height: 5px;
     background: var(--modal-indicator-bg);
     border-radius: 10px;
     margin: 12px auto;
+    position: absolute;
+    align-self: center;
 }
-
 .btn-cerrar-modal {
     position: absolute;
     top: 20px;
@@ -624,6 +630,7 @@ svg.icono-transicion {
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
     padding-bottom: 100px;
 }
 
@@ -633,10 +640,9 @@ svg.icono-transicion {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 12px 20px 0;
+    padding: 28px 20px 0;
     background: var(--modal-img-gradient);
 }
-
 .modal-img-bg {
     width: min(100%, 560px);
     height: 100%;
@@ -4295,8 +4301,7 @@ body.is-light .parati-card-img { background-color: rgba(0,0,0,0.06); }
     padding: 10px 10px 12px;
 }
 .parati-card-nombre {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 14px;
     color: var(--color-texto, #e8e4d8);
     white-space: nowrap;
     overflow: hidden;
