@@ -129,7 +129,14 @@
         
         <div class="modal-scroll-area">
             <div class="modal-imagen-container">
-                <div id="modal-img" class="modal-img-bg"></div>
+                <div class="modal-img-track" id="modal-img-track"></div>
+                <button class="modal-slider-btn modal-slider-prev is-hidden" id="modal-slider-prev" aria-label="Imagen anterior">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="modal-slider-btn modal-slider-next is-hidden" id="modal-slider-next" aria-label="Siguiente imagen">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"></polyline></svg>
+                </button>
+                <div class="modal-slider-dots" id="modal-slider-dots"></div>
             </div>
 
             <div class="modal-body">

@@ -430,7 +430,7 @@ function crearTarjetaProducto(producto, index) {
 	return `
 		<article class="tarjeta-producto" data-producto-id="${index}">
 			<div class="imagen-contenedor">
-				<img class="img-producto" src="${producto.imagen}" alt="${producto.nombre}" loading="lazy" decoding="async">
+				<img class="img-producto" src="${(Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen}" alt="${producto.nombre}" loading="lazy" decoding="async">
 				<div class="sombra-interior"></div>
 			</div>
 			<div class="info-producto">
@@ -889,6 +889,8 @@ if (switchContainer) {
 /* ─── MODAL DETALLE PRODUCTO ─── */
 const modal     = document.getElementById('modal-producto');
 const btnCerrar = document.querySelector('.btn-cerrar-modal');
+let sliderImagenes = [];
+let sliderActual   = 0;
 
 function registrarInteraccion(nombreProducto) {
 	const key = 'levitad-interacciones';
@@ -923,15 +925,10 @@ function abrirDetalles(datos) {
 			</li>
 		`).join('');
 
-	const modalImg = document.getElementById('modal-img');
-	if (datos.imagen) {
-		modalImg.style.backgroundImage    = `url("${datos.imagen}")`;
-		modalImg.style.backgroundSize     = 'contain';
-		modalImg.style.backgroundRepeat   = 'no-repeat';
-		modalImg.style.backgroundPosition = 'center';
-	} else {
-		modalImg.style.backgroundImage = 'none';
-	}
+	const imagenes = Array.isArray(datos.imagenes) && datos.imagenes.length
+		? datos.imagenes
+		: (datos.imagen ? [datos.imagen] : []);
+	renderizarSlider(imagenes, datos.nombre);
 
 	// Sincroniza el botón con el estado real del carrito para este producto.
 	// Sin esto, si el producto anterior se agregó, el botón queda disabled=true
@@ -957,6 +954,46 @@ function cerrarModal() {
 	}, 500);
 }
 
+function irASlide(idx) {
+	if (!sliderImagenes.length) return;
+	sliderActual = Math.max(0, Math.min(idx, sliderImagenes.length - 1));
+	const track = document.getElementById('modal-img-track');
+	if (track) track.style.transform = `translateX(${-sliderActual * 100}%)`;
+	document.querySelectorAll('#modal-slider-dots .modal-dot').forEach((d, i) => {
+		d.classList.toggle('is-active', i === sliderActual);
+	});
+	const prev = document.getElementById('modal-slider-prev');
+	const next = document.getElementById('modal-slider-next');
+	if (prev) prev.classList.toggle('is-hidden', sliderActual === 0);
+	if (next) next.classList.toggle('is-hidden', sliderActual === sliderImagenes.length - 1);
+}
+
+function renderizarSlider(imagenes, nombre) {
+	sliderImagenes = imagenes;
+	sliderActual   = 0;
+	const track = document.getElementById('modal-img-track');
+	const dots  = document.getElementById('modal-slider-dots');
+	if (!track) return;
+
+	track.innerHTML = imagenes.map(src => `
+		<div class="modal-slide">
+			<img src="${src}" alt="${nombre}" class="modal-slide-img" decoding="async">
+		</div>
+	`).join('');
+	track.style.transform = 'translateX(0)';
+
+	const hasMult = imagenes.length > 1;
+	if (dots) {
+		dots.innerHTML = hasMult
+			? imagenes.map((_, i) => `<span class="modal-dot${i === 0 ? ' is-active' : ''}"></span>`).join('')
+			: '';
+	}
+	const prev = document.getElementById('modal-slider-prev');
+	const next = document.getElementById('modal-slider-next');
+	if (prev) prev.classList.toggle('is-hidden', true);
+	if (next) next.classList.toggle('is-hidden', !hasMult);
+}
+
 /* ─── EVENT DELEGATION GRID ─── */
 const grid = document.querySelector('.grid-productos');
 if (grid) {
@@ -980,6 +1017,21 @@ if (grid) {
 if (btnCerrar && modal) {
 	btnCerrar.addEventListener('click', cerrarModal);
 	modal.addEventListener('click', e => { if (e.target === modal) cerrarModal(); });
+}
+
+const btnSliderPrev = document.getElementById('modal-slider-prev');
+const btnSliderNext = document.getElementById('modal-slider-next');
+if (btnSliderPrev) btnSliderPrev.addEventListener('click', e => { e.stopPropagation(); irASlide(sliderActual - 1); });
+if (btnSliderNext) btnSliderNext.addEventListener('click', e => { e.stopPropagation(); irASlide(sliderActual + 1); });
+
+const trackEl = document.getElementById('modal-img-track');
+if (trackEl) {
+	let _touchX = 0;
+	trackEl.addEventListener('touchstart', e => { _touchX = e.changedTouches[0].clientX; }, { passive: true });
+	trackEl.addEventListener('touchend',   e => {
+		const delta = _touchX - e.changedTouches[0].clientX;
+		if (Math.abs(delta) > 40) irASlide(sliderActual + (delta > 0 ? 1 : -1));
+	}, { passive: true });
 }
 
 /* ─── BÚSQUEDA Y FILTROS ─── */
