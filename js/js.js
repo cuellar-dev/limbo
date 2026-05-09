@@ -1876,128 +1876,177 @@ if (header) {
 	// hasta el centro de los 70px visibles cuando está pegado en el top.
 	const collapsedYOffset = () => (header.offsetHeight - 70) / 2;
 
-	// Ajuste fino para logo-area: compensa el padding asimétrico 16/28 de
-	// .header-container (la flex-centering real no está en el centro exacto).
-	const logoYOffset = () => (header.offsetHeight - 58) / 2;
+	// Ajuste fino para logo-area: compensa el padding asimétrico de
+	// .header-container. Fórmula: la y necesaria para llevar h1 al centro
+	// de los 70px visibles del estado colapsado es (h - 70 - (P_t - P_b))/2.
+	// Con padding 130/28 → P_t - P_b = 102 → constante = 70 + 102 = 172.
+	const logoYOffset = () => (header.offsetHeight - 172) / 2;
 
-	// Caché del tema actual — se actualiza cuando body cambia de clase
-	// Esto evita DOM read (classList.contains) en cada frame del onUpdate
-	let currentThemeIsLight = document.body.classList.contains('is-light');
+	// Fórmula compartida del x final del logoArea: la traslación ideal es -25%
+	// del ancho del header, pero en pantallas estrechas eso puede empujar el
+	// borde IZQUIERDO de h1 fuera del viewport. Clampa para que h1.left ≥ 0.
+	const computeFinalLogoX = () => {
+		const w = header.clientWidth;
+		const idealX = -w * 0.25;
+		const h1ScaledW = h1El.offsetWidth * 0.78;
+		const minX = h1ScaledW / 2 - w / 2;
+		return Math.max(idealX, minX);
+	};
 
-	// Observa cambios de clase en body para actualizar caché automáticamente
-	new MutationObserver(() => {
-		currentThemeIsLight = document.body.classList.contains('is-light');
-	}).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+	const mm = gsap.matchMedia();
 
-	// Caché de booleanos de threshold para evitar classList.toggle redundante cada frame
-	let lastExpandedState = null;
-	let lastSearchHidden  = null;
+	// ── Desktop / tablets (≥ 769px): timeline scrubbed acoplado al scroll ──
+	// Mantiene la sensación premium: cada pixel de scroll mueve la animación.
+	mm.add('(min-width: 769px)', () => {
+		// Caché del tema — evita classList.contains en cada frame del onUpdate
+		let currentThemeIsLight = document.body.classList.contains('is-light');
+		const themeObserver = new MutationObserver(() => {
+			currentThemeIsLight = document.body.classList.contains('is-light');
+		});
+		themeObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-	// ── Timeline scrubbed ────────────────────────────────────────────────────────
-	// scrub:0.3 → con animaciones puramente GPU (transforms+opacity) podemos usar
-	// un scrub más ajustado sin lag. Antes 0.5 compensaba el reflow del height.
-	const tl = gsap.timeline({
-		defaults: { ease: 'none' },
-		scrollTrigger: {
-			trigger: document.documentElement,
-			start:   'top top',
-			end:     () => `+=${getScrollDist()}`,
-			scrub:   0.3,
-			invalidateOnRefresh: true,
+		let lastExpandedState = true;
+		let lastSearchHidden  = false;
 
-			onEnter:     () => header.classList.add('is-collapsed'),
-			onLeaveBack: () => header.classList.remove('is-collapsed'),
+		const tl = gsap.timeline({
+			defaults: { ease: 'none' },
+			scrollTrigger: {
+				trigger: document.documentElement,
+				start:   'top top',
+				end:     () => `+=${getScrollDist()}`,
+				scrub:   0.3,
+				invalidateOnRefresh: true,
 
-			onUpdate: (self) => {
-				const p = self.progress;
+				onEnter:     () => header.classList.add('is-collapsed'),
+				onLeaveBack: () => header.classList.remove('is-collapsed'),
 
-				// CSS variables para el alpha del fondo y borde (computa el browser).
-				if (currentThemeIsLight) {
-					header.style.setProperty('--header-bg-alpha',     (0.90 + 0.10 * p).toFixed(3));
-					header.style.setProperty('--header-border-alpha', (0.12 + 0.18 * p).toFixed(3));
-				} else {
-					header.style.setProperty('--header-bg-alpha',     (0.85 + 0.15 * p).toFixed(3));
-					header.style.setProperty('--header-border-alpha', (0.10 + 0.20 * p).toFixed(3));
-				}
+				onUpdate: (self) => {
+					const p = self.progress;
 
-				// is-expanded (alas decorativas): toggle solo cuando cruza el threshold
-				const expanded = p <= 0.18;
-				if (expanded !== lastExpandedState) {
-					lastExpandedState = expanded;
-					header.classList.toggle('is-expanded', expanded);
-				}
+					if (currentThemeIsLight) {
+						header.style.setProperty('--header-bg-alpha',     (0.90 + 0.10 * p).toFixed(3));
+						header.style.setProperty('--header-border-alpha', (0.12 + 0.18 * p).toFixed(3));
+					} else {
+						header.style.setProperty('--header-bg-alpha',     (0.85 + 0.15 * p).toFixed(3));
+						header.style.setProperty('--header-border-alpha', (0.10 + 0.20 * p).toFixed(3));
+					}
 
-				// Buscador: toggle solo cuando cruza el threshold
-				const searchHidden = p > 0.2;
-				if (searchBar && searchHidden !== lastSearchHidden) {
-					lastSearchHidden = searchHidden;
-					searchBar.classList.toggle('is-scroll-hidden', searchHidden);
-				}
+					const expanded = p <= 0.18;
+					if (expanded !== lastExpandedState) {
+						lastExpandedState = expanded;
+						header.classList.toggle('is-expanded', expanded);
+					}
+
+					const searchHidden = p > 0.2;
+					if (searchBar && searchHidden !== lastSearchHidden) {
+						lastSearchHidden = searchHidden;
+						searchBar.classList.toggle('is-scroll-hidden', searchHidden);
+					}
+				},
 			},
-		},
-	});
+		});
 
-	// ── Animaciones GPU-only (transforms + opacity) ──────────────────────────────
-	// ANTES: animábamos `height` y `paddingTop/paddingBottom` → reflow del documento
-	//        entero cada frame. Masonry abajo tenía que recalcular posiciones,
-	//        causando lag del scroll mientras la animación corría.
-	// AHORA: el header tiene `height: 45vh` fijo y `top: calc(70px - 45vh)` sticky,
-	//        así que se ancla naturalmente cuando solo quedan 70px visibles.
-	//        Solo animamos transforms y opacity → 100% GPU compositing, cero reflow.
-
-	// Logo: traslada hacia abajo (zona visible al colapsar) + a la izquierda.
-	// El offset compensa el alto entero del header para llevar al h1 al centro
-	// de los 70px visibles, más el ajuste por el nav que ocupa layout abajo.
-	tl.fromTo(logoArea,
-		{ y: 24, x: 0 },
-		{
-			y: () => logoYOffset() + (logoArea.offsetHeight - h1El.offsetHeight) / 2,
-			x: () => -headerW * 0.25,
-		},
-		0
-	);
-
-	// h1: desplazamiento horizontal y escala (eje vertical lo maneja logoArea)
-	tl.fromTo(h1El,
-		{ x: 6, scale: 1    },
-		{ x: 0, scale: 0.78 },
-		0
-	);
-
-	// Nav: opacity fade out
-	if (headerNav) {
-		tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
-	}
-
-	// Iconos: aparecen y se centran en los 70px visibles inferiores.
-	// Sumamos collapsedYOffset al cálculo original (-40% / -50% en px).
-	if (iconosContainer) {
-		tl.fromTo(iconosContainer,
+		tl.fromTo(logoArea,
+			{ y: 24, x: 0 },
 			{
-				opacity: 0,
-				y: () => collapsedYOffset() - iconosContainer.offsetHeight * 0.4,
-				scale: 0.92,
-			},
-			{
-				opacity: 1,
-				y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2,
-				scale: 1,
+				y: () => logoYOffset() + (logoArea.offsetHeight - h1El.offsetHeight) / 2,
+				x: computeFinalLogoX,
 			},
 			0
 		);
-	}
 
-	/* ── INICIALIZACIÓN: Fuerza el estado expandido en la primera carga ── */
-	/* El header sale expandido (scroll en 0), pero GSAP aún no ha ejecutado onUpdate.
-	   Sin esto, las alas y .header-nav permanecen ocultos hasta el primer scroll.
-	   Esto simula el estado inicial correcto: p=0, por tanto expanded=true */
-	lastExpandedState = true;
+		tl.fromTo(h1El,
+			{ x: 6, scale: 1    },
+			{ x: 0, scale: 0.78 },
+			0
+		);
+
+		if (headerNav) {
+			tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
+		}
+
+		if (iconosContainer) {
+			tl.fromTo(iconosContainer,
+				{
+					opacity: 0,
+					y: () => collapsedYOffset() - iconosContainer.offsetHeight * 0.4,
+					scale: 0.92,
+				},
+				{
+					opacity: 1,
+					y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2,
+					scale: 1,
+				},
+				0
+			);
+		}
+
+		return () => themeObserver.disconnect();
+	});
+
+	// ── Móviles (≤ 768px): tween único disparado al cruzar el threshold ──
+	// El scrub crea trabajo en cada frame de scroll → en GPUs móviles el onUpdate
+	// + writes de CSS vars + interpolación de transforms hace que el scroll se
+	// sienta pesado. Aquí: una sola transición de ~320ms cuando el header pasa
+	// de expandido a colapsado, sin scrub, sin onUpdate por frame.
+	mm.add('(max-width: 768px)', () => {
+		// Estado inicial expandido — iconosContainer espera valores px de GSAP
+		gsap.set(logoArea, { y: 24, x: 0 });
+		gsap.set(h1El,     { x: 6, scale: 1 });
+		if (headerNav)       gsap.set(headerNav, { opacity: 1 });
+		if (iconosContainer) gsap.set(iconosContainer, {
+			opacity: 0,
+			y: () => collapsedYOffset() - iconosContainer.offsetHeight * 0.4,
+			scale: 0.92,
+		});
+
+		const collapseTl = gsap.timeline({
+			paused: true,
+			defaults: { duration: 0.32, ease: 'power2.out' },
+		});
+
+		collapseTl.to(logoArea, {
+			y: () => logoYOffset() + (logoArea.offsetHeight - h1El.offsetHeight) / 2,
+			x: computeFinalLogoX,
+		}, 0);
+		collapseTl.to(h1El, { x: 0, scale: 0.78 }, 0);
+		if (headerNav)       collapseTl.to(headerNav, { opacity: 0 }, 0);
+		if (iconosContainer) collapseTl.to(iconosContainer, {
+			opacity: 1,
+			y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2,
+			scale: 1,
+		}, 0);
+
+		ScrollTrigger.create({
+			trigger: document.documentElement,
+			start: 'top top',
+			end:   () => `+=${getScrollDist()}`,
+			invalidateOnRefresh: true,
+
+			onEnter: () => {
+				header.classList.add('is-collapsed');
+				header.classList.remove('is-expanded');
+				header.style.setProperty('--header-bg-alpha',     '1.000');
+				header.style.setProperty('--header-border-alpha', '0.300');
+				if (searchBar) searchBar.classList.add('is-scroll-hidden');
+				collapseTl.play();
+			},
+			onLeaveBack: () => {
+				header.classList.remove('is-collapsed');
+				header.classList.add('is-expanded');
+				const light = document.body.classList.contains('is-light');
+				header.style.setProperty('--header-bg-alpha',     light ? '0.900' : '0.850');
+				header.style.setProperty('--header-border-alpha', light ? '0.120' : '0.100');
+				if (searchBar) searchBar.classList.remove('is-scroll-hidden');
+				collapseTl.reverse();
+			},
+		});
+	});
+
+	/* ── INICIALIZACIÓN: estado expandido visible en la primera carga ── */
+	/* Sin esto, las alas y .header-nav permanecen ocultos hasta el primer scroll. */
 	header.classList.add('is-expanded');
-	if (searchBar) {
-		lastSearchHidden = false;
-		searchBar.classList.remove('is-scroll-hidden');
-	}
-	/* Fin: Ahora en la primera carga ya se ven alas y nav correctamente */
+	if (searchBar) searchBar.classList.remove('is-scroll-hidden');
 	}
 
 }

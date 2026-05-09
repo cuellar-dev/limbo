@@ -801,7 +801,14 @@ svg.icono-transicion {
     justify-content: center;
     height: 100%;
     position: relative;
-    padding-top:    16px;
+    /* Reserva para las alas: el SVG tiene viewBox 2541×2091 a width:200px,
+       por lo que su altura renderizada ≈ 165px. translateY(-63/-70%) las
+       desplaza ~104px hacia arriba desde el centro vertical del h1, y la
+       rotación de ±10° añade ~17px al bounding box → las alas se extienden
+       ~120px por encima del h1. Sin esta reserva, en viewports anchos pero
+       cortos el contenido centrado queda tan arriba que las alas chocan
+       con el borde superior del header (overflow: clip las recorta). */
+    padding-top:    130px;
     padding-bottom: 28px;
 }
 
