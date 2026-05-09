@@ -1,4 +1,4 @@
-/*IIIIIIIIIIIIIII*/
+/*AAAAAAAAAAAAA*/
 
 
 const switchContainer = document.querySelector('.switch-container');
@@ -1678,10 +1678,16 @@ function initFooter() {
 
 		<!-- Barra inferior -->
 		<div class="site-footer-bottom">
+		<span class="footer-made-cuba">
+				<span>Made</span>
+				in 
+				<span class="footer-made-rojo">Cuba</span>
+			</span>
 			<span class="footer-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
 			<span class="footer-dev">
 				Diseñado por <a href="#" class="footer-dev-link">La Casita</a>
 			</span>
+			
 		</div>
 	`;
 

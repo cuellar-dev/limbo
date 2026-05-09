@@ -1,5 +1,5 @@
 
-/*IIIIIIIIIIIII*/
+/*AAAAAAAAAAA*/
 /* Importación de fuentes (Eliminada la fuente Limbo) */
 @font-face {
     font-family: 'Arcane';
@@ -916,7 +916,6 @@ body.is-encargue #header {
     width: 100%;
     max-width: min(350px, 100%);
     counter-reset: nav-counter;
-    background-color: rgb(var(--header-bg-r) var(--header-bg-g) var(--header-bg-b) / var(--header-bg-alpha));
 }
 
 /* Tarjeta de navegación */
@@ -3087,6 +3086,14 @@ body.is-encargue .footer-red:active     {
 
 body.is-encargue .footer-dev-link { color: var(--acento-encargue); }
 
+.footer-made-cuba {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    color: rgba(137, 141, 146, 0.55);
+}
+.footer-made-rojo { color: var(--acento-dorado); }
+
 
 /* ═══════════════════════════════════════════════════════════
    PANEL DE CONTACTO
@@ -3590,6 +3597,13 @@ body.is-light.is-encargue .header-nav li:hover {
     border-color: rgba(93, 114, 233, 0.40);
 }
 
+body.is-light .header-nav li:hover {
+    background: rgba(218, 224, 238, 0.95);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10),
+                0 0 18px rgba(202, 172, 71, 0.06),
+                inset 0 1px 0 rgba(202, 172, 71, 0.12);
+}
+
 /* Panel menú hamburguesa */
 body.is-light .menu-nav-panel {
     background: linear-gradient(170deg, #F7F8FA 0%, #EDF0F5 50%, #E4E9F2 100%);
@@ -3628,6 +3642,10 @@ body.is-light .menu-nav-copy    { color: rgba(43, 47, 51, 0.27); }
 body.is-light .carrito-panel {
     background: linear-gradient(175deg, #F7F8FA 0%, #EDF0F5 55%, #E4E9F2 100%);
     box-shadow: -22px 0 60px rgba(0, 0, 0, 0.1), -1px 0 0 var(--carrito-borde);
+}
+
+body.is-light .carrito-panel-footer {
+    background: linear-gradient(to top, rgba(200, 208, 225, 0.65), rgba(var(--carrito-acento-rgb), 0.02));
 }
 
 body.is-light .carrito-item-eliminar {
@@ -3689,6 +3707,18 @@ body.is-light .footer-red {
 
 /* Carrito vacío */
 body.is-light .carrito-vacio { color: rgba(43, 47, 51, 0.5); }
+
+/* Switch catálogo/encargue */
+body.is-light .switch-container {
+    background: rgba(218, 223, 236, 0.95);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Píldora "sin resultados" */
+body.is-light .estado-sin-resultados p {
+    background: rgba(240, 242, 247, 0.97);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.10);
+}
 
 /* Contacto: placeholders e inputs */
 body.is-light .contacto-campo input::placeholder,
@@ -4052,6 +4082,15 @@ body.is-light .outfits-nav:hover { color: #F7F8FA; }
     background: var(--color-alas-principal);
 }
 
+/* SVG conector entre markers e imagen y cards de prenda */
+.outfit-conectores {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 1;
+}
+
 /* ─── Mobile: layout vertical, sin conectores ─────────────── */
 @media (max-width: 720px) {
     .outfits-panel { width: 96vw; max-height: 94vh; border-radius: 18px; }
@@ -4072,6 +4111,7 @@ body.is-light .outfits-nav:hover { color: #F7F8FA; }
     }
     .outfit-detalle { max-height: 38vh; }
     .outfit-detalle-titulo { font-size: 22px; }
+    .outfit-conectores { display: none; }
 }
 
 @media (max-width: 480px) {
