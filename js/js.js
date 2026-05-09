@@ -1,4 +1,4 @@
-/*AAAAAAAAAAAAA*/
+/*EEEEEEEEEEEEEEEEEE*/
 
 
 const switchContainer = document.querySelector('.switch-container');
@@ -18,6 +18,13 @@ const estadoTienda = {
 	carritoEncargue: [],  // carrito del modo "Encargue"
 	productoDetalleActual: null
 };
+
+const PAGINA_LIMITE        = 20;
+let paginaActual           = 0;
+let isLoading              = false;
+let hayMasProductos        = true;
+let productosVisibles      = [];
+let infiniteScrollObserver = null;
 
 const MENSAJE_SIN_RESULTADOS       = 'No se encontraron resultados.';
 const STORAGE_KEY_CARRITO          = 'levitad-carrito';
@@ -486,6 +493,103 @@ function inicializarMasonry() {
 	setTimeout(relayout, 120);
 }
 
+function crearCentinelaYLoader() {
+	const grid = document.querySelector('.grid-productos');
+	if (!grid) return;
+	document.getElementById('infinite-loader')?.remove();
+	document.getElementById('centinela-scroll')?.remove();
+
+	const loader = document.createElement('div');
+	loader.id = 'infinite-loader';
+	loader.className = 'infinite-loader';
+	loader.setAttribute('aria-hidden', 'true');
+	loader.innerHTML = `
+		<span class="infinite-loader-dot"></span>
+		<span class="infinite-loader-dot"></span>
+		<span class="infinite-loader-dot"></span>
+	`;
+
+	const centinela = document.createElement('div');
+	centinela.id = 'centinela-scroll';
+	centinela.setAttribute('aria-hidden', 'true');
+
+	grid.insertAdjacentElement('afterend', loader);
+	loader.insertAdjacentElement('afterend', centinela);
+}
+
+function mostrarLoader(visible) {
+	document.getElementById('infinite-loader')?.classList.toggle('is-visible', visible);
+}
+
+function configurarInfiniteScroll() {
+	const centinela = document.getElementById('centinela-scroll');
+	if (!centinela) return;
+	if (infiniteScrollObserver) infiniteScrollObserver.disconnect();
+	infiniteScrollObserver = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting && !isLoading) cargarMas();
+	}, { threshold: 0.1 });
+	infiniteScrollObserver.observe(centinela);
+}
+
+function cargarMas() {
+	if (isLoading || !hayMasProductos) return;
+
+	const offset = paginaActual * PAGINA_LIMITE;
+	const lote   = productosVisibles.slice(offset, offset + PAGINA_LIMITE);
+
+	if (!lote.length) {
+		hayMasProductos = false;
+		infiniteScrollObserver?.disconnect();
+		return;
+	}
+
+	const grid = document.querySelector('.grid-productos');
+	if (!grid || !estadoTienda.masonry) return;
+
+	isLoading = true;
+	mostrarLoader(true);
+
+	setTimeout(() => {
+		const nuevasTarjetas = [];
+		lote.forEach((producto, i) => {
+			const tmp = document.createElement('div');
+			tmp.innerHTML = crearTarjetaProducto(producto, offset + i).trim();
+			const tarjeta = tmp.firstElementChild;
+			tarjeta.classList.add('is-entrando');
+			grid.appendChild(tarjeta);
+			nuevasTarjetas.push(tarjeta);
+		});
+
+		estadoTienda.masonry.appended(nuevasTarjetas);
+
+		nuevasTarjetas.forEach(tarjeta => {
+			tarjeta.querySelectorAll('.img-producto').forEach(img => {
+				if (!img.complete) img.addEventListener('load', () => estadoTienda.masonry?.layout(), { once: true });
+			});
+		});
+
+		paginaActual++;
+		if (lote.length < PAGINA_LIMITE) {
+			hayMasProductos = false;
+			infiniteScrollObserver?.disconnect();
+		}
+
+		requestAnimationFrame(() => requestAnimationFrame(() => {
+			isLoading = false;
+			mostrarLoader(false);
+			nuevasTarjetas.forEach((tarjeta, i) => {
+				setTimeout(() => {
+					tarjeta.classList.remove('is-entrando');
+					tarjeta.classList.add('is-visible');
+				}, i * 25);
+			});
+			if (estadoTienda.headerScrollTriggerEnabled && typeof ScrollTrigger !== 'undefined') {
+				ScrollTrigger.refresh();
+			}
+		}));
+	}, 80);
+}
+
 function obtenerEstadoSinResultados() {
 	let el = document.getElementById('estado-sin-resultados');
 	if (!el) {
@@ -536,15 +640,34 @@ function renderizarProductos(productos, opciones = {}) {
 	const grid = document.querySelector('.grid-productos');
 	if (!grid) return;
 
-	const savedY = window.scrollY;
+	if (infiniteScrollObserver) {
+		infiniteScrollObserver.disconnect();
+		infiniteScrollObserver = null;
+	}
+
+	productosVisibles = productos;
+	paginaActual      = 0;
+	isLoading         = false;
+	hayMasProductos   = true;
+
+	const savedY     = window.scrollY;
+	const primerLote = productosVisibles.slice(0, PAGINA_LIMITE);
 
 	grid.innerHTML = `
 		<div class="grid-sizer"></div>
 		<div class="gutter-sizer"></div>
-		${productos.map((p, i) => crearTarjetaProducto(p, i)).join('')}
+		${primerLote.map((p, i) => crearTarjetaProducto(p, i)).join('')}
 	`;
 	mostrarEstadoSinResultados(mostrarVacio);
 	inicializarMasonry();
+	crearCentinelaYLoader();
+
+	if (primerLote.length < PAGINA_LIMITE) {
+		hayMasProductos = false;
+	} else {
+		paginaActual = 1;
+		configurarInfiniteScroll();
+	}
 
 	// Restaurar scroll: el rebuild del DOM puede forzar al navegador a volver al top
 	if (savedY > 0) {
