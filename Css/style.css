@@ -6,20 +6,25 @@
     src: url('../Fuentes/The\ Foregen\ Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 @font-face{
     font-family: 'Quicksand';
     src: url('../Fuentes/Quicksand/Quicksand-VariableFont_wght.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 @font-face{
     font-family: 'drink';
-    src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
+    src: url('../Fuentes/Outfit/Outfit-VariableFont_wght.woff2') format('woff2'),
+         url('../Fuentes/Outfit/Outfit-VariableFont_wght.ttf') format('truetype');
+    font-display: swap;
 }
 @font-face{
     font-family: 'Elegante';
     src: url('../Fuentes/josefin-sans/JosefinSans-Bold.ttf') format('truetype');
+    font-display: swap;
 }
 
 /* Variables CSS para la nueva paleta LEVITA */
@@ -323,7 +328,7 @@ body.is-encargue #menu-hamb g {
 /* --- TARJETA DE PRODUCTO --- */
 /* --- TARJETA DE PRODUCTO (DISEÑO MÓVIL SÓLIDO) --- */
 .tarjeta-producto {
-    background-color: var(--tarjeta-fondo); 
+    background-color: var(--tarjeta-fondo);
     border: 1px solid var(--borde-dorado); /* Borde dorado oscuro */
     border-radius: 8px;
     overflow: hidden;
@@ -333,7 +338,8 @@ body.is-encargue #menu-hamb g {
     position: relative;
     z-index: 1;
     margin-bottom: 15px;
-
+    min-height: 240px;
+    contain: layout;
 }
 
 .imagen-contenedor {
@@ -1411,16 +1417,40 @@ body.carrito-abierto {
     }
 }
 
+/* Spacer que ocupa el lugar del hamburguesa en .iconos-container para preservar el layout flex */
+.hamb-spacer {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+}
+
+/* Wrapper fijo fuera del header — escapa del stacking context de position:sticky */
+#menu-hamb-wrap {
+    position: fixed;
+    top: 0;
+    right: 20px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    z-index: 3000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+}
+
+/* Visible cuando el header ya está colapsado (clase que pone el JS) o el menú está abierto */
+#header.is-collapsed ~ #menu-hamb-wrap,
+body.menu-open #menu-hamb-wrap {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 #menu-hamb {
     width: 50px;
     height: 50px;
     cursor: pointer;
-    opacity: 1;           /* el padre .iconos-container controla el fade-in */
-    transform: scale(1);  /* ídem */
     transform-origin: center;
     transition: transform 0.15s ease;
-    position: relative;
-    z-index: 2000;
 }
 
 #menu-hamb:hover {
