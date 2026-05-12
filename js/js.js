@@ -194,7 +194,7 @@ function renderizarCarrito() {
 		}
 		lista.innerHTML = carrito.map((item, index) => `
 			<li class="carrito-item" data-carrito-index="${index}">
-				<img class="carrito-item-img" src="${item.imagen}" alt="${item.nombre}">
+				<img class="carrito-item-img" src="${item.imagen || (estadoTienda.productos.find(p => p.nombre === item.nombre)?.imagenes?.[0]) || ''}" alt="${item.nombre}">
 				<div class="carrito-item-info">
 					<span class="carrito-item-nombre">${item.nombre}</span>
 					<span class="carrito-item-precio">${formatPrecio(item.precio)}</span>
@@ -316,7 +316,7 @@ function agregarAlCarrito(producto, boton) {
 	carritoActivo().push({
 		nombre: producto.nombre,
 		precio: Number(producto.precio) || 0,
-		imagen: producto.imagen || ''
+		imagen: (Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen || ''
 	});
 
 	const isEncargue = modoActual() === 'encargue';
@@ -997,7 +997,22 @@ function renderizarSlider(imagenes, nombre) {
 /* ─── EVENT DELEGATION GRID ─── */
 const grid = document.querySelector('.grid-productos');
 if (grid) {
+	let _gridTouchX = 0, _gridTouchY = 0, _gridTouchMoved = false;
+	grid.addEventListener('touchstart', e => {
+		_gridTouchX = e.touches[0].clientX;
+		_gridTouchY = e.touches[0].clientY;
+		_gridTouchMoved = false;
+	}, { passive: true });
+	grid.addEventListener('touchmove', e => {
+		if (Math.abs(e.touches[0].clientX - _gridTouchX) > 10 ||
+		    Math.abs(e.touches[0].clientY - _gridTouchY) > 10) {
+			_gridTouchMoved = true;
+		}
+	}, { passive: true });
+
 	grid.addEventListener('click', (e) => {
+		if (_gridTouchMoved) { _gridTouchMoved = false; return; }
+
 		const tarjeta   = e.target.closest('.tarjeta-producto');
 		const btnAnadir = e.target.closest('.btn-anadir');
 
@@ -1027,11 +1042,10 @@ if (btnSliderNext) btnSliderNext.addEventListener('click', e => { e.stopPropagat
 const trackEl = document.getElementById('modal-img-track');
 if (trackEl) {
 	let _touchX = 0;
-	trackEl.addEventListener('touchstart', e => { _touchX = e.changedTouches[0].clientX; }, { passive: true });
-	trackEl.addEventListener('touchend',   e => {
-		const delta = _touchX - e.changedTouches[0].clientX;
-		if (Math.abs(delta) > 40) irASlide(sliderActual + (delta > 0 ? 1 : -1));
-	}, { passive: true });
+	// Swipe-to-change-image disabled per request. To re-enable, listen
+	// touchstart/touchend, compute delta horizontal and call `irASlide(...)`.
+	trackEl.addEventListener('touchstart', e => { /* swipe disabled */ }, { passive: true });
+	trackEl.addEventListener('touchend',   e => { /* swipe disabled */ }, { passive: true });
 }
 
 /* ─── BÚSQUEDA Y FILTROS ─── */
@@ -1244,31 +1258,32 @@ function initMenuHamburguesa() {
 
 			<!-- LINKS -->
 			<nav class="menu-nav-links">
-				<a class="menu-nav-item" href="#">
+				<a class="menu-nav-item menu-nav-item-categorias" href="#" data-action="categorias">
 					<span class="menu-nav-num">01</span>
-					<span class="menu-nav-text">Colecciones</span>
+					<span class="menu-nav-text">Categor&#237;as</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
 				<a class="menu-nav-item menu-nav-item-parati" href="#" data-action="parati">
 					<span class="menu-nav-num">02</span>
 					<span class="menu-nav-text">Para Ti</span>
 					<span class="menu-nav-arrow">→</span>
-				</a>
+				</a>				
 				<a class="menu-nav-item menu-nav-item-outfits" href="#" data-action="outfits">
 					<span class="menu-nav-num">03</span>
 					<span class="menu-nav-text">Outfits</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
-				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
+				<a class="menu-nav-item menu-nav-item-sobre-levitad" href="#" data-action="sobre-levitad">
 					<span class="menu-nav-num">04</span>
+					<span class="menu-nav-text">Sobre Lévitad</span>
+					<span class="menu-nav-arrow">→</span>
+				</a>
+				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
+					<span class="menu-nav-num">05</span>
 					<span class="menu-nav-text">Contacto</span>
 					<span class="menu-nav-arrow">→</span>
 				</a>
-				<a class="menu-nav-item menu-nav-item-categorias" href="#" data-action="categorias">
-					<span class="menu-nav-num">05</span>
-					<span class="menu-nav-text">Categor&#237;as</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
+				
 			</nav>
 
 			<!-- TOGGLE TEMA -->
@@ -1375,6 +1390,13 @@ function initMenuHamburguesa() {
 			});
 		}
 
+		const sobreLevitadBtn = panel.querySelector('.menu-nav-item-sobre-levitad');
+		if (sobreLevitadBtn) {
+			sobreLevitadBtn.addEventListener('click', () => {
+				setTimeout(() => abrirSobreLevitadPanel(), 400);
+			});
+		}
+
 		const temaToggle = panel.querySelector('#tema-toggle');
 		if (temaToggle) {
 			temaToggle.addEventListener('click', () => {
@@ -1422,7 +1444,7 @@ function abrirContactoPanel() {
 		<header class="contacto-header">
 			<span class="contacto-eyebrow">Hablemos</span>
 			<h2 class="contacto-titulo">Contacto</h2>
-			<p class="contacto-sub">Contanos qué tenés en mente y te respondemos a la brevedad.</p>
+			<p class="contacto-sub">Contacto con el desarrollador para lo que desees, solo sigue los requisitos.</p>
 		</header>
 
 		<form class="contacto-form" id="contacto-form" novalidate autocomplete="on">
@@ -1598,6 +1620,84 @@ async function manejarEnvioContacto(e) {
 
 
 /* ═══════════════════════════════════════════════════════════
+   Panel Sobre Lévitad — ventana de marca / about, pantalla completa.
+═══════════════════════════════════════════════════════════ */
+function abrirSobreLevitadPanel() {
+	if (document.getElementById('sobre-panel')) return;
+	document.body.classList.add('sobre-abierto');
+
+	const panel = document.createElement('div');
+	panel.id        = 'sobre-panel';
+	panel.className = 'sobre-panel';
+
+	panel.innerHTML = `
+		<button class="sobre-cerrar" aria-label="Cerrar">✕</button>
+
+		<svg class="sobre-bg-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+			<ellipse cx="270" cy="90"  rx="75"  ry="21" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.20" />
+			<ellipse cx="270" cy="90"  rx="100" ry="30" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.10" />
+
+			<ellipse cx="530" cy="510" rx="90"  ry="25" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.16" />
+			<ellipse cx="530" cy="510" rx="120" ry="34" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.08" />
+
+			<ellipse cx="400" cy="320" rx="220" ry="58" stroke="currentColor" stroke-width="0.6" fill="none" opacity="0.06" />
+			<ellipse cx="400" cy="320" rx="295" ry="80" stroke="currentColor" stroke-width="0.5" fill="none" opacity="0.04" />
+
+			<line x1="275" y1="200" x2="275" y2="520" stroke="currentColor" stroke-width="0.6" opacity="0.13" stroke-linecap="round" />
+			<line x1="525" y1="60"  x2="525" y2="380" stroke="currentColor" stroke-width="0.6" opacity="0.13" stroke-linecap="round" />
+			<line x1="330" y1="80"  x2="330" y2="240" stroke="currentColor" stroke-width="0.5" opacity="0.08" stroke-linecap="round" />
+			<line x1="470" y1="380" x2="470" y2="560" stroke="currentColor" stroke-width="0.5" opacity="0.08" stroke-linecap="round" />
+		</svg>
+
+		<div class="sobre-content">
+			<header class="sobre-header">
+				<span class="sobre-eyebrow">El proyecto</span>
+				<h2 class="sobre-titulo">Sobre Lévitad</h2>
+				<div class="sobre-divider"></div>
+			</header>
+			<div class="sobre-body">
+				<p><strong>Lévitad</strong> nace de convertir lo simple a algo nuevo en <strong>Cuba</strong>, no es solo importar hacia acá prendas que <strong>elevan</strong>, que distinguen, que cuentan algo. Un puente entre la originalidad y lo clásico. No queríamos tener simplemente un negocio, queríamos dejar una marca, crear una experiencia de diseño y accesibilidad</p>
+				<p>Detrás de cada línea de código de este sitio, hay solo una persona. Un desarrollador que pone su empeño para que todo lo que toca se sienta único. Esto que estás viendo se construyó con un cuidado artesanal — pixel a pixel, palabra por palabra — con ayuda de muchos e ideas de otros pocos.</p>
+				<p>Siempre espero que les haya gustado la experiencia, como tanto me esforcé lográndola.</p>
+				<p class="sobre-firma">— Hecho con ♡ desde La Casita</p>
+				<p class="sobre-pais">Made in Cuba</p>
+			</div>
+		</div>
+	`;
+
+	document.body.appendChild(panel);
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		panel.classList.add('is-active');
+	}));
+
+	panel.querySelector('.sobre-cerrar').addEventListener('click', cerrarSobreLevitadPanel);
+	// Click en zona vacía del panel (fuera del contenido) también cierra
+	panel.addEventListener('click', (e) => {
+		if (e.target === panel) cerrarSobreLevitadPanel();
+	});
+	// Tecla Escape cierra
+	document.addEventListener('keydown', _sobreLevitadEscHandler);
+}
+
+function _sobreLevitadEscHandler(e) {
+	if (e.key === 'Escape' && document.getElementById('sobre-panel')) {
+		cerrarSobreLevitadPanel();
+	}
+}
+
+function cerrarSobreLevitadPanel() {
+	document.body.classList.remove('sobre-abierto');
+	document.removeEventListener('keydown', _sobreLevitadEscHandler);
+	const panel = document.getElementById('sobre-panel');
+	if (panel) {
+		panel.classList.add('is-closing');
+		setTimeout(() => panel.remove(), 420);
+	}
+}
+
+
+/* ═══════════════════════════════════════════════════════════
    Panel de Outfits — mostruario tipo lookbook.
    ───────────────────────────────────────────────────────────
    LÓGICA:
@@ -1751,15 +1851,17 @@ function abrirOutfitsPanel() {
 	dots.forEach(d => d.addEventListener('click', () => irA(Number(d.dataset.go))));
 
 	// ─── Click en card → abre el detalle del producto ─────────
+	let _outfitsTouchMoved = false;
+	track.addEventListener('touchstart', () => { _outfitsTouchMoved = false; }, { passive: true });
+	track.addEventListener('touchmove',  () => { _outfitsTouchMoved = true;  }, { passive: true });
+	// Scroll en cualquier descendiente (outfit-detalle, etc.) — captura porque scroll no burbujea
+	panel.addEventListener('scroll', () => { _outfitsTouchMoved = true; }, { passive: true, capture: true });
 	track.addEventListener('click', (e) => {
-		const card = e.target.closest('.outfit-prenda');
-		if (!card || card.disabled) return;
-		const nombre = card.dataset.producto;
-		const prod = mapaProductos.get(nombre);
-		if (!prod) return;
-		// Cerrar el panel para que el modal quede limpio encima
-		cerrarOutfitsPanel();
-		setTimeout(() => abrirDetalles(prod), 280);
+		// Apertura de detalle desactivada en Outfits por petición del producto.
+		if (_outfitsTouchMoved) { _outfitsTouchMoved = false; return; }
+		// Si en el futuro se quiere reactivar, obtener `card.dataset.producto`,
+		// buscar el producto en `mapaProductos` y llamar a `cerrarOutfitsPanel()`
+		// seguido de `abrirDetalles(prod)` después de la animación.
 	});
 
 	// ─── Cerrar ───────────────────────────────────────────────
@@ -2114,6 +2216,9 @@ if (header) {
 					lastSearchHidden = searchHidden;
 					searchBar.classList.toggle('is-scroll-hidden', searchHidden);
 				}
+
+				// Hamburguesa: no clickeable mientras sea invisible (p < 0.65)
+				if (hambWrap) hambWrap.style.pointerEvents = p >= 0.65 ? 'auto' : 'none';
 			},
 		},
 	});
@@ -2150,22 +2255,35 @@ if (header) {
 		tl.fromTo(headerNav, { opacity: 1 }, { opacity: 0 }, 0);
 	}
 
-	// Iconos: aparecen y se centran en los 70px visibles inferiores.
-	// Sumamos collapsedYOffset al cálculo original (-40% / -50% en px).
+	// Iconos: se deslizan con el colapso del header desde su posición natural
+	// (top:50% sin offset) hasta el centro de los 70px visibles.
+	// Opacidad separada: completa al 65% del scroll — antes y en sync con el SVG.
 	if (iconosContainer) {
 		tl.fromTo(iconosContainer,
-			{
-				opacity: 0,
-				y: () => collapsedYOffset() - iconosContainer.offsetHeight * 0.4,
-				scale: 0.92,
-			},
-			{
-				opacity: 1,
-				y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2,
-				scale: 1,
-			},
+			{ y: 0, scale: 0.92 },
+			{ y: () => collapsedYOffset() - iconosContainer.offsetHeight / 2, scale: 1 },
 			0
 		);
+		tl.fromTo(iconosContainer, { opacity: 0 }, { opacity: 1, duration: 0.65 }, 0);
+	}
+
+	// Carrito: arco suave en Y relativo al contenedor — la lupa no se mueve, el carrito
+	// sube ~12px a mitad de la animación y vuelve. Simula no-uniformidad orgánica.
+	const carritoWrapper = header.querySelector('.carrito-wrapper');
+	if (carritoWrapper && iconosContainer) {
+		tl.fromTo(carritoWrapper, { y: 0 }, { y: -70, duration: 0.5, ease: 'power1.out' }, 0);
+		tl.to(carritoWrapper, { y: 0, duration: 0.5, ease: 'power1.in' }, 0.5);
+	}
+
+	// Hamburguesa (wrapper fijo): misma posición visual de arranque que iconosContainer
+	// (centro = H/2 + IC/2 desde viewport), misma trayectoria y mismo fade-in al 65%.
+	const hambWrap = document.getElementById('menu-hamb-wrap');
+	if (hambWrap) {
+		const hambFromY = iconosContainer
+			? () => (header.offsetHeight + iconosContainer.offsetHeight - hambWrap.offsetHeight) * 0.5
+			: () => header.offsetHeight * 0.5;
+		tl.fromTo(hambWrap, { y: hambFromY }, { y: 0 }, 0);
+		tl.fromTo(hambWrap, { opacity: 0 }, { opacity: 1, duration: 0.65 }, 0);
 	}
 
 	/* ── INICIALIZACIÓN: Fuerza el estado expandido en la primera carga ── */
@@ -2222,7 +2340,7 @@ function abrirParaTiPanel() {
 			prods.forEach(p => { productoContador[p.nombre] = (productoContador[p.nombre] || 0) + 1; });
 			const cardsHTML = prods.map(p => `
 				<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
-					<span class="parati-card-img" style="background-image:url('${p.imagen || ''}')"></span>
+					<span class="parati-card-img" style="background-image:url('${(Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || ''}')"></span>
 					<span class="parati-card-info">
 						<span class="parati-card-nombre">${p.nombre}</span>
 						<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
@@ -2274,11 +2392,41 @@ function abrirParaTiPanel() {
 	panel.querySelector('.parati-cerrar').addEventListener('click', cerrar);
 	ov.addEventListener('click', cerrar);
 
+	let _paratiTouchMoved = false, _paratiScrollY0 = 0;
+	const paratiBody = panel.querySelector('.parati-body');
+	if (paratiBody) {
+		paratiBody.addEventListener('touchstart', () => {
+			_paratiTouchMoved = false;
+			_paratiScrollY0   = paratiBody.scrollTop;
+		}, { passive: true });
+		paratiBody.addEventListener('touchmove', () => {
+			_paratiTouchMoved = true;
+		}, { passive: true });
+		// scroll: señal definitiva aunque touchmove no se dispare (iOS compositor scroll)
+		paratiBody.addEventListener('scroll', () => {
+			if (Math.abs(paratiBody.scrollTop - _paratiScrollY0) > 6) _paratiTouchMoved = true;
+		}, { passive: true });
+	}
+
+	// Mismo patrón para scroll horizontal en cada fila .parati-cards
+	panel.querySelectorAll('.parati-cards').forEach(row => {
+		let _paratiScrollX0 = 0;
+		row.addEventListener('touchstart', () => {
+			_paratiTouchMoved = false;
+			_paratiScrollX0 = row.scrollLeft;
+		}, { passive: true });
+		row.addEventListener('scroll', () => {
+			if (Math.abs(row.scrollLeft - _paratiScrollX0) > 6) _paratiTouchMoved = true;
+		}, { passive: true });
+	});
+
 	panel.querySelectorAll('.parati-card').forEach(btn => {
 		btn.addEventListener('click', () => {
-			const nombre = btn.dataset.producto;
-			const prod   = (estadoTienda.productos || []).find(p => p.nombre === nombre);
-			if (prod) { cerrar(); setTimeout(() => abrirDetalles(prod), 420); }
+			if (_paratiTouchMoved) { _paratiTouchMoved = false; return; }
+			const prod = estadoTienda.productos.find(p => p.nombre === btn.dataset.producto);
+			if (!prod) return;
+			cerrar();
+			setTimeout(() => abrirDetalles(prod), 420);
 		});
 	});
 }
@@ -2321,7 +2469,7 @@ function abrirCategoriasPanel() {
 	const cardHTML = (p, rank) => `
 		<button class="cat-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
 			${rank ? `<span class="cat-card-rank">#${rank}</span>` : ''}
-			<span class="cat-card-img" style="background-image:url('${p.imagen || ''}')"></span>
+			<span class="cat-card-img" style="background-image:url('${(Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || ''}')"></span>
 			<span class="cat-card-info">
 				<span class="cat-card-nombre">${p.nombre}</span>
 				<span class="cat-card-precio">${formatPrecio(p.precio)}</span>
@@ -2418,11 +2566,40 @@ function abrirCategoriasPanel() {
 		});
 	});
 
+	let _catTouchMoved = false, _catScrollY0 = 0;
+	if (body) {
+		body.addEventListener('touchstart', () => {
+			_catTouchMoved = false;
+			_catScrollY0   = body.scrollTop;
+		}, { passive: true });
+		body.addEventListener('touchmove', () => {
+			_catTouchMoved = true;
+		}, { passive: true });
+		// scroll: señal definitiva aunque touchmove no se dispare (iOS compositor scroll)
+		body.addEventListener('scroll', () => {
+			if (Math.abs(body.scrollTop - _catScrollY0) > 6) _catTouchMoved = true;
+		}, { passive: true });
+	}
+
+	// Mismo patrón para scroll horizontal en cada fila .cat-cards
+	panel.querySelectorAll('.cat-cards').forEach(row => {
+		let _catScrollX0 = 0;
+		row.addEventListener('touchstart', () => {
+			_catTouchMoved = false;
+			_catScrollX0 = row.scrollLeft;
+		}, { passive: true });
+		row.addEventListener('scroll', () => {
+			if (Math.abs(row.scrollLeft - _catScrollX0) > 6) _catTouchMoved = true;
+		}, { passive: true });
+	});
+
 	panel.querySelectorAll('.cat-card').forEach(btn => {
 		btn.addEventListener('click', () => {
-			const nombre = btn.dataset.producto;
-			const prod   = (estadoTienda.productos || []).find(p => p.nombre === nombre);
-			if (prod) { cerrar(); setTimeout(() => abrirDetalles(prod), 420); }
+			if (_catTouchMoved) { _catTouchMoved = false; return; }
+			const prod = estadoTienda.productos.find(p => p.nombre === btn.dataset.producto);
+			if (!prod) return;
+			cerrar();
+			setTimeout(() => abrirDetalles(prod), 420);
 		});
 	});
 }
