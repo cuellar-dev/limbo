@@ -621,6 +621,7 @@ function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
 	searchBar.classList.add('is-active');
 	actualizarBotonBusqueda(searchSubmitBtn);
 	setTimeout(() => searchInput.focus(), 150);
+	document.querySelector('.header-nav')?.classList.add('nav-oculta');
 }
 
 function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
@@ -629,6 +630,9 @@ function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
 	searchInput.value = '';
 	filtrarProductos('');
 	searchInput.blur();
+	if (!document.getElementById('modal-producto')?.classList.contains('is-active')) {
+		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
+	}
 	_searchCloseTimer = setTimeout(() => {
 		searchBar.classList.remove('is-active', 'is-closing');
 		_searchCloseTimer = null;
@@ -669,11 +673,16 @@ function renderizarProductos(productos, opciones = {}) {
 		configurarInfiniteScroll();
 	}
 
-	// Restaurar scroll: el rebuild del DOM puede forzar al navegador a volver al top
-	if (savedY > 0) {
+	// Restaurar scroll: el rebuild del DOM puede forzar al navegador a volver al top.
+	// Si hay búsqueda activa, desplaza suavemente al inicio del grid (header colapsado visible).
+	const _scrollTarget = estadoFiltros.termino
+		? Math.max(100, window.innerHeight * 0.45 - 60)
+		: savedY;
+
+	if (_scrollTarget > 0 || savedY > 0) {
 		requestAnimationFrame(() =>
 			requestAnimationFrame(() =>
-				window.scrollTo({ top: savedY, behavior: 'instant' })
+				window.scrollTo({ top: _scrollTarget, behavior: 'instant' })
 			)
 		);
 	}
@@ -908,6 +917,7 @@ function registrarTagsVistos(tags) {
 }
 
 function abrirDetalles(datos) {
+	document.querySelector('.header-nav')?.classList.add('nav-oculta');
 	registrarInteraccion(datos.nombre);
 	registrarTagsVistos(datos.tags);
 
@@ -949,6 +959,9 @@ function abrirDetalles(datos) {
 
 function cerrarModal() {
 	modal.classList.remove('is-active');
+	if (!document.getElementById('search-bar')?.classList.contains('is-active')) {
+		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
+	}
 	setTimeout(() => {
 		modal.style.display = 'none';
 	}, 500);
@@ -1789,7 +1802,7 @@ function abrirOutfitsPanel() {
 
 		const cardsHTML = outfit.prendas.map((pr, i) => {
 			const prod = mapaProductos.get(pr.producto);
-			const img  = prod?.imagen || 'imagenes/sudadera.jpg';
+			const img  = (Array.isArray(prod?.imagenes) && prod.imagenes[0]) || prod?.imagen || 'imagenes/sudadera.jpg';
 			const nom  = prod?.nombre || pr.producto;
 			const cat  = prod?.categoria ? prod.categoria.charAt(0).toUpperCase() + prod.categoria.slice(1) : (pr.etiqueta || '');
 			const prec = prod ? formatPrecio(prod.precio) : '';
@@ -1825,6 +1838,15 @@ function abrirOutfitsPanel() {
 						<p class="outfit-detalle-desc">${outfit.descripcion}</p>
 					</header>
 					<div class="outfit-prendas-lista">${cardsHTML}</div>
+					<button class="outfit-llevar-todo" data-outfit-idx="${idx}" type="button">
+						<svg class="outfit-llevar-todo-ico" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+							<circle cx="9" cy="21" r="1"></circle>
+							<circle cx="20" cy="21" r="1"></circle>
+							<path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"></path>
+						</svg>
+						<span class="outfit-llevar-todo-text">Llevar todo el look al carrito</span>
+						<span class="outfit-llevar-todo-chevron" aria-hidden="true">→</span>
+					</button>
 				</aside>
 
 				<svg class="outfit-conectores" aria-hidden="true"></svg>
@@ -1887,11 +1909,56 @@ function abrirOutfitsPanel() {
 	// Scroll en cualquier descendiente (outfit-detalle, etc.) — captura porque scroll no burbujea
 	panel.addEventListener('scroll', () => { _outfitsTouchMoved = true; }, { passive: true, capture: true });
 	track.addEventListener('click', (e) => {
-		// Apertura de detalle desactivada en Outfits por petición del producto.
 		if (_outfitsTouchMoved) { _outfitsTouchMoved = false; return; }
-		// Si en el futuro se quiere reactivar, obtener `card.dataset.producto`,
-		// buscar el producto en `mapaProductos` y llamar a `cerrarOutfitsPanel()`
-		// seguido de `abrirDetalles(prod)` después de la animación.
+		// El botón "Llevar todo" tiene su propio handler — no abrir detalles
+		if (e.target.closest('.outfit-llevar-todo')) return;
+		const card = e.target.closest('.outfit-prenda');
+		if (!card || card.disabled) return;
+		const prod = mapaProductos.get(card.dataset.producto);
+		if (!prod) return;
+		cerrarOutfitsPanel();
+		setTimeout(() => abrirDetalles(prod), 420);
+	});
+
+	// ─── Botón "Llevar todo el look al carrito" ──────────────
+	panel.querySelectorAll('.outfit-llevar-todo').forEach(btn => {
+		const textEl = btn.querySelector('.outfit-llevar-todo-text');
+		const textoOriginal = textEl ? textEl.textContent : '';
+		btn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (_outfitsTouchMoved) { _outfitsTouchMoved = false; return; }
+			if (btn.classList.contains('is-busy')) return;
+			const idx = Number(btn.dataset.outfitIdx);
+			const outfit = outfits[idx];
+			if (!outfit) return;
+
+			let agregadas = 0;
+			outfit.prendas.forEach(pr => {
+				const prod = mapaProductos.get(pr.producto);
+				if (!prod) return;
+				if (obtenerProductoEnCarrito(prod.nombre)) return;
+				agregarAlCarrito(prod, null);
+				agregadas++;
+				// Sincroniza el botón correspondiente en el grid del catálogo
+				document.querySelectorAll('.btn-anadir').forEach(b => {
+					const t = b.closest('.tarjeta-producto');
+					if (!t) return;
+					const p = estadoTienda.productos[Number(t.dataset.productoId)];
+					if (p && p.nombre === prod.nombre) marcarBotonComoAgregado(b);
+				});
+			});
+
+			btn.classList.add('is-busy', 'is-added');
+			if (textEl) {
+				textEl.textContent = agregadas > 0
+					? (agregadas === 1 ? '1 prenda agregada' : `${agregadas} prendas agregadas`)
+					: 'Ya están en el carrito';
+			}
+			setTimeout(() => {
+				btn.classList.remove('is-busy', 'is-added');
+				if (textEl) textEl.textContent = textoOriginal;
+			}, 1800);
+		});
 	});
 
 	// ─── Cerrar ───────────────────────────────────────────────
