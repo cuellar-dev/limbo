@@ -338,7 +338,7 @@ function eliminarDelCarrito(index, itemEl) {
 			carrito.splice(index, 1);
 			desmarcarProductoEnGrid(productoEliminado.nombre);
 			renderizarCarrito();
-		}, 220); // 220ms > 200ms del transition más largo (transform)
+		}, 340); // 340ms > 320ms del transition más largo (max-height)
 	} else {
 		carrito.splice(index, 1);
 		desmarcarProductoEnGrid(productoEliminado.nombre);
@@ -369,7 +369,7 @@ function vaciarCarrito() {
 		items.forEach((el, i) => {
 			setTimeout(() => el.classList.add('is-removing'), i * 40);
 		});
-		const delay = items.length * 40 + 210;
+		const delay = items.length * 40 + 330;
 		setTimeout(() => {
 			const isEncargue = modoActual() === 'encargue';
 			carrito.forEach(item => {

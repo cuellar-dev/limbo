@@ -1279,13 +1279,18 @@ body.is-encargue .carrito-cerrar:hover {
     gap: 12px;
     padding: 10px;
     margin-bottom: 12px;
+    max-height: 220px;
     border-radius: 16px;
     border: 1px solid rgba(202, 172, 71, 0.16);
     background: rgba(255, 255, 255, 0.03);
     overflow: hidden;
     transition:
-        opacity   0.18s ease,
-        transform 0.2s ease;
+        opacity        0.22s ease,
+        transform      0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        max-height     0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        padding        0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        margin-bottom  0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        border-width   0.28s ease;
 }
 
 .carrito-item:last-child { margin-bottom: 0; }
@@ -2044,8 +2049,15 @@ body.is-encargue {
     border-radius: 18px;
     position: relative;
     overflow: hidden;
-    transition: border-color 0.3s ease, background 0.3s ease,
-                opacity 0.22s ease, transform 0.22s ease;
+    transition:
+        border-color   0.3s  ease,
+        background     0.3s  ease,
+        opacity        0.22s ease,
+        transform      0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        max-height     0.32s cubic-bezier(0.4, 0, 0.2, 1),
+        padding        0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        margin-bottom  0.28s cubic-bezier(0.4, 0, 0.2, 1),
+        border-width   0.28s ease;
 }
 
 /* Línea de acento izquierda en cada item */
