@@ -1351,12 +1351,31 @@ function initMenuHamburguesa() {
 			ov.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
+		let _hambTouchMoved = false;
+let _hambResetTimeout = null;
+
+panel.addEventListener('touchstart', () => {
+    clearTimeout(_hambResetTimeout);
+}, { passive: true });
+panel.addEventListener('touchmove', () => {
+    _hambTouchMoved = true;
+}, { passive: true });
+panel.addEventListener('scroll', () => {
+    _hambTouchMoved = true;
+}, { passive: true });
+panel.addEventListener('touchend', () => {
+    _hambResetTimeout = setTimeout(() => {
+        _hambTouchMoved = false;
+    }, 400);
+}, { passive: true });
+
 		itemsNoTocar = document.querySelectorAll('.menu-nav-item');
 		itemsNoTocar.forEach(item => {
 			item.addEventListener('contextmenu', (e) => e.preventDefault());
 			// Cualquier opción del menú cierra el panel al tocarse
 			item.addEventListener('click', (e) => {
 				e.preventDefault();
+				if (_hambTouchMoved) return;
 				cerrarMenu();
 			});
 		});
@@ -1365,6 +1384,7 @@ function initMenuHamburguesa() {
 		const contactoBtn = panel.querySelector('.menu-nav-item-contacto');
 		if (contactoBtn) {
 			contactoBtn.addEventListener('click', () => {
+				if (_hambTouchMoved) return;
 				setTimeout(() => abrirContactoPanel(), 400);
 			});
 		}
@@ -1372,6 +1392,7 @@ function initMenuHamburguesa() {
 		const outfitsBtn = panel.querySelector('.menu-nav-item-outfits');
 		if (outfitsBtn) {
 			outfitsBtn.addEventListener('click', () => {
+				if (_hambTouchMoved) return;
 				setTimeout(() => abrirOutfitsPanel(), 400);
 			});
 		}
@@ -1379,6 +1400,7 @@ function initMenuHamburguesa() {
 		const paraTiBtn = panel.querySelector('.menu-nav-item-parati');
 		if (paraTiBtn) {
 			paraTiBtn.addEventListener('click', () => {
+				if (_hambTouchMoved) return;
 				setTimeout(() => abrirParaTiPanel(), 400);
 			});
 		}
@@ -1386,6 +1408,7 @@ function initMenuHamburguesa() {
 		const categoriasBtn = panel.querySelector('.menu-nav-item-categorias');
 		if (categoriasBtn) {
 			categoriasBtn.addEventListener('click', () => {
+				if (_hambTouchMoved) return;
 				setTimeout(() => abrirCategoriasPanel(), 400);
 			});
 		}
@@ -1393,6 +1416,7 @@ function initMenuHamburguesa() {
 		const sobreLevitadBtn = panel.querySelector('.menu-nav-item-sobre-levitad');
 		if (sobreLevitadBtn) {
 			sobreLevitadBtn.addEventListener('click', () => {
+				if (_hambTouchMoved) return;
 				setTimeout(() => abrirSobreLevitadPanel(), 400);
 			});
 		}

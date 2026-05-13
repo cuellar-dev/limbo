@@ -1876,7 +1876,7 @@ body.is-encargue .filter-btn:active {
     width: 100%;
     height: 0;
     background: rgba(17, 21, 34, 0.98);
-    z-index: 999;             /* justo por debajo del header (z:100) */
+    z-index: 9999;             /* justo por debajo del header (z:100) */
     border-bottom: 1px solid var(--borde-dorado);
     overflow: hidden;
     opacity: 0;
@@ -2656,8 +2656,9 @@ body.menu-open #header {
     display: flex;
     flex-direction: column;
     padding: 0;
-    overflow: hidden;
-
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
 }
@@ -4366,7 +4367,7 @@ body.is-light .parati-sub { color: rgba(30, 30, 50, 0.52); }
 .parati-body {
     flex: 1;
     overflow-y: auto;
-    padding: 26px 0 36px;
+    padding: 26px 0 36px 10px;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
@@ -4381,7 +4382,7 @@ body.is-light .parati-sub { color: rgba(30, 30, 50, 0.52); }
     font-size: 12px;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: var(--color-texto-suave, rgba(232, 228, 216, 0.42));
+
     margin: 0 0 14px;
     padding: 0 28px;
     font-weight: 600;
