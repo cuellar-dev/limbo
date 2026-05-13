@@ -1009,6 +1009,12 @@ if (grid) {
 			_gridTouchMoved = true;
 		}
 	}, { passive: true });
+	// scroll horizontal de etiquetas: el scroll no burbujea, lo captamos en fase de captura
+	grid.addEventListener('scroll', (e) => {
+		if (e.target && e.target.classList && e.target.classList.contains('etiquetas-container')) {
+			_gridTouchMoved = true;
+		}
+	}, { capture: true, passive: true });
 
 	grid.addEventListener('click', (e) => {
 		if (_gridTouchMoved) { _gridTouchMoved = false; return; }

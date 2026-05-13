@@ -4521,6 +4521,9 @@ body.is-encargue .parati-cerrar:hover {
 body.is-encargue .parati-eyebrow {
     color: rgba(93, 114, 233, 0.56);
 }
+body.is-encargue .parati-titulo {
+    color: var(--acento-encargue);
+}
 body.is-encargue .parati-seccion-titulo {
     color: rgba(93, 114, 233, 0.48);
 }
@@ -4881,6 +4884,44 @@ body.is-light .cat-vacio-texto { color: rgba(30, 30, 50, 0.50); }
 }
 
 body.categorias-abierto { overflow: hidden; }
+
+/* ── Categorías: Modo Encargue (textos e iconos dorados → azul) ── */
+body.is-encargue .cat-eyebrow {
+    color: rgba(93, 114, 233, 0.68);
+}
+body.is-encargue .cat-titulo {
+    color: var(--acento-encargue);
+}
+body.is-encargue .cat-seccion-icon {
+    color: var(--acento-encargue);
+}
+body.is-encargue .cat-chip:hover {
+    color: var(--acento-encargue);
+}
+body.is-encargue .cat-card-precio {
+    color: var(--acento-encargue);
+}
+body.is-encargue .cat-card-rank {
+    background: var(--acento-encargue);
+    color: #fff;
+}
+body.is-encargue .cat-vacio-icono {
+    color: rgba(93, 114, 233, 0.32);
+}
+
+/* ── Categorías: Light + Encargue (anula las reglas is-light) ── */
+body.is-light.is-encargue .cat-titulo {
+    color: rgba(93, 114, 233, 0.85);
+}
+body.is-light.is-encargue .cat-seccion-icon {
+    color: rgba(93, 114, 233, 0.85);
+}
+body.is-light.is-encargue .cat-chip:hover {
+    color: rgba(93, 114, 233, 0.85);
+}
+body.is-light.is-encargue .cat-card-precio {
+    color: rgba(93, 114, 233, 0.85);
+}
 
 
 /* ═══════════════════════════════════════════════════════════
