@@ -153,3 +153,11 @@
     position: relative;
     z-index: 101;
 }
+
+/* ── Modo claro: túnica azul oscura (como el fondo del menú hamburguesa) y pliegues más blancos ── */
+body.is-light .angel-svg [fill="#E2E2E2"]:not(.angel-wingL):not(.angel-wingR) {
+    fill: #151c2e;
+}
+body.is-light .angel-svg [stroke="#c8c8c8"] {
+    stroke: #eaeaea;
+}
