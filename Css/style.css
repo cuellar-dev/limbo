@@ -2678,6 +2678,7 @@ body.menu-open #header {
     overscroll-behavior: contain;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: none;
 }
 
 .menu-nav-panel.is-active {
@@ -3253,10 +3254,12 @@ body.is-encargue .footer-dev-link { color: var(--acento-encargue); }
     flex-direction: column;
     transition: transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s ease, border-color 0.35s ease;
     font-family: 'Quicksand', sans-serif;
+    pointer-events: none;
 }
 .contacto-panel.is-active {
     transform: translate(-50%, -50%) scale(1);
     opacity: 1;
+    pointer-events: auto;
 }
 .contacto-panel.is-closing {
     transform: translate(-50%, -50%) scale(0.94);
@@ -5192,6 +5195,7 @@ body.is-light.is-encargue .cat-card-precio {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    pointer-events: none;
 }
 
 body.is-light .sobre-panel {
@@ -5218,6 +5222,7 @@ body.is-light.is-encargue .sobre-panel {
 .sobre-panel.is-active {
     opacity: 1;
     transform: scale(1);
+    pointer-events: auto;
 }
 .sobre-panel.is-closing {
     opacity: 0;

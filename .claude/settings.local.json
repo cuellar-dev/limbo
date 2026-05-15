@@ -7,7 +7,10 @@
       "PowerShell($path = 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\imagenes'; Get-ChildItem $path | ForEach-Object { \"$\\($_.Name\\) - $\\([math]::Round\\($_.Length/1KB, 1\\)\\) KB\" })",
       "PowerShell($jsPath = 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\js\\\\js.js'; $cssPath = 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Css\\\\style.css'; $angelCss = 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Css\\\\angel.css'; \"js.js: $\\([math]::Round\\(\\(Get-Item $jsPath\\).Length/1KB,1\\)\\) KB\"; \"style.css: $\\([math]::Round\\(\\(Get-Item $cssPath\\).Length/1KB,1\\)\\) KB\"; \"angel.css: $\\([math]::Round\\(\\(Get-Item $angelCss\\).Length/1KB,1\\)\\) KB\")",
       "PowerShell(Get-ChildItem 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Fuentes\\\\' -Recurse | Where-Object { $_.Extension -eq '.woff2' } | Select-Object FullName, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}})",
-      "PowerShell(Get-ChildItem 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Fuentes\\\\' -Recurse | Select-Object Name, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}})"
+      "PowerShell(Get-ChildItem 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Fuentes\\\\' -Recurse | Select-Object Name, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}})",
+      "Bash(node -e ' *)",
+      "Bash(node --input-type=module)",
+      "Bash(node --check js/js.js)"
     ]
   }
 }

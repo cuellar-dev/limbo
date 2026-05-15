@@ -1253,311 +1253,124 @@ function cerrarModalFiltros() {
 
 function initMenuHamburguesa() {
 	const menuBtn = document.getElementById('menu-hamb');
-	if (!menuBtn) return;
+	const ov      = document.getElementById('menu-nav-overlay');
+	const panel   = document.getElementById('menu-nav-panel');
+	if (!menuBtn || !ov || !panel) return;
+
+	let _hambTouchMoved   = false;
+	let _hambResetTimeout = null;
 
 	function abrirMenu() {
-		if (document.getElementById('menu-nav-panel')) return;
+		if (panel.classList.contains('is-active')) return;
 		menuBtn.classList.add('is-open');
-
-		const ov = document.createElement('div');
-		ov.id        = 'menu-nav-overlay';
-		ov.className = 'menu-nav-overlay';
-
-		const panel = document.createElement('div');
-		panel.id        = 'menu-nav-panel';
-		panel.className = 'menu-nav-panel';
-
-		panel.innerHTML = `
-			<div class="menu-nav-glow"></div>
-
-			<!-- MARCA -->
-			<div class="menu-nav-header">
-				<span class="menu-nav-marca">LÉVITAD</span>
-			</div>
-
-			<!-- LINKS -->
-			<nav class="menu-nav-links">
-				<a class="menu-nav-item menu-nav-item-categorias" href="#" data-action="categorias">
-					<span class="menu-nav-num">01</span>
-					<span class="menu-nav-text">Categor&#237;as</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
-				<a class="menu-nav-item menu-nav-item-parati" href="#" data-action="parati">
-					<span class="menu-nav-num">02</span>
-					<span class="menu-nav-text">Para Ti</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>				
-				<a class="menu-nav-item menu-nav-item-outfits" href="#" data-action="outfits">
-					<span class="menu-nav-num">03</span>
-					<span class="menu-nav-text">Outfits</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
-				<a class="menu-nav-item menu-nav-item-sobre-levitad" href="#" data-action="sobre-levitad">
-					<span class="menu-nav-num">04</span>
-					<span class="menu-nav-text">Sobre Lévitad</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
-				<a class="menu-nav-item menu-nav-item-contacto" href="#" data-action="contacto">
-					<span class="menu-nav-num">05</span>
-					<span class="menu-nav-text">Contacto</span>
-					<span class="menu-nav-arrow">→</span>
-				</a>
-				
-			</nav>
-
-			<!-- TOGGLE TEMA -->
-			<div class="menu-tema-row">
-				<span class="menu-tema-label">Tema</span>
-				<button class="menu-tema-toggle" id="tema-toggle" aria-label="Cambiar tema" type="button">
-					<span class="menu-tema-thumb">
-						<span class="tema-luna">
-							<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" style="color:#5d72e9"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-						</span>
-						<span class="tema-sol">
-							<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="color:#caac47"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>
-						</span>
-					</span>
-				</button>
-			</div>
-
-			<!-- FOOTER DEL MENÚ -->
-			<footer class="menu-nav-footer">
-
-				<!-- Slogan -->
-				<p class="menu-nav-tagline">Prendas que elevan.</p>
-
-				<!-- Redes sociales -->
-				<div class="menu-nav-redes">
-					<a href="https://instagram.com/levitad" target="_blank" rel="noopener noreferrer"
-					   class="menu-nav-red" aria-label="Instagram">
-						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.6"/>
-							<circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>
-							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
-						</svg>
-						<span>Instagram</span>
-					</a>
-					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
-					   class="menu-nav-red" aria-label="WhatsApp">
-						<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-							<path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.418A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-							<path d="M8.5 9.5c.5 1 1.5 3 3.5 4s3-1 3-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-						</svg>
-						<span>WhatsApp</span>
-					</a>
-				</div>
-
-				<!-- Divider -->
-				<div class="menu-nav-divider"></div>
-
-				<!-- Créditos -->
-				<div class="menu-nav-creditos">
-					<span class="menu-nav-dev">
-						Hecho con ♡ desde
-						<a href="#" class="menu-nav-dev-link">La Casita</a>
-					</span>
-					<span class="menu-nav-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
-				</div>
-
-			</footer>
-		`;
-		
-		document.body.appendChild(ov);
-		document.body.appendChild(panel);
-
-		ov.addEventListener('click', cerrarMenu);
+		panel.style.display = 'flex';
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			ov.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
-		let _hambTouchMoved = false;
-let _hambResetTimeout = null;
-
-panel.addEventListener('touchstart', () => {
-    clearTimeout(_hambResetTimeout);
-}, { passive: true });
-panel.addEventListener('touchmove', () => {
-    _hambTouchMoved = true;
-}, { passive: true });
-panel.addEventListener('scroll', () => {
-    _hambTouchMoved = true;
-}, { passive: true });
-panel.addEventListener('touchend', () => {
-    _hambResetTimeout = setTimeout(() => {
-        _hambTouchMoved = false;
-    }, 400);
-}, { passive: true });
-
-		itemsNoTocar = document.querySelectorAll('.menu-nav-item');
-		itemsNoTocar.forEach(item => {
-			item.addEventListener('contextmenu', (e) => e.preventDefault());
-			// Cualquier opción del menú cierra el panel al tocarse
-			item.addEventListener('click', (e) => {
-				e.preventDefault();
-				if (_hambTouchMoved) return;
-				cerrarMenu();
-			});
-		});
-
-		// Después del cierre, abre el panel correspondiente
-		const contactoBtn = panel.querySelector('.menu-nav-item-contacto');
-		if (contactoBtn) {
-			contactoBtn.addEventListener('click', () => {
-				if (_hambTouchMoved) return;
-				setTimeout(() => abrirContactoPanel(), 400);
-			});
-		}
-
-		const outfitsBtn = panel.querySelector('.menu-nav-item-outfits');
-		if (outfitsBtn) {
-			outfitsBtn.addEventListener('click', () => {
-				if (_hambTouchMoved) return;
-				setTimeout(() => abrirOutfitsPanel(), 400);
-			});
-		}
-
-		const paraTiBtn = panel.querySelector('.menu-nav-item-parati');
-		if (paraTiBtn) {
-			paraTiBtn.addEventListener('click', () => {
-				if (_hambTouchMoved) return;
-				setTimeout(() => abrirParaTiPanel(), 400);
-			});
-		}
-
-		const categoriasBtn = panel.querySelector('.menu-nav-item-categorias');
-		if (categoriasBtn) {
-			categoriasBtn.addEventListener('click', () => {
-				if (_hambTouchMoved) return;
-				setTimeout(() => abrirCategoriasPanel(), 400);
-			});
-		}
-
-		const sobreLevitadBtn = panel.querySelector('.menu-nav-item-sobre-levitad');
-		if (sobreLevitadBtn) {
-			sobreLevitadBtn.addEventListener('click', () => {
-				if (_hambTouchMoved) return;
-				setTimeout(() => abrirSobreLevitadPanel(), 400);
-			});
-		}
-
-		const temaToggle = panel.querySelector('#tema-toggle');
-		if (temaToggle) {
-			temaToggle.addEventListener('click', () => {
-				const esClaro = document.body.classList.toggle('is-light');
-				localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
-			});
-		}
 	}
 
 	function cerrarMenu() {
 		menuBtn.classList.remove('is-open');
-		const ov    = document.getElementById('menu-nav-overlay');
-		const panel = document.getElementById('menu-nav-panel');
-		if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
-		if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
+		ov.classList.remove('is-active');
+		ov.classList.add('is-closing');
+		panel.classList.remove('is-active');
+		panel.classList.add('is-closing');
+		setTimeout(() => {
+			ov.classList.remove('is-closing');
+			panel.classList.remove('is-closing');
+			panel.style.display = '';
+		}, 380);
 	}
 
+	panel.addEventListener('touchstart', () => { clearTimeout(_hambResetTimeout); }, { passive: true });
+	panel.addEventListener('touchmove',  () => { _hambTouchMoved = true; },          { passive: true });
+	panel.addEventListener('scroll',     () => { _hambTouchMoved = true; },          { passive: true });
+	panel.addEventListener('touchend',   () => {
+		_hambResetTimeout = setTimeout(() => { _hambTouchMoved = false; }, 400);
+	}, { passive: true });
+
+	ov.addEventListener('click', cerrarMenu);
+
+	document.querySelectorAll('.menu-nav-item').forEach(item => {
+		item.addEventListener('contextmenu', e => e.preventDefault());
+		item.addEventListener('click', e => {
+			e.preventDefault();
+			if (_hambTouchMoved) return;
+			cerrarMenu();
+		});
+	});
+
+	panel.querySelector('.menu-nav-item-contacto')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirContactoPanel(), 400);
+	});
+	panel.querySelector('.menu-nav-item-outfits')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirOutfitsPanel(), 400);
+	});
+	panel.querySelector('.menu-nav-item-parati')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirParaTiPanel(), 400);
+	});
+	panel.querySelector('.menu-nav-item-categorias')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirCategoriasPanel(), 400);
+	});
+	panel.querySelector('.menu-nav-item-sobre-levitad')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirSobreLevitadPanel(), 400);
+	});
+	panel.querySelector('#tema-toggle')?.addEventListener('click', () => {
+		const esClaro = document.body.classList.toggle('is-light');
+		localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
+	});
+
 	menuBtn.addEventListener('click', () =>
-		menuBtn.classList.contains('is-open') ? cerrarMenu() : abrirMenu()
+		panel.classList.contains('is-active') ? cerrarMenu() : abrirMenu()
 	);
 }
 
 
+
 /* ═══════════════════════════════════════════════════════════
-   Panel de Contacto — formulario que se inyecta al hacer click
-   en "Contacto" desde el menú hamburguesa.
+   Panel de Contacto — vive en el HTML, JS solo activa/desactiva.
 ═══════════════════════════════════════════════════════════ */
+function initContactoPanel() {
+	const ov    = document.getElementById('contacto-overlay');
+	const panel = document.getElementById('contacto-panel');
+	if (!ov || !panel) return;
+
+	ov.addEventListener('click', cerrarContactoPanel);
+	panel.querySelector('.contacto-cerrar')?.addEventListener('click', cerrarContactoPanel);
+
+	const form = panel.querySelector('#contacto-form');
+	if (form) {
+		form.addEventListener('submit', manejarEnvioContacto);
+		form.querySelectorAll('input, textarea').forEach(el => {
+			el.addEventListener('input', () => limpiarErrorCampo(el));
+		});
+	}
+}
+
 function abrirContactoPanel() {
-	if (document.getElementById('contacto-panel')) return;
+	const ov    = document.getElementById('contacto-overlay');
+	const panel = document.getElementById('contacto-panel');
+	if (!ov || !panel || panel.classList.contains('is-active')) return;
 	document.body.classList.add('contacto-abierto');
-
-	const ov = document.createElement('div');
-	ov.id        = 'contacto-overlay';
-	ov.className = 'contacto-overlay';
-
-	const panel = document.createElement('div');
-	panel.id        = 'contacto-panel';
-	panel.className = 'contacto-panel';
-
-	panel.innerHTML = `
-		<button class="contacto-cerrar" aria-label="Cerrar contacto">✕</button>
-
-		<div class="contacto-glow"></div>
-
-		<header class="contacto-header">
-			<span class="contacto-eyebrow">Hablemos</span>
-			<h2 class="contacto-titulo">Contacto</h2>
-			<p class="contacto-sub">Contacto con el desarrollador para lo que desees, solo sigue los requisitos.</p>
-		</header>
-
-		<form class="contacto-form" id="contacto-form" novalidate autocomplete="on">
-			<div class="contacto-campo">
-				<label for="contacto-nombre">Nombre</label>
-				<input id="contacto-nombre" name="nombre" type="text"
-				       required minlength="2" maxlength="60"
-				       autocomplete="name" placeholder="Tu nombre" />
-				<span class="contacto-error" data-error-for="nombre"></span>
-			</div>
-
-			<div class="contacto-campo">
-				<label for="contacto-email">Correo electrónico</label>
-				<input id="contacto-email" name="email" type="email"
-				       required maxlength="120"
-				       autocomplete="email" placeholder="tucorreo@dominio.com" />
-				<span class="contacto-error" data-error-for="email"></span>
-			</div>
-
-			<div class="contacto-campo">
-				<label for="contacto-mensaje">Mensaje</label>
-				<textarea id="contacto-mensaje" name="mensaje" rows="5"
-				          required minlength="5" maxlength="1000"
-				          placeholder="Escribí tu mensaje..."></textarea>
-				<span class="contacto-error" data-error-for="mensaje"></span>
-			</div>
-
-			<!-- Honeypot anti-spam (oculto al usuario) -->
-			<div class="contacto-hp" aria-hidden="true">
-				<label>No completar
-					<input type="text" name="_honey" tabindex="-1" autocomplete="off" />
-				</label>
-			</div>
-
-			<button type="submit" class="contacto-submit">
-				<span class="contacto-submit-text">Enviar mensaje</span>
-				<span class="contacto-submit-loader" aria-hidden="true"></span>
-			</button>
-
-			<p class="contacto-status" role="status" aria-live="polite"></p>
-		</form>
-
-		<div class="contacto-pattern" aria-hidden="true"></div>
-	`;
-
-	document.body.appendChild(ov);
-	document.body.appendChild(panel);
-
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
 	}));
-
-	ov.addEventListener('click', cerrarContactoPanel);
-	panel.querySelector('.contacto-cerrar').addEventListener('click', cerrarContactoPanel);
-
-	const form = panel.querySelector('#contacto-form');
-	form.addEventListener('submit', manejarEnvioContacto);
-
-	form.querySelectorAll('input, textarea').forEach(el => {
-		el.addEventListener('input', () => limpiarErrorCampo(el));
-	});
 }
+
 
 function cerrarContactoPanel() {
 	document.body.classList.remove('contacto-abierto');
 	const ov    = document.getElementById('contacto-overlay');
 	const panel = document.getElementById('contacto-panel');
-	if (ov)    { ov.classList.add('is-closing');    setTimeout(() => ov.remove(),    380); }
-	if (panel) { panel.classList.add('is-closing'); setTimeout(() => panel.remove(), 380); }
+	if (ov)    { ov.classList.remove('is-active');    ov.classList.add('is-closing');    setTimeout(() => ov.classList.remove('is-closing'),    380); }
+	if (panel) { panel.classList.remove('is-active'); panel.classList.add('is-closing'); setTimeout(() => panel.classList.remove('is-closing'), 380); }
 }
 
 function limpiarErrorCampo(el) {
@@ -1662,70 +1475,34 @@ async function manejarEnvioContacto(e) {
 }
 
 
+
 /* ═══════════════════════════════════════════════════════════
-   Panel Sobre Lévitad — ventana de marca / about, pantalla completa.
+   Panel Sobre Lévitad — vive en el HTML, JS solo activa/desactiva.
 ═══════════════════════════════════════════════════════════ */
-function abrirSobreLevitadPanel() {
-	if (document.getElementById('sobre-panel')) return;
-	document.body.classList.add('sobre-abierto');
+function initSobrePanel() {
+	const panel = document.getElementById('sobre-panel');
+	if (!panel) return;
 
-	const panel = document.createElement('div');
-	panel.id        = 'sobre-panel';
-	panel.className = 'sobre-panel';
-
-	panel.innerHTML = `
-		<button class="sobre-cerrar" aria-label="Cerrar">✕</button>
-
-		<svg class="sobre-bg-svg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-			<ellipse cx="270" cy="90"  rx="75"  ry="21" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.20" />
-			<ellipse cx="270" cy="90"  rx="100" ry="30" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.10" />
-
-			<ellipse cx="530" cy="510" rx="90"  ry="25" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.16" />
-			<ellipse cx="530" cy="510" rx="120" ry="34" stroke="currentColor" stroke-width="0.8" fill="none" opacity="0.08" />
-
-			<ellipse cx="400" cy="320" rx="220" ry="58" stroke="currentColor" stroke-width="0.6" fill="none" opacity="0.06" />
-			<ellipse cx="400" cy="320" rx="295" ry="80" stroke="currentColor" stroke-width="0.5" fill="none" opacity="0.04" />
-
-			<line x1="275" y1="200" x2="275" y2="520" stroke="currentColor" stroke-width="0.6" opacity="0.13" stroke-linecap="round" />
-			<line x1="525" y1="60"  x2="525" y2="380" stroke="currentColor" stroke-width="0.6" opacity="0.13" stroke-linecap="round" />
-			<line x1="330" y1="80"  x2="330" y2="240" stroke="currentColor" stroke-width="0.5" opacity="0.08" stroke-linecap="round" />
-			<line x1="470" y1="380" x2="470" y2="560" stroke="currentColor" stroke-width="0.5" opacity="0.08" stroke-linecap="round" />
-		</svg>
-
-		<div class="sobre-content">
-			<header class="sobre-header">
-				<span class="sobre-eyebrow">El proyecto</span>
-				<h2 class="sobre-titulo">Sobre Lévitad</h2>
-				<div class="sobre-divider"></div>
-			</header>
-			<div class="sobre-body">
-				<p><strong>Lévitad</strong> nace de convertir lo simple a algo nuevo en <strong>Cuba</strong>, no es solo importar hacia acá prendas que <strong>elevan</strong>, que distinguen, que cuentan algo. Un puente entre la originalidad y lo clásico. No queríamos tener simplemente un negocio, queríamos dejar una marca, crear una experiencia de diseño y accesibilidad</p>
-				<p>Detrás de cada línea de código de este sitio, hay solo una persona. Un desarrollador que pone su empeño para que todo lo que toca se sienta único. Esto que estás viendo se construyó con un cuidado artesanal — pixel a pixel, palabra por palabra — con ayuda de muchos e ideas de otros pocos.</p>
-				<p>Siempre espero que les haya gustado la experiencia, como tanto me esforcé lográndola.</p>
-				<p class="sobre-firma">— Hecho con ♡ desde La Casita</p>
-				<p class="sobre-pais">Made in Cuba</p>
-			</div>
-		</div>
-	`;
-
-	document.body.appendChild(panel);
-
-	requestAnimationFrame(() => requestAnimationFrame(() => {
-		panel.classList.add('is-active');
-	}));
-
-	panel.querySelector('.sobre-cerrar').addEventListener('click', cerrarSobreLevitadPanel);
-	// Click en zona vacía del panel (fuera del contenido) también cierra
+	panel.querySelector('.sobre-cerrar')?.addEventListener('click', cerrarSobreLevitadPanel);
 	panel.addEventListener('click', (e) => {
 		if (e.target === panel) cerrarSobreLevitadPanel();
 	});
-	// Tecla Escape cierra
+}
+
+function abrirSobreLevitadPanel() {
+	const panel = document.getElementById('sobre-panel');
+	if (!panel || panel.classList.contains('is-active')) return;
+	document.body.classList.add('sobre-abierto');
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		panel.classList.add('is-active');
+	}));
 	document.addEventListener('keydown', _sobreLevitadEscHandler);
 }
 
 function _sobreLevitadEscHandler(e) {
-	if (e.key === 'Escape' && document.getElementById('sobre-panel')) {
-		cerrarSobreLevitadPanel();
+	if (e.key === 'Escape') {
+		const panel = document.getElementById('sobre-panel');
+		if (panel?.classList.contains('is-active')) cerrarSobreLevitadPanel();
 	}
 }
 
@@ -1734,8 +1511,9 @@ function cerrarSobreLevitadPanel() {
 	document.removeEventListener('keydown', _sobreLevitadEscHandler);
 	const panel = document.getElementById('sobre-panel');
 	if (panel) {
+		panel.classList.remove('is-active');
 		panel.classList.add('is-closing');
-		setTimeout(() => panel.remove(), 420);
+		setTimeout(() => panel.classList.remove('is-closing'), 420);
 	}
 }
 
@@ -1991,82 +1769,11 @@ function cerrarOutfitsPanel() {
    Llamá initFooter() dentro de DOMContentLoaded.
 ═══════════════════════════════════════════════════════════ */
 function initFooter() {
-	// Evitar duplicados
-	if (document.getElementById('site-footer')) return;
-
-	const footer = document.createElement('footer');
-	footer.id        = 'site-footer';
-	footer.className = 'site-footer';
-
-	footer.innerHTML = `
-		<div class="site-footer-glow"></div>
-
-		<div class="site-footer-inner">
-
-			<!-- Columna marca -->
-			<div class="footer-col footer-col-marca">
-				<h2 class="footer-logo">LÉVIT<span class="logo-a">A
-                        <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <filter id="halo-glow" x="-50%" y="-50%" width="200%" height="200%">
-                                    <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                                    <feFlood class="halo-glow-color" result="glow-color"/>
-                                    <feComposite in="glow-color" in2="blur" operator="in" result="colored-blur"/>
-                                    <feMerge>
-                                        <feMergeNode in="colored-blur"/>
-                                        <feMergeNode in="SourceGraphic"/>
-                                    </feMerge>
-                                </filter>
-                            </defs>
-                            <path class="halo-path" d="M20,25 A30,12 0 1,1 75,22" fill="none" stroke-width="8" stroke-linecap="round" filter="url(#halo-glow)" />
-                        </svg>
-                    </span>D</h2>
-				<p class="footer-slogan">Prendas que elevan.</p>
-			</div>
-
-			<!-- Columna redes -->
-			<div class="footer-col footer-col-redes">
-				<p class="footer-col-titulo">Síguenos</p>
-				<div class="footer-redes">
-					<a href="https://instagram.com/levitad" target="_blank" rel="noopener noreferrer"
-					   class="footer-red" aria-label="Instagram">
-						<svg viewBox="0 0 24 24" fill="none">
-							<rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.6"/>
-							<circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="1.6"/>
-							<circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
-						</svg>
-						<span>Instagram</span>
-					</a>
-					<a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer"
-					   class="footer-red" aria-label="WhatsApp">
-						<svg viewBox="0 0 24 24" fill="none">
-							<path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.418A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-							<path d="M8.5 9.5c.5 1 1.5 3 3.5 4s3-1 3-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-						</svg>
-						<span>WhatsApp</span>
-					</a>
-				</div>
-			</div>
-
-		</div>
-
-		<!-- Barra inferior -->
-		<div class="site-footer-bottom">
-		<span class="footer-made-cuba">
-				<span>Made</span>
-				in 
-				<span class="footer-made-rojo">Cuba</span>
-			</span>
-			<span class="footer-copy">© ${new Date().getFullYear()} Lévitad. Todos los derechos reservados.</span>
-			<span class="footer-dev">
-				Diseñado por <a href="#" class="footer-dev-link">La Casita</a>
-			</span>
-			
-		</div>
-	`;
-
-	// Insertar al final del body, antes de los SVG de alas si existen
-	document.body.appendChild(footer);
+	const year = new Date().getFullYear();
+	const footerYear     = document.getElementById('footer-year');
+	const menuFooterYear = document.getElementById('menu-footer-year');
+	if (footerYear)     footerYear.textContent     = year;
+	if (menuFooterYear) menuFooterYear.textContent = year;
 }
 
 /* ─── INIT ─── */
@@ -2148,6 +1855,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	initMenuHamburguesa();
+	initContactoPanel();
+	initSobrePanel();
 	initHeaderNavLinks();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
