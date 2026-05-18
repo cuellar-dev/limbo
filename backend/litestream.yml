@@ -1,0 +1,21 @@
+# Replica la base de datos de PocketBase a un bucket S3 (Backblaze B2).
+# Las variables ${...} se rellenan con las Environment Variables de Render.
+dbs:
+  - path: /pb/pb_data/data.db
+    replicas:
+      - type: s3
+        endpoint: ${B2_ENDPOINT}
+        bucket: ${B2_BUCKET}
+        path: pocketbase/data
+        access-key-id: ${B2_KEY_ID}
+        secret-access-key: ${B2_APP_KEY}
+        force-path-style: true
+  - path: /pb/pb_data/auxiliary.db
+    replicas:
+      - type: s3
+        endpoint: ${B2_ENDPOINT}
+        bucket: ${B2_BUCKET}
+        path: pocketbase/auxiliary
+        access-key-id: ${B2_KEY_ID}
+        secret-access-key: ${B2_APP_KEY}
+        force-path-style: true

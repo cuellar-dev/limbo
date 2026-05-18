@@ -1,0 +1,21 @@
+# Imagen para Render: PocketBase + Litestream (persistencia en bucket S3).
+FROM alpine:latest
+
+ARG PB_VERSION=0.38.1
+ARG LS_VERSION=0.3.13
+
+RUN apk add --no-cache unzip ca-certificates
+
+# PocketBase (versión Linux; tu .exe es solo para Windows/local)
+ADD https://github.com/pocketbase/pocketbase/releases/download/v${PB_VERSION}/pocketbase_${PB_VERSION}_linux_amd64.zip /tmp/pb.zip
+RUN unzip /tmp/pb.zip -d /pb/ && rm /tmp/pb.zip
+
+# Litestream (replica/restaura la BD a/desde el bucket)
+ADD https://github.com/benbjohnson/litestream/releases/download/v${LS_VERSION}/litestream-v${LS_VERSION}-linux-amd64.tar.gz /tmp/ls.tar.gz
+RUN tar -C /usr/local/bin -xzf /tmp/ls.tar.gz && rm /tmp/ls.tar.gz
+
+COPY litestream.yml /etc/litestream.yml
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+CMD ["/entrypoint.sh"]

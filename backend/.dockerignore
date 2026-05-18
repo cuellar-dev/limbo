@@ -1,0 +1,4 @@
+# No subir nada local al servidor: la BD del servidor arranca limpia en su volumen.
+pb_data/
+pb_migrations/
+*.exe
