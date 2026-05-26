@@ -251,7 +251,7 @@ function renderProductos() {
         const modo = p.modo || 'stack';
         return `
             <div class="item" data-i="${indiceReal}">
-                <img class="item-thumb" src="${esc(img)}" alt="" onerror="this.style.visibility='hidden'">
+                <img class="item-thumb" src="${esc(img)}" alt="">
                 <div class="item-info">
                     <div class="item-nombre">${esc(p.nombre || '(sin nombre)')}</div>
                     <div class="item-meta">
@@ -275,6 +275,13 @@ function renderProductos() {
         const i = Number(b.closest('.item').dataset.i);
         borrarProducto(i);
     }));
+    engancharErrorImagenes(cont);
+}
+
+function engancharErrorImagenes(cont) {
+    cont.querySelectorAll('.item-thumb').forEach(img => {
+        img.addEventListener('error', () => { img.style.visibility = 'hidden'; });
+    });
 }
 
 function formatPrecio(p) {
@@ -468,7 +475,7 @@ function renderOutfits() {
         const idx = state.data.outfits.indexOf(o);
         return `
             <div class="item" data-i="${idx}">
-                <img class="item-thumb" src="${esc(o.imagen || '')}" alt="" onerror="this.style.visibility='hidden'">
+                <img class="item-thumb" src="${esc(o.imagen || '')}" alt="">
                 <div class="item-info">
                     <div class="item-nombre">${esc(o.nombre || '(sin nombre)')}</div>
                     <div class="item-meta">
@@ -491,6 +498,7 @@ function renderOutfits() {
         const i = Number(b.closest('.item').dataset.i);
         borrarOutfit(i);
     }));
+    engancharErrorImagenes(cont);
 }
 
 document.getElementById('buscar-out').addEventListener('input', e => {
