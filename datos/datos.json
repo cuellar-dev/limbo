@@ -1517,27 +1517,6 @@
       }
     },
     {
-      "nombre": "Conjunto de Top y Short",
-      "precio": 7000,
-      "imagenes": [
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779826216/levitad/vrmlnwabec3x5zivbnsk.jpg",
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779826765/levitad/an2r2hbwzbss4xzbakmb.jpg"
-      ],
-      "categoria": "conjunto",
-      "modo": "stack",
-      "enlace": "none",
-      "tags": [
-        "#veraniego"
-      ],
-      "detalles": {
-        "Talla": "M",
-        "Color": "Carmelita"
-      },
-      "ventas": 0,
-      "interacciones": 0,
-      "pesoManual": 0
-    },
-    {
       "nombre": "Pullover",
       "precio": 5000,
       "imagenes": [
@@ -1556,6 +1535,30 @@
       "detalles": {
         "Talla": "M",
         "Color": "Rosado Suave"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 0
+    },
+    {
+      "nombre": "Conjunto de Top y Short",
+      "precio": 7000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779828878/levitad/mbtion8gdvlfd8ueq8bx.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779828924/levitad/h3emhtrpq5yurqh3qrrm.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "veraniego",
+        "fresco",
+        "suave",
+        "comodo"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Carmelita"
       },
       "ventas": 0,
       "interacciones": 0,
