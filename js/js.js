@@ -2279,6 +2279,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
+
+	// Service Worker: cachea imágenes (Cloudinary + locales) para que las
+	// próximas visitas las carguen del disco. Ver sw.js.
+	// Solo intercepta requests de imagen; no afecta nada más.
+	if ('serviceWorker' in navigator) {
+		navigator.serviceWorker.register('sw.js').catch(() => {});
+	}
 });
 
 /* ─── HEADER SCROLL ─── */
@@ -2419,17 +2426,10 @@ if (header) {
 					header.classList.toggle('is-expanded', expanded);
 				}
 
-				// Buscador: al dispararse la animación del header se cierra la
-				// barra conservando la búsqueda (texto + resultados), para que
-				// al volver arriba el header muestre alas + nav con normalidad.
-				// Pero si el input tiene el foco (usuario escribiendo), no lo cerramos:
-				// el teclado virtual provoca scroll y eso disparaba un cierre falso.
-				if (searchBar && p > 0.2 &&
-					searchBar.classList.contains('is-active') &&
-					!searchBar.classList.contains('is-closing') &&
-					document.activeElement?.id !== 'search-input') {
-					ocultarBuscadorConservandoBusqueda();
-				}
+				// (Eliminado) Auto-cierre del buscador al scrollear: rompía la
+				// experiencia móvil porque el teclado virtual provocaba scroll
+				// y el buscador se cerraba al escribir una letra. Ahora la
+				// lupa se cierra solo manualmente con su botón ✕.
 
 				// Hamburguesa: no clickeable mientras sea invisible (p < 0.65)
 				if (hambWrap) hambWrap.style.pointerEvents = p >= 0.65 ? 'auto' : 'none';
