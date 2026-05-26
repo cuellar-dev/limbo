@@ -1536,6 +1536,30 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 0
+    },
+    {
+      "nombre": "Pullover",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779828380/levitad/w38if2n5jbzwbeztqnne.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779828394/levitad/pnjyxkbt4bxlsjetgm6s.jpg"
+      ],
+      "categoria": "pullover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "pullover",
+        "fresco",
+        "pinky"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rosado Suave"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 0
     }
   ],
   "outfits": [
