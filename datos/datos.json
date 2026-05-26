@@ -1,1139 +1,1612 @@
 {
-	"productos": [
-		{
-			"nombre": "Buzo Oversize Nube Oxidada",
-			"precio": 48900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 17,
-			"tags": ["oversize", "unisex", "urbano", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Naranja oxidado",
-				"Material": "Frisa premium con interior peinado",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Stock": "8 unidades"
-			}
-		},
-		{
-			"nombre": "Jogger Eclipse Negro",
-			"precio": 36900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 9,
-			"tags": ["jogger", "basico", "comodo", "streetwear"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro lavado",
-				"Material": "Algodon con elastano",
-				"Corte": "Recto relajado",
-				"Ajuste": "Regular",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar cloro",
-				"Stock": "12 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Grafito Relieve",
-			"precio": 21900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 1,
-			"tags": ["remera", "liviana", "daily", "premium"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Grafito",
-				"Material": "Jersey de algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secado a la sombra",
-				"Stock": "15 unidades"
-			}
-		},
-		{
-			"nombre": "Campera Aura Arena",
-			"precio": 55900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "campera",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 1,
-			"tags": ["campera", "abrigo", "capucha", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Arena",
-				"Material": "Frisa pesada con cierre metalico",
-				"Corte": "Regular",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar con agua fria",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Top Marea Arena",
-			"precio": 17900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg"],
-			"categoria": "top",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 4,
-			"tags": ["top", "liviano", "fresco", "verano"],
-			"detalles": {
-				"Talla": "S",
-				"Color": "Beige arena",
-				"Material": "Algodon elastizado",
-				"Corte": "Corto",
-				"Ajuste": "Ajustado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "No retorcer",
-				"Stock": "18 unidades"
-			}
-		},
-		{
-			"nombre": "Pantalon Cargo Noche",
-			"precio": 42900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 2,
-			"tags": ["cargo", "bolsillos", "urbano", "resistente"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro humo",
-				"Material": "Gabardina elastizada",
-				"Corte": "Cargo recto",
-				"Ajuste": "Relaxed",
-				"Temporada": "Todo el año",
-				"Cuidados": "Plancha tibia",
-				"Stock": "9 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Canguro Humo Azul",
-			"precio": 46500,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 9,
-			"tags": ["canguro", "capucha", "street", "algodon"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Azul humo",
-				"Material": "Frisa suave",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar a mano si es posible",
-				"Stock": "10 unidades"
-			}
-		},
-		{
-			"nombre": "Camisa Boxy Tiza",
-			"precio": 39900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "camisa",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 5,
-			"tags": ["camisa", "boxy", "minimal", "capas"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Blanco tiza",
-				"Material": "Algodon premium",
-				"Corte": "Boxy",
-				"Ajuste": "Relajado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secar colgado",
-				"Stock": "7 unidades"
-			}
-		},
-		{
-			"nombre": "Short Urbano Crema",
-			"precio": 19900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "short",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 15,
-			"tags": ["short", "verano", "ligero", "diario"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Crema",
-				"Material": "Twill liviano",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar con colores similares",
-				"Stock": "20 unidades"
-			}
-		},
-		{
-			"nombre": "Conjunto Duna Relax",
-			"precio": 68900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "conjunto",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 7,
-			"tags": ["conjunto", "relajado", "premium", "nuevo"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Duna",
-				"Material": "Frisa y algodon premium",
-				"Corte": "Relaxed fit",
-				"Ajuste": "Holgado",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar secadora",
-				"Stock": "5 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Eclipse Verde",
-			"precio": 23900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["remera", "basica", "verde", "soft"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 1,
-			"detalles": {
-				"Talla": "S",
-				"Color": "Verde oliva",
-				"Material": "Algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar a mano o programa suave",
-				"Stock": "14 unidades"
-			}
-		},
-		{
-			"nombre": "Chaleco Niebla Técnica",
-			"precio": 51900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "chaleco",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["chaleco", "ligero", "capas", "tecnico"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 4,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Gris humo",
-				"Material": "Nylon tecnico acolchado",
-				"Corte": "Recto",
-				"Ajuste": "Regular",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "No planchar sobre el acolchado",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Oversize Nube Oxidada",
-			"precio": 48900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 16,
-			"tags": ["oversize", "unisex", "urbano", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Naranja oxidado",
-				"Material": "Frisa premium con interior peinado",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar en frio y del revés",
-				"Stock": "8 unidades"
-			}
-		},
-		{
-			"nombre": "Jogger Eclipse Negro",
-			"precio": 36900,
-			"imagenes": ["imagenes/sudadera.jpg","imagenes/img.webp" ],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 5,
-			"tags": ["jogger", "basico", "comodo", "streetwear"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro lavado",
-				"Material": "Algodon con elastano",
-				"Corte": "Recto relajado",
-				"Ajuste": "Regular",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar cloro",
-				"Stock": "12 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Grafito Relieve",
-			"precio": 21900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 18,
-			"tags": ["remera", "liviana", "daily", "premium"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Grafito",
-				"Material": "Jersey de algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secado a la sombra",
-				"Stock": "15 unidades"
-			}
-		},
-		{
-			"nombre": "Campera Aura Arena",
-			"precio": 55900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "campera",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 19,
-			"tags": ["campera", "abrigo", "capucha", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Arena",
-				"Material": "Frisa pesada con cierre metalico",
-				"Corte": "Regular",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar con agua fria",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Top Marea Arena",
-			"precio": 17900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg"],
-			"categoria": "top",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 12,
-			"tags": ["top", "liviano", "fresco", "verano"],
-			"detalles": {
-				"Talla": "S",
-				"Color": "Beige arena",
-				"Material": "Algodon elastizado",
-				"Corte": "Corto",
-				"Ajuste": "Ajustado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "No retorcer",
-				"Stock": "18 unidades"
-			}
-		},
-		{
-			"nombre": "Pantalon Cargo Noche",
-			"precio": 42900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 8,
-			"tags": ["cargo", "bolsillos", "urbano", "resistente"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro humo",
-				"Material": "Gabardina elastizada",
-				"Corte": "Cargo recto",
-				"Ajuste": "Relaxed",
-				"Temporada": "Todo el año",
-				"Cuidados": "Plancha tibia",
-				"Stock": "9 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Canguro Humo Azul",
-			"precio": 46500,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 4,
-			"tags": ["canguro", "capucha", "street", "algodon"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Azul humo",
-				"Material": "Frisa suave",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar a mano si es posible",
-				"Stock": "10 unidades"
-			}
-		},
-		{
-			"nombre": "Camisa Boxy Tiza",
-			"precio": 39900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "camisa",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 2,
-			"tags": ["camisa", "boxy", "minimal", "capas"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Blanco tiza",
-				"Material": "Algodon premium",
-				"Corte": "Boxy",
-				"Ajuste": "Relajado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secar colgado",
-				"Stock": "7 unidades"
-			}
-		},
-		{
-			"nombre": "Short Urbano Crema",
-			"precio": 19900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "short",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 11,
-			"tags": ["short", "verano", "ligero", "diario"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Crema",
-				"Material": "Twill liviano",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar con colores similares",
-				"Stock": "20 unidades"
-			}
-		},
-		{
-			"nombre": "Conjunto Duna Relax",
-			"precio": 68900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "conjunto",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 3,
-			"tags": ["conjunto", "relajado", "premium", "nuevo"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Duna",
-				"Material": "Frisa y algodon premium",
-				"Corte": "Relaxed fit",
-				"Ajuste": "Holgado",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar secadora",
-				"Stock": "5 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Eclipse Verde",
-			"precio": 23900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["remera", "basica", "verde", "soft"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 13,
-			"detalles": {
-				"Talla": "S",
-				"Color": "Verde oliva",
-				"Material": "Algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar a mano o programa suave",
-				"Stock": "14 unidades"
-			}
-		},
-		{
-			"nombre": "Chaleco Niebla Técnica",
-			"precio": 51900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "chaleco",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["chaleco", "ligero", "capas", "tecnico"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 3,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Gris humo",
-				"Material": "Nylon tecnico acolchado",
-				"Corte": "Recto",
-				"Ajuste": "Regular",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "No planchar sobre el acolchado",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Oversize Nube Oxidada",
-			"precio": 48900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 11,
-			"tags": ["oversize", "unisex", "urbano", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Naranja oxidado",
-				"Material": "Frisa premium con interior peinado",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar en frio y del revés",
-				"Stock": "8 unidades"
-			}
-		},
-		{
-			"nombre": "Jogger Eclipse Negro",
-			"precio": 36900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 13,
-			"tags": ["jogger", "basico", "comodo", "streetwear"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro lavado",
-				"Material": "Algodon con elastano",
-				"Corte": "Recto relajado",
-				"Ajuste": "Regular",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar cloro",
-				"Stock": "12 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Grafito Relieve",
-			"precio": 21900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 10,
-			"tags": ["remera", "liviana", "daily", "premium"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Grafito",
-				"Material": "Jersey de algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secado a la sombra",
-				"Stock": "15 unidades"
-			}
-		},
-		{
-			"nombre": "Campera Aura Arena",
-			"precio": 55900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "campera",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 6,
-			"tags": ["campera", "abrigo", "capucha", "premium"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Arena",
-				"Material": "Frisa pesada con cierre metalico",
-				"Corte": "Regular",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar con agua fria",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Top Marea Arena",
-			"precio": 17900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg"],
-			"categoria": "top",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 20,
-			"tags": ["top", "liviano", "fresco", "verano"],
-			"detalles": {
-				"Talla": "S",
-				"Color": "Beige arena",
-				"Material": "Algodon elastizado",
-				"Corte": "Corto",
-				"Ajuste": "Ajustado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "No retorcer",
-				"Stock": "18 unidades"
-			}
-		},
-		{
-			"nombre": "Pantalon Cargo Noche",
-			"precio": 42900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 3,
-			"tags": ["cargo", "bolsillos", "urbano", "resistente"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro humo",
-				"Material": "Gabardina elastizada",
-				"Corte": "Cargo recto",
-				"Ajuste": "Relaxed",
-				"Temporada": "Todo el año",
-				"Cuidados": "Plancha tibia",
-				"Stock": "9 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Canguro Humo Azul",
-			"precio": 46500,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 19,
-			"tags": ["canguro", "capucha", "street", "algodon"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Azul humo",
-				"Material": "Frisa suave",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar a mano si es posible",
-				"Stock": "10 unidades"
-			}
-		},
-		{
-			"nombre": "Camisa Boxy Tiza",
-			"precio": 39900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "camisa",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 13,
-			"tags": ["camisa", "boxy", "minimal", "capas"],
-			"detalles": {
-				"Talla": "L",
-				"Color": "Blanco tiza",
-				"Material": "Algodon premium",
-				"Corte": "Boxy",
-				"Ajuste": "Relajado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Secar colgado",
-				"Stock": "7 unidades"
-			}
-		},
-		{
-			"nombre": "Short Urbano Crema",
-			"precio": 19900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "short",
-			"modo": "stack",
-			"enlace": "none",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 4,
-			"tags": ["short", "verano", "ligero", "diario"],
-			"detalles": {
-				"Talla": "M",
-				"Color": "Crema",
-				"Material": "Twill liviano",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar con colores similares",
-				"Stock": "20 unidades"
-			}
-		},
-		{
-			"nombre": "Conjunto Duna Relax",
-			"precio": 68900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "conjunto",
-			"modo": "encargue",
-			"enlace": "",
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 2,
-			"tags": ["conjunto", "relajado", "premium", "nuevo"],
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Duna",
-				"Material": "Frisa y algodon premium",
-				"Corte": "Relaxed fit",
-				"Ajuste": "Holgado",
-				"Temporada": "Todo el año",
-				"Cuidados": "No usar secadora",
-				"Stock": "5 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Eclipse Verde",
-			"precio": 23900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["remera", "basica", "verde", "soft"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 15,
-			"detalles": {
-				"Talla": "S",
-				"Color": "Verde oliva",
-				"Material": "Algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar a mano o programa suave",
-				"Stock": "14 unidades"
-			}
-		},
-		{
-			"nombre": "Chaleco Niebla Técnica",
-			"precio": 51900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "chaleco",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["chaleco", "ligero", "capas", "tecnico"],
-			"ventas": 50,
-			"interacciones": 120,
-			"pesoManual": 8,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Gris humo",
-				"Material": "Nylon tecnico acolchado",
-				"Corte": "Recto",
-				"Ajuste": "Regular",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "No planchar sobre el acolchado",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Vintage Hueso",
-			"precio": 22900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "remera",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["remera", "vintage", "basica", "unisex"],
-			"ventas": 38,
-			"interacciones": 95,
-			"pesoManual": 7,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Hueso",
-				"Material": "Algodon peinado",
-				"Corte": "Recto",
-				"Ajuste": "Standard",
-				"Temporada": "Todo el año",
-				"Cuidados": "Lavar a mano o programa suave",
-				"Stock": "16 unidades"
-			}
-		},
-		{
-			"nombre": "Campera Cuero Sintético Noir",
-			"precio": 72900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/images.jpg"],
-			"categoria": "campera",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["campera", "cuero", "urbano", "premium"],
-			"ventas": 22,
-			"interacciones": 80,
-			"pesoManual": 12,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Negro intenso",
-				"Material": "Cuero sintetico con forro polar",
-				"Corte": "Slim",
-				"Ajuste": "Ajustado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Limpiar con paño humedo",
-				"Stock": "4 unidades"
-			}
-		},
-		{
-			"nombre": "Pantalon Pinzado Ceniza",
-			"precio": 44900,
-			"imagenes": ["imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "pantalon",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["pantalon", "pinzado", "formal", "minimalista"],
-			"ventas": 30,
-			"interacciones": 70,
-			"pesoManual": 6,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Ceniza media",
-				"Material": "Gabardina liviana",
-				"Corte": "Recto con pinzas",
-				"Ajuste": "Regular",
-				"Temporada": "Todo el año",
-				"Cuidados": "Planchar con vapor",
-				"Stock": "11 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Cromado Noche",
-			"precio": 49900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "buzo",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["buzo", "oversize", "nocturno", "street"],
-			"ventas": 27,
-			"interacciones": 88,
-			"pesoManual": 10,
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Negro cromado",
-				"Material": "Frisa con hilo reflectivo",
-				"Corte": "Oversize",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar del reves en frio",
-				"Stock": "7 unidades"
-			}
-		},
-		{
-			"nombre": "Buzo Zen Gris Piedra",
-			"precio": 47500,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "buzo",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["buzo", "minimalista", "gris", "comodo"],
-			"ventas": 42,
-			"interacciones": 110,
-			"pesoManual": 8,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Gris piedra",
-				"Material": "Frisa suave doble cara",
-				"Corte": "Regular",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar en frio",
-				"Stock": "13 unidades"
-			}
-		},
-		{
-			"nombre": "Pantalon Sastre Carbon",
-			"precio": 53900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "pantalon",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["pantalon", "sastre", "formal", "premium"],
-			"ventas": 18,
-			"interacciones": 60,
-			"pesoManual": 9,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Carbon oscuro",
-				"Material": "Lana fria elastizada",
-				"Corte": "Recto sastre",
-				"Ajuste": "Slim regular",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar en seco recomendado",
-				"Stock": "5 unidades"
-			}
-		},
-		{
-			"nombre": "Short Cargo Musgo",
-			"precio": 24900,
-			"imagenes": ["imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "short",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["short", "cargo", "verde", "verano"],
-			"ventas": 35,
-			"interacciones": 90,
-			"pesoManual": 5,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Verde musgo",
-				"Material": "Gabardina liviana con bolsillos laterales",
-				"Corte": "Cargo medio",
-				"Ajuste": "Relaxed",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar con colores oscuros",
-				"Stock": "17 unidades"
-			}
-		},
-		{
-			"nombre": "Remera Long Pizarra",
-			"precio": 26900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg"],
-			"categoria": "remera",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["remera", "long", "layering", "urbano"],
-			"ventas": 24,
-			"interacciones": 75,
-			"pesoManual": 6,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Pizarra",
-				"Material": "Jersey pesado",
-				"Corte": "Largo asimetrico",
-				"Ajuste": "Relajado",
-				"Temporada": "Todo el año",
-				"Cuidados": "Secado a la sombra",
-				"Stock": "9 unidades"
-			}
-		},
-		{
-			"nombre": "Camisa Lino Marfil",
-			"precio": 37900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "camisa",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["camisa", "lino", "verano", "liviano"],
-			"ventas": 29,
-			"interacciones": 85,
-			"pesoManual": 7,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Marfil",
-				"Material": "Mezcla de lino y algodon",
-				"Corte": "Regular",
-				"Ajuste": "Relajado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Plancha tibia sin vapor",
-				"Stock": "10 unidades"
-			}
-		},
-		{
-			"nombre": "Chaleco Polar Glaciar",
-			"precio": 44900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp"],
-			"categoria": "chaleco",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["chaleco", "polar", "abrigo", "invierno"],
-			"ventas": 20,
-			"interacciones": 65,
-			"pesoManual": 11,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Gris glaciar",
-				"Material": "Polar double face",
-				"Corte": "Recto",
-				"Ajuste": "Regular",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "Lavar a baja temperatura",
-				"Stock": "8 unidades"
-			}
-		},
-		{
-			"nombre": "Top Rib Cobre",
-			"precio": 18900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "top",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["top", "rib", "ajustado", "verano"],
-			"ventas": 44,
-			"interacciones": 105,
-			"pesoManual": 9,
-			"detalles": {
-				"Talla": "S",
-				"Color": "Cobre terroso",
-				"Material": "Jersey acanalado elastizado",
-				"Corte": "Corto",
-				"Ajuste": "Ajustado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "No retorcer ni usar secadora",
-				"Stock": "22 unidades"
-			}
-		},
-		{
-			"nombre": "Camisa Lino Sage",
-			"precio": 38900,
-			"imagenes": ["imagenes/images.jpg", "imagenes/img.webp", "imagenes/sudadera.jpg"],
-			"categoria": "camisa",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["camisa", "lino", "sage", "minimal"],
-			"ventas": 16,
-			"interacciones": 58,
-			"pesoManual": 8,
-			"detalles": {
-				"Talla": "M",
-				"Color": "Verde sage",
-				"Material": "Lino lavado",
-				"Corte": "Boxy",
-				"Ajuste": "Relajado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "Lavar a mano frio",
-				"Stock": "6 unidades"
-			}
-		},
-		{
-			"nombre": "Conjunto Tundra Oscuro",
-			"precio": 71900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/img.webp", "imagenes/images.jpg"],
-			"categoria": "conjunto",
-			"modo": "stack",
-			"enlace": "none",
-			"tags": ["conjunto", "oscuro", "invierno", "premium"],
-			"ventas": 25,
-			"interacciones": 78,
-			"pesoManual": 14,
-			"detalles": {
-				"Talla": "XL",
-				"Color": "Pizarra oscuro",
-				"Material": "Frisa pesada premium",
-				"Corte": "Relaxed fit",
-				"Ajuste": "Holgado",
-				"Temporada": "Otoño / Invierno",
-				"Cuidados": "No usar secadora",
-				"Stock": "4 unidades"
-			}
-		},
-		{
-			"nombre": "Conjunto Cromatico Arena",
-			"precio": 69900,
-			"imagenes": ["imagenes/sudadera.jpg", "imagenes/images.jpg", "imagenes/img.webp"],
-			"categoria": "conjunto",
-			"modo": "encargue",
-			"enlace": "",
-			"tags": ["conjunto", "arena", "verano", "nuevo"],
-			"ventas": 14,
-			"interacciones": 52,
-			"pesoManual": 10,
-			"detalles": {
-				"Talla": "L",
-				"Color": "Arena natural",
-				"Material": "Algodon liviano premium",
-				"Corte": "Relaxed fit",
-				"Ajuste": "Holgado",
-				"Temporada": "Primavera / Verano",
-				"Cuidados": "No usar cloro ni secadora",
-				"Stock": "3 unidades"
-			}
-		}
-	],
-	"outfits": [
-		{
-			"id": "outfit-eclipse-urbano",
-			"nombre": "Eclipse Urbano",
-			"estilo": "Casual / Streetwear",
-			"descripcion": "Silueta oversize y caída cargo, ideal para días frescos.",
-			"imagen": "imagenes/sudadera.jpg",
-			"prendas": [
-				{ "producto": "Buzo Oversize Nube Oxidada", "puntoX": 50, "puntoY": 32, "etiqueta": "Buzo" },
-				{ "producto": "Pantalon Cargo Noche",       "puntoX": 50, "puntoY": 72, "etiqueta": "Pantalón" }
-			]
-		},
-		{
-			"id": "outfit-verano-sereno",
-			"nombre": "Verano Sereno",
-			"estilo": "Liviano / Diario",
-			"descripcion": "Tonos arena y crema para una caída fresca con corte relajado.",
-			"imagen": "imagenes/images.jpg",
-			"prendas": [
-				{ "producto": "Top Marea Arena",     "puntoX": 50, "puntoY": 30, "etiqueta": "Top" },
-				{ "producto": "Short Urbano Crema",  "puntoX": 50, "puntoY": 70, "etiqueta": "Short" }
-			]
-		},
-		{
-			"id": "outfit-layered-tiza",
-			"nombre": "Layered Tiza",
-			"estilo": "Capas / Minimal",
-			"descripcion": "Tres capas livianas para un look minimal en clima cambiante.",
-			"imagen": "imagenes/img.webp",
-			"prendas": [
-				{ "producto": "Camisa Boxy Tiza",       "puntoX": 50, "puntoY": 22, "etiqueta": "Camisa" },
-				{ "producto": "Remera Grafito Relieve", "puntoX": 50, "puntoY": 48, "etiqueta": "Remera" },
-				{ "producto": "Jogger Eclipse Negro",   "puntoX": 50, "puntoY": 78, "etiqueta": "Jogger" }
-			]
-		}
-	]
+  "productos": [
+    {
+      "nombre": "Buzo Oversize Nube Oxidada",
+      "precio": 48900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 17,
+      "tags": [
+        "oversize",
+        "unisex",
+        "urbano",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Naranja oxidado",
+        "Material": "Frisa premium con interior peinado",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Stock": "8 unidades"
+      }
+    },
+    {
+      "nombre": "Jogger Eclipse Negro",
+      "precio": 36900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 9,
+      "tags": [
+        "jogger",
+        "basico",
+        "comodo",
+        "streetwear"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro lavado",
+        "Material": "Algodon con elastano",
+        "Corte": "Recto relajado",
+        "Ajuste": "Regular",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar cloro",
+        "Stock": "12 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Grafito Relieve",
+      "precio": 21900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 1,
+      "tags": [
+        "remera",
+        "liviana",
+        "daily",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Grafito",
+        "Material": "Jersey de algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secado a la sombra",
+        "Stock": "15 unidades"
+      }
+    },
+    {
+      "nombre": "Campera Aura Arena",
+      "precio": 55900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "campera",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 1,
+      "tags": [
+        "campera",
+        "abrigo",
+        "capucha",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Arena",
+        "Material": "Frisa pesada con cierre metalico",
+        "Corte": "Regular",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar con agua fria",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Top Marea Arena",
+      "precio": 17900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 4,
+      "tags": [
+        "top",
+        "liviano",
+        "fresco",
+        "verano"
+      ],
+      "detalles": {
+        "Talla": "S",
+        "Color": "Beige arena",
+        "Material": "Algodon elastizado",
+        "Corte": "Corto",
+        "Ajuste": "Ajustado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "No retorcer",
+        "Stock": "18 unidades"
+      }
+    },
+    {
+      "nombre": "Pantalon Cargo Noche",
+      "precio": 42900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 2,
+      "tags": [
+        "cargo",
+        "bolsillos",
+        "urbano",
+        "resistente"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro humo",
+        "Material": "Gabardina elastizada",
+        "Corte": "Cargo recto",
+        "Ajuste": "Relaxed",
+        "Temporada": "Todo el año",
+        "Cuidados": "Plancha tibia",
+        "Stock": "9 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Canguro Humo Azul",
+      "precio": 46500,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 9,
+      "tags": [
+        "canguro",
+        "capucha",
+        "street",
+        "algodon"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul humo",
+        "Material": "Frisa suave",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar a mano si es posible",
+        "Stock": "10 unidades"
+      }
+    },
+    {
+      "nombre": "Camisa Boxy Tiza",
+      "precio": 39900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "camisa",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 5,
+      "tags": [
+        "camisa",
+        "boxy",
+        "minimal",
+        "capas"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Blanco tiza",
+        "Material": "Algodon premium",
+        "Corte": "Boxy",
+        "Ajuste": "Relajado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secar colgado",
+        "Stock": "7 unidades"
+      }
+    },
+    {
+      "nombre": "Short Urbano Crema",
+      "precio": 19900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "short",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 15,
+      "tags": [
+        "short",
+        "verano",
+        "ligero",
+        "diario"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Crema",
+        "Material": "Twill liviano",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar con colores similares",
+        "Stock": "20 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto Duna Relax",
+      "precio": 68900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 7,
+      "tags": [
+        "conjunto",
+        "relajado",
+        "premium",
+        "nuevo"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Duna",
+        "Material": "Frisa y algodon premium",
+        "Corte": "Relaxed fit",
+        "Ajuste": "Holgado",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar secadora",
+        "Stock": "5 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Eclipse Verde",
+      "precio": 23900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "remera",
+        "basica",
+        "verde",
+        "soft"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 1,
+      "detalles": {
+        "Talla": "S",
+        "Color": "Verde oliva",
+        "Material": "Algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar a mano o programa suave",
+        "Stock": "14 unidades"
+      }
+    },
+    {
+      "nombre": "Chaleco Niebla Técnica",
+      "precio": 51900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "chaleco",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "chaleco",
+        "ligero",
+        "capas",
+        "tecnico"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 4,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Gris humo",
+        "Material": "Nylon tecnico acolchado",
+        "Corte": "Recto",
+        "Ajuste": "Regular",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "No planchar sobre el acolchado",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Oversize Nube Oxidada",
+      "precio": 48900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 16,
+      "tags": [
+        "oversize",
+        "unisex",
+        "urbano",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Naranja oxidado",
+        "Material": "Frisa premium con interior peinado",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar en frio y del revés",
+        "Stock": "8 unidades"
+      }
+    },
+    {
+      "nombre": "Jogger Eclipse Negro",
+      "precio": 36900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 5,
+      "tags": [
+        "jogger",
+        "basico",
+        "comodo",
+        "streetwear"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro lavado",
+        "Material": "Algodon con elastano",
+        "Corte": "Recto relajado",
+        "Ajuste": "Regular",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar cloro",
+        "Stock": "12 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Grafito Relieve",
+      "precio": 21900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 18,
+      "tags": [
+        "remera",
+        "liviana",
+        "daily",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Grafito",
+        "Material": "Jersey de algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secado a la sombra",
+        "Stock": "15 unidades"
+      }
+    },
+    {
+      "nombre": "Campera Aura Arena",
+      "precio": 55900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "campera",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 19,
+      "tags": [
+        "campera",
+        "abrigo",
+        "capucha",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Arena",
+        "Material": "Frisa pesada con cierre metalico",
+        "Corte": "Regular",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar con agua fria",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Top Marea Arena",
+      "precio": 17900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 12,
+      "tags": [
+        "top",
+        "liviano",
+        "fresco",
+        "verano"
+      ],
+      "detalles": {
+        "Talla": "S",
+        "Color": "Beige arena",
+        "Material": "Algodon elastizado",
+        "Corte": "Corto",
+        "Ajuste": "Ajustado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "No retorcer",
+        "Stock": "18 unidades"
+      }
+    },
+    {
+      "nombre": "Pantalon Cargo Noche",
+      "precio": 42900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 8,
+      "tags": [
+        "cargo",
+        "bolsillos",
+        "urbano",
+        "resistente"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro humo",
+        "Material": "Gabardina elastizada",
+        "Corte": "Cargo recto",
+        "Ajuste": "Relaxed",
+        "Temporada": "Todo el año",
+        "Cuidados": "Plancha tibia",
+        "Stock": "9 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Canguro Humo Azul",
+      "precio": 46500,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 4,
+      "tags": [
+        "canguro",
+        "capucha",
+        "street",
+        "algodon"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul humo",
+        "Material": "Frisa suave",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar a mano si es posible",
+        "Stock": "10 unidades"
+      }
+    },
+    {
+      "nombre": "Camisa Boxy Tiza",
+      "precio": 39900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "camisa",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 2,
+      "tags": [
+        "camisa",
+        "boxy",
+        "minimal",
+        "capas"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Blanco tiza",
+        "Material": "Algodon premium",
+        "Corte": "Boxy",
+        "Ajuste": "Relajado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secar colgado",
+        "Stock": "7 unidades"
+      }
+    },
+    {
+      "nombre": "Short Urbano Crema",
+      "precio": 19900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "short",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 11,
+      "tags": [
+        "short",
+        "verano",
+        "ligero",
+        "diario"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Crema",
+        "Material": "Twill liviano",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar con colores similares",
+        "Stock": "20 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto Duna Relax",
+      "precio": 68900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 3,
+      "tags": [
+        "conjunto",
+        "relajado",
+        "premium",
+        "nuevo"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Duna",
+        "Material": "Frisa y algodon premium",
+        "Corte": "Relaxed fit",
+        "Ajuste": "Holgado",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar secadora",
+        "Stock": "5 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Eclipse Verde",
+      "precio": 23900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "remera",
+        "basica",
+        "verde",
+        "soft"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 13,
+      "detalles": {
+        "Talla": "S",
+        "Color": "Verde oliva",
+        "Material": "Algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar a mano o programa suave",
+        "Stock": "14 unidades"
+      }
+    },
+    {
+      "nombre": "Chaleco Niebla Técnica",
+      "precio": 51900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "chaleco",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "chaleco",
+        "ligero",
+        "capas",
+        "tecnico"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 3,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Gris humo",
+        "Material": "Nylon tecnico acolchado",
+        "Corte": "Recto",
+        "Ajuste": "Regular",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "No planchar sobre el acolchado",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Oversize Nube Oxidada",
+      "precio": 48900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 11,
+      "tags": [
+        "oversize",
+        "unisex",
+        "urbano",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Naranja oxidado",
+        "Material": "Frisa premium con interior peinado",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar en frio y del revés",
+        "Stock": "8 unidades"
+      }
+    },
+    {
+      "nombre": "Jogger Eclipse Negro",
+      "precio": 36900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 13,
+      "tags": [
+        "jogger",
+        "basico",
+        "comodo",
+        "streetwear"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro lavado",
+        "Material": "Algodon con elastano",
+        "Corte": "Recto relajado",
+        "Ajuste": "Regular",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar cloro",
+        "Stock": "12 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Grafito Relieve",
+      "precio": 21900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 10,
+      "tags": [
+        "remera",
+        "liviana",
+        "daily",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Grafito",
+        "Material": "Jersey de algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secado a la sombra",
+        "Stock": "15 unidades"
+      }
+    },
+    {
+      "nombre": "Campera Aura Arena",
+      "precio": 55900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "campera",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 6,
+      "tags": [
+        "campera",
+        "abrigo",
+        "capucha",
+        "premium"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Arena",
+        "Material": "Frisa pesada con cierre metalico",
+        "Corte": "Regular",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar con agua fria",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Top Marea Arena",
+      "precio": 17900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 20,
+      "tags": [
+        "top",
+        "liviano",
+        "fresco",
+        "verano"
+      ],
+      "detalles": {
+        "Talla": "S",
+        "Color": "Beige arena",
+        "Material": "Algodon elastizado",
+        "Corte": "Corto",
+        "Ajuste": "Ajustado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "No retorcer",
+        "Stock": "18 unidades"
+      }
+    },
+    {
+      "nombre": "Pantalon Cargo Noche",
+      "precio": 42900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 3,
+      "tags": [
+        "cargo",
+        "bolsillos",
+        "urbano",
+        "resistente"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro humo",
+        "Material": "Gabardina elastizada",
+        "Corte": "Cargo recto",
+        "Ajuste": "Relaxed",
+        "Temporada": "Todo el año",
+        "Cuidados": "Plancha tibia",
+        "Stock": "9 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Canguro Humo Azul",
+      "precio": 46500,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 19,
+      "tags": [
+        "canguro",
+        "capucha",
+        "street",
+        "algodon"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul humo",
+        "Material": "Frisa suave",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar a mano si es posible",
+        "Stock": "10 unidades"
+      }
+    },
+    {
+      "nombre": "Camisa Boxy Tiza",
+      "precio": 39900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "camisa",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 13,
+      "tags": [
+        "camisa",
+        "boxy",
+        "minimal",
+        "capas"
+      ],
+      "detalles": {
+        "Talla": "L",
+        "Color": "Blanco tiza",
+        "Material": "Algodon premium",
+        "Corte": "Boxy",
+        "Ajuste": "Relajado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Secar colgado",
+        "Stock": "7 unidades"
+      }
+    },
+    {
+      "nombre": "Short Urbano Crema",
+      "precio": 19900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "short",
+      "modo": "stack",
+      "enlace": "none",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 4,
+      "tags": [
+        "short",
+        "verano",
+        "ligero",
+        "diario"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Crema",
+        "Material": "Twill liviano",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar con colores similares",
+        "Stock": "20 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto Duna Relax",
+      "precio": 68900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "encargue",
+      "enlace": "",
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 2,
+      "tags": [
+        "conjunto",
+        "relajado",
+        "premium",
+        "nuevo"
+      ],
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Duna",
+        "Material": "Frisa y algodon premium",
+        "Corte": "Relaxed fit",
+        "Ajuste": "Holgado",
+        "Temporada": "Todo el año",
+        "Cuidados": "No usar secadora",
+        "Stock": "5 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Eclipse Verde",
+      "precio": 23900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "remera",
+        "basica",
+        "verde",
+        "soft"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 15,
+      "detalles": {
+        "Talla": "S",
+        "Color": "Verde oliva",
+        "Material": "Algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar a mano o programa suave",
+        "Stock": "14 unidades"
+      }
+    },
+    {
+      "nombre": "Chaleco Niebla Técnica",
+      "precio": 51900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "chaleco",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "chaleco",
+        "ligero",
+        "capas",
+        "tecnico"
+      ],
+      "ventas": 50,
+      "interacciones": 120,
+      "pesoManual": 8,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Gris humo",
+        "Material": "Nylon tecnico acolchado",
+        "Corte": "Recto",
+        "Ajuste": "Regular",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "No planchar sobre el acolchado",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Vintage Hueso",
+      "precio": 22900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "remera",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "remera",
+        "vintage",
+        "basica",
+        "unisex"
+      ],
+      "ventas": 38,
+      "interacciones": 95,
+      "pesoManual": 7,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Hueso",
+        "Material": "Algodon peinado",
+        "Corte": "Recto",
+        "Ajuste": "Standard",
+        "Temporada": "Todo el año",
+        "Cuidados": "Lavar a mano o programa suave",
+        "Stock": "16 unidades"
+      }
+    },
+    {
+      "nombre": "Campera Cuero Sintético Noir",
+      "precio": 72900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "campera",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "campera",
+        "cuero",
+        "urbano",
+        "premium"
+      ],
+      "ventas": 22,
+      "interacciones": 80,
+      "pesoManual": 12,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Negro intenso",
+        "Material": "Cuero sintetico con forro polar",
+        "Corte": "Slim",
+        "Ajuste": "Ajustado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Limpiar con paño humedo",
+        "Stock": "4 unidades"
+      }
+    },
+    {
+      "nombre": "Pantalon Pinzado Ceniza",
+      "precio": 44900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "pantalon",
+        "pinzado",
+        "formal",
+        "minimalista"
+      ],
+      "ventas": 30,
+      "interacciones": 70,
+      "pesoManual": 6,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Ceniza media",
+        "Material": "Gabardina liviana",
+        "Corte": "Recto con pinzas",
+        "Ajuste": "Regular",
+        "Temporada": "Todo el año",
+        "Cuidados": "Planchar con vapor",
+        "Stock": "11 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Cromado Noche",
+      "precio": 49900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "buzo",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "buzo",
+        "oversize",
+        "nocturno",
+        "street"
+      ],
+      "ventas": 27,
+      "interacciones": 88,
+      "pesoManual": 10,
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Negro cromado",
+        "Material": "Frisa con hilo reflectivo",
+        "Corte": "Oversize",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar del reves en frio",
+        "Stock": "7 unidades"
+      }
+    },
+    {
+      "nombre": "Buzo Zen Gris Piedra",
+      "precio": 47500,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "buzo",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "buzo",
+        "minimalista",
+        "gris",
+        "comodo"
+      ],
+      "ventas": 42,
+      "interacciones": 110,
+      "pesoManual": 8,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Gris piedra",
+        "Material": "Frisa suave doble cara",
+        "Corte": "Regular",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar en frio",
+        "Stock": "13 unidades"
+      }
+    },
+    {
+      "nombre": "Pantalon Sastre Carbon",
+      "precio": 53900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "pantalon",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "pantalon",
+        "sastre",
+        "formal",
+        "premium"
+      ],
+      "ventas": 18,
+      "interacciones": 60,
+      "pesoManual": 9,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Carbon oscuro",
+        "Material": "Lana fria elastizada",
+        "Corte": "Recto sastre",
+        "Ajuste": "Slim regular",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar en seco recomendado",
+        "Stock": "5 unidades"
+      }
+    },
+    {
+      "nombre": "Short Cargo Musgo",
+      "precio": 24900,
+      "imagenes": [
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "short",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "short",
+        "cargo",
+        "verde",
+        "verano"
+      ],
+      "ventas": 35,
+      "interacciones": 90,
+      "pesoManual": 5,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Verde musgo",
+        "Material": "Gabardina liviana con bolsillos laterales",
+        "Corte": "Cargo medio",
+        "Ajuste": "Relaxed",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar con colores oscuros",
+        "Stock": "17 unidades"
+      }
+    },
+    {
+      "nombre": "Remera Long Pizarra",
+      "precio": 26900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "remera",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "remera",
+        "long",
+        "layering",
+        "urbano"
+      ],
+      "ventas": 24,
+      "interacciones": 75,
+      "pesoManual": 6,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Pizarra",
+        "Material": "Jersey pesado",
+        "Corte": "Largo asimetrico",
+        "Ajuste": "Relajado",
+        "Temporada": "Todo el año",
+        "Cuidados": "Secado a la sombra",
+        "Stock": "9 unidades"
+      }
+    },
+    {
+      "nombre": "Camisa Lino Marfil",
+      "precio": 37900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "camisa",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "camisa",
+        "lino",
+        "verano",
+        "liviano"
+      ],
+      "ventas": 29,
+      "interacciones": 85,
+      "pesoManual": 7,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Marfil",
+        "Material": "Mezcla de lino y algodon",
+        "Corte": "Regular",
+        "Ajuste": "Relajado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Plancha tibia sin vapor",
+        "Stock": "10 unidades"
+      }
+    },
+    {
+      "nombre": "Chaleco Polar Glaciar",
+      "precio": 44900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "chaleco",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "chaleco",
+        "polar",
+        "abrigo",
+        "invierno"
+      ],
+      "ventas": 20,
+      "interacciones": 65,
+      "pesoManual": 11,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Gris glaciar",
+        "Material": "Polar double face",
+        "Corte": "Recto",
+        "Ajuste": "Regular",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "Lavar a baja temperatura",
+        "Stock": "8 unidades"
+      }
+    },
+    {
+      "nombre": "Top Rib Cobre",
+      "precio": 18900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "top",
+        "rib",
+        "ajustado",
+        "verano"
+      ],
+      "ventas": 44,
+      "interacciones": 105,
+      "pesoManual": 9,
+      "detalles": {
+        "Talla": "S",
+        "Color": "Cobre terroso",
+        "Material": "Jersey acanalado elastizado",
+        "Corte": "Corto",
+        "Ajuste": "Ajustado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "No retorcer ni usar secadora",
+        "Stock": "22 unidades"
+      }
+    },
+    {
+      "nombre": "Camisa Lino Sage",
+      "precio": 38900,
+      "imagenes": [
+        "imagenes/images.jpg",
+        "imagenes/img.webp",
+        "imagenes/sudadera.jpg"
+      ],
+      "categoria": "camisa",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "camisa",
+        "lino",
+        "sage",
+        "minimal"
+      ],
+      "ventas": 16,
+      "interacciones": 58,
+      "pesoManual": 8,
+      "detalles": {
+        "Talla": "M",
+        "Color": "Verde sage",
+        "Material": "Lino lavado",
+        "Corte": "Boxy",
+        "Ajuste": "Relajado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "Lavar a mano frio",
+        "Stock": "6 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto Tundra Oscuro",
+      "precio": 71900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/img.webp",
+        "imagenes/images.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "conjunto",
+        "oscuro",
+        "invierno",
+        "premium"
+      ],
+      "ventas": 25,
+      "interacciones": 78,
+      "pesoManual": 14,
+      "detalles": {
+        "Talla": "XL",
+        "Color": "Pizarra oscuro",
+        "Material": "Frisa pesada premium",
+        "Corte": "Relaxed fit",
+        "Ajuste": "Holgado",
+        "Temporada": "Otoño / Invierno",
+        "Cuidados": "No usar secadora",
+        "Stock": "4 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto Cromatico Arena",
+      "precio": 69900,
+      "imagenes": [
+        "imagenes/sudadera.jpg",
+        "imagenes/images.jpg",
+        "imagenes/img.webp"
+      ],
+      "categoria": "conjunto",
+      "modo": "encargue",
+      "enlace": "",
+      "tags": [
+        "conjunto",
+        "arena",
+        "verano",
+        "nuevo"
+      ],
+      "ventas": 14,
+      "interacciones": 52,
+      "pesoManual": 10,
+      "detalles": {
+        "Talla": "L",
+        "Color": "Arena natural",
+        "Material": "Algodon liviano premium",
+        "Corte": "Relaxed fit",
+        "Ajuste": "Holgado",
+        "Temporada": "Primavera / Verano",
+        "Cuidados": "No usar cloro ni secadora",
+        "Stock": "3 unidades"
+      }
+    },
+    {
+      "nombre": "Conjunto de Top y Short",
+      "precio": 7000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779826216/levitad/vrmlnwabec3x5zivbnsk.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/v1779826765/levitad/an2r2hbwzbss4xzbakmb.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "#veraniego"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Carmelita"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 0
+    }
+  ],
+  "outfits": [
+    {
+      "id": "outfit-eclipse-urbano",
+      "nombre": "Eclipse Urbano",
+      "estilo": "Casual / Streetwear",
+      "descripcion": "Silueta oversize y caída cargo, ideal para días frescos.",
+      "imagen": "imagenes/sudadera.jpg",
+      "prendas": [
+        {
+          "producto": "Buzo Oversize Nube Oxidada",
+          "puntoX": 50,
+          "puntoY": 32,
+          "etiqueta": "Buzo"
+        },
+        {
+          "producto": "Pantalon Cargo Noche",
+          "puntoX": 50,
+          "puntoY": 72,
+          "etiqueta": "Pantalón"
+        }
+      ]
+    },
+    {
+      "id": "outfit-verano-sereno",
+      "nombre": "Verano Sereno",
+      "estilo": "Liviano / Diario",
+      "descripcion": "Tonos arena y crema para una caída fresca con corte relajado.",
+      "imagen": "imagenes/images.jpg",
+      "prendas": [
+        {
+          "producto": "Top Marea Arena",
+          "puntoX": 50,
+          "puntoY": 30,
+          "etiqueta": "Top"
+        },
+        {
+          "producto": "Short Urbano Crema",
+          "puntoX": 50,
+          "puntoY": 70,
+          "etiqueta": "Short"
+        }
+      ]
+    },
+    {
+      "id": "outfit-layered-tiza",
+      "nombre": "Layered Tiza",
+      "estilo": "Capas / Minimal",
+      "descripcion": "Tres capas livianas para un look minimal en clima cambiante.",
+      "imagen": "imagenes/img.webp",
+      "prendas": [
+        {
+          "producto": "Camisa Boxy Tiza",
+          "puntoX": 50,
+          "puntoY": 22,
+          "etiqueta": "Camisa"
+        },
+        {
+          "producto": "Remera Grafito Relieve",
+          "puntoX": 50,
+          "puntoY": 48,
+          "etiqueta": "Remera"
+        },
+        {
+          "producto": "Jogger Eclipse Negro",
+          "puntoX": 50,
+          "puntoY": 78,
+          "etiqueta": "Jogger"
+        }
+      ]
+    }
+  ]
 }
