@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<!-- CSP estricta: solo conexiones a la API de GitHub, sin scripts inline ajenos, sin object/embed. -->
+<!-- CSP estricta: solo conexiones a GitHub y Cloudinary (widget de subida), sin scripts inline ajenos, sin object/embed. -->
 <meta http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+      content="default-src 'self'; script-src 'self' https://upload-widget.cloudinary.com https://widget.cloudinary.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; connect-src 'self' https://api.github.com https://api.cloudinary.com; frame-src https://upload-widget.cloudinary.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
 <title>Lévitad — Panel</title>
 <style>
     :root {
@@ -258,6 +258,7 @@
 <!-- ─── Contenedor de avisos ─── -->
 <div class="aviso-cont" id="aviso-cont" aria-live="polite"></div>
 
+<script src="https://upload-widget.cloudinary.com/global/all.js"></script>
 <script defer src="js/admin.js"></script>
 </body>
 </html>

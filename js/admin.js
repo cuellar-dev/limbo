@@ -11,6 +11,12 @@ const TEMA_KEY    = 'levitad-admin-tema';
 
 const API = 'https://api.github.com';
 
+const CLOUDINARY = {
+    cloudName:    'ddhwh86yd',
+    uploadPreset: 'levitad_unsigned',
+    folder:       'levitad'
+};
+
 /* ─── Utilidades ─── */
 function esc(s) {
     if (s === null || s === undefined) return '';
@@ -284,6 +290,73 @@ function engancharErrorImagenes(cont) {
     });
 }
 
+/* ─── Cloudinary: subida de imágenes desde el navegador (unsigned) ─── */
+function abrirSubidorCloudinary({ multiple = true } = {}, onUrl) {
+    if (typeof cloudinary === 'undefined' || !cloudinary.createUploadWidget) {
+        aviso('error', 'Subidor no disponible', 'No se cargó el widget de Cloudinary. Revisa tu conexión y recarga.');
+        return;
+    }
+    const widget = cloudinary.createUploadWidget({
+        cloudName:           CLOUDINARY.cloudName,
+        uploadPreset:        CLOUDINARY.uploadPreset,
+        folder:              CLOUDINARY.folder,
+        multiple,
+        sources:             ['local', 'camera', 'url'],
+        defaultSource:       'local',
+        cropping:            false,
+        showAdvancedOptions: false,
+        clientAllowedFormats:['jpg', 'jpeg', 'png', 'webp', 'avif', 'heic'],
+        maxFileSize:         10 * 1024 * 1024,  // 10 MB antes de la optimización
+        language:            'es',
+        text: {
+            es: {
+                or:           'o',
+                menu: {
+                    files:    'Mi dispositivo',
+                    camera:   'Cámara',
+                    url:      'URL'
+                },
+                local: {
+                    browse:   'Elegir archivo',
+                    dd_title_single: 'Arrastra una foto aquí',
+                    dd_title_multi:  'Arrastra fotos aquí'
+                }
+            }
+        },
+        styles: {
+            palette: {
+                window:         '#141a29',
+                sourceBg:       '#1b2233',
+                windowBorder:   '#caac47',
+                tabIcon:        '#caac47',
+                inactiveTabIcon:'#9BA4B5',
+                menuIcons:      '#caac47',
+                link:           '#caac47',
+                action:         '#caac47',
+                inProgress:     '#caac47',
+                complete:       '#3ecf8e',
+                error:          '#e5484d',
+                textDark:       '#0a0d18',
+                textLight:      '#E2E2E2'
+            }
+        }
+    }, (error, result) => {
+        if (error) {
+            aviso('error', 'Error al subir', (error && error.message) || 'No se pudo subir la imagen.');
+            return;
+        }
+        if (!result) return;
+        if (result.event === 'success') {
+            const url = result.info && result.info.secure_url;
+            if (url && typeof onUrl === 'function') onUrl(url);
+        }
+        if (result.event === 'queues-end') {
+            aviso('exito', 'Subida lista', 'Las URLs se añadieron al campo de imágenes.');
+        }
+    });
+    widget.open();
+}
+
 function formatPrecio(p) {
     const n = Number(p) || 0;
     return '$' + n.toLocaleString('es-DO');
@@ -354,7 +427,8 @@ function abrirEditorProducto(indice) {
         <div class="campo">
             <label>Imágenes (una URL por línea) *</label>
             <textarea id="f-imagenes" placeholder="https://imagen1.jpg&#10;https://imagen2.jpg">${esc((p.imagenes || []).join('\n'))}</textarea>
-            <div class="ayuda">Pega aquí las URLs de las fotos. La primera es la principal. Usa un servicio como Cloudinary o ImgBB.</div>
+            <button id="btn-subir-img" class="btn-detalle-add" type="button">📤 Subir foto(s) a Cloudinary</button>
+            <div class="ayuda">Sube desde tu dispositivo o pega URLs a mano. La primera imagen es la principal. Cloudinary las optimiza solo (WebP, máx. 1200px).</div>
         </div>
 
         <div class="campo">
@@ -383,6 +457,14 @@ function abrirEditorProducto(indice) {
         engancharBorrarDetalle(card);
     });
     engancharBorrarDetalle(card);
+
+    card.querySelector('#btn-subir-img').addEventListener('click', () => {
+        abrirSubidorCloudinary({ multiple: true }, (url) => {
+            const ta = card.querySelector('#f-imagenes');
+            const sep = ta.value && !ta.value.endsWith('\n') ? '\n' : '';
+            ta.value += sep + url;
+        });
+    });
 
     card.querySelector('#btn-cancelar').addEventListener('click', cerrarModal);
     card.querySelector('#btn-aplicar').addEventListener('click', () => {
@@ -520,7 +602,11 @@ function abrirEditorOutfit(indice) {
         <div class="campo"><label>Nombre *</label><input id="o-nombre" type="text" value="${esc(o.nombre)}" required></div>
         <div class="campo"><label>Estilo</label><input id="o-estilo" type="text" value="${esc(o.estilo)}" placeholder="Casual / Streetwear..."></div>
         <div class="campo"><label>Descripción</label><textarea id="o-desc" style="font-family:inherit;font-size:13.5px;">${esc(o.descripcion)}</textarea></div>
-        <div class="campo"><label>Imagen principal (URL)</label><input id="o-img" type="text" value="${esc(o.imagen)}" placeholder="https://..."></div>
+        <div class="campo">
+            <label>Imagen principal (URL)</label>
+            <input id="o-img" type="text" value="${esc(o.imagen)}" placeholder="https://...">
+            <button id="btn-subir-img-out" class="btn-detalle-add" type="button" style="margin-top:6px">📤 Subir foto a Cloudinary</button>
+        </div>
         <div class="campo">
             <label>Prendas del outfit</label>
             <div id="o-prendas" class="detalles-list">${prendasHTML}</div>
@@ -534,6 +620,11 @@ function abrirEditorOutfit(indice) {
     `;
 
     engancharPrendaBorrar(card);
+    card.querySelector('#btn-subir-img-out').addEventListener('click', () => {
+        abrirSubidorCloudinary({ multiple: false }, (url) => {
+            card.querySelector('#o-img').value = url;
+        });
+    });
     card.querySelector('#btn-add-prenda').addEventListener('click', () => {
         card.querySelector('#o-prendas').insertAdjacentHTML('beforeend', filaPrenda({}));
         engancharPrendaBorrar(card);
