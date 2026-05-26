@@ -348,13 +348,22 @@ function abrirSubidorCloudinary({ multiple = true } = {}, onUrl) {
         if (!result) return;
         if (result.event === 'success') {
             const url = result.info && result.info.secure_url;
-            if (url && typeof onUrl === 'function') onUrl(url);
+            if (url && typeof onUrl === 'function') onUrl(optimizarUrlCloudinary(url));
         }
         if (result.event === 'queues-end') {
             aviso('exito', 'Subida lista', 'Las URLs se añadieron al campo de imágenes.');
         }
     });
     widget.open();
+}
+
+// Inserta `f_auto,q_auto` en la URL para que Cloudinary entregue WebP/AVIF
+// al navegador que lo soporte (en vez de servir el .jpg/.png original).
+// Si la URL ya trae transformaciones, no la duplica.
+function optimizarUrlCloudinary(url) {
+    if (typeof url !== 'string' || !url.includes('res.cloudinary.com')) return url;
+    if (url.includes('/upload/f_auto') || url.includes(',f_auto')) return url;
+    return url.replace('/upload/', '/upload/f_auto,q_auto/');
 }
 
 function formatPrecio(p) {
@@ -438,6 +447,12 @@ function abrirEditorProducto(indice) {
             <div class="ayuda">Por ejemplo: Talla → XL, Color → Naranja, Material → Algodón, Stock → 8 unidades.</div>
         </div>
 
+        <div class="campo">
+            <label>Peso manual (0–20)</label>
+            <input id="f-peso-manual" type="number" min="0" step="1" value="${Number(p.pesoManual) || 0}">
+            <div class="ayuda">Empuje extra para que el producto aparezca antes en "Más vendidos" y recomendaciones. 0 = neutral, 20 = máximo destacado.</div>
+        </div>
+
         <div class="modal-acciones">
             <button class="btn-secundario" id="btn-cancelar" type="button">Cancelar</button>
             <button class="btn-confirmar"  id="btn-aplicar"  type="button">${esNuevo ? 'Crear' : 'Aplicar cambios'}</button>
@@ -468,7 +483,7 @@ function abrirEditorProducto(indice) {
 
     card.querySelector('#btn-cancelar').addEventListener('click', cerrarModal);
     card.querySelector('#btn-aplicar').addEventListener('click', () => {
-        const nuevo = leerFormularioProducto(card);
+        const nuevo = leerFormularioProducto(card, esNuevo ? null : state.data.productos[indice]);
         if (!nuevo) return;
         if (esNuevo) state.data.productos.push(nuevo);
         else state.data.productos[indice] = nuevo;
@@ -498,7 +513,7 @@ function engancharBorrarDetalle(card) {
     });
 }
 
-function leerFormularioProducto(card) {
+function leerFormularioProducto(card, existente) {
     const nombre = card.querySelector('#f-nombre').value.trim();
     const precio = Number(card.querySelector('#f-precio').value);
     if (!nombre)        { aviso('error', 'Falta el nombre', 'El producto necesita un nombre.'); return null; }
@@ -516,6 +531,8 @@ function leerFormularioProducto(card) {
         const v = r.querySelector('.d-v').value.trim();
         if (k) detalles[k] = v;
     });
+    const pesoManualRaw = Number(card.querySelector('#f-peso-manual')?.value);
+    const pesoManual    = Number.isFinite(pesoManualRaw) && pesoManualRaw >= 0 ? pesoManualRaw : 0;
     return {
         nombre,
         precio,
@@ -525,9 +542,11 @@ function leerFormularioProducto(card) {
         enlace,
         tags,
         detalles,
-        ventas: 0,
-        interacciones: 0,
-        pesoManual: 0
+        // Preservar contadores acumulados del producto existente (si se está editando).
+        // Sin esto, cada edición reseteaba ventas/interacciones a 0.
+        ventas:        existente ? (Number(existente.ventas) || 0)        : 0,
+        interacciones: existente ? (Number(existente.interacciones) || 0) : 0,
+        pesoManual
     };
 }
 

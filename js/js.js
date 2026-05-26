@@ -1611,11 +1611,18 @@ function abrirModalFiltros() {
 	});
 
 	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-active')));
+
+	// Bloquear scroll del body mientras el modal está abierto.
+	// Guardamos el overflow previo para restaurarlo exactamente al cerrar.
+	el.dataset.bodyOverflow = document.body.style.overflow || '';
+	document.body.style.overflow = 'hidden';
 }
 
 function cerrarModalFiltros() {
 	const el = document.getElementById('modal-filtros');
 	if (!el) return;
+	// Restaurar scroll del body al cerrar.
+	document.body.style.overflow = el.dataset.bodyOverflow || '';
 	el.classList.add('is-closing');
 	setTimeout(() => el.remove(), 350);
 }
@@ -2415,9 +2422,12 @@ if (header) {
 				// Buscador: al dispararse la animación del header se cierra la
 				// barra conservando la búsqueda (texto + resultados), para que
 				// al volver arriba el header muestre alas + nav con normalidad.
+				// Pero si el input tiene el foco (usuario escribiendo), no lo cerramos:
+				// el teclado virtual provoca scroll y eso disparaba un cierre falso.
 				if (searchBar && p > 0.2 &&
 					searchBar.classList.contains('is-active') &&
-					!searchBar.classList.contains('is-closing')) {
+					!searchBar.classList.contains('is-closing') &&
+					document.activeElement?.id !== 'search-input') {
 					ocultarBuscadorConservandoBusqueda();
 				}
 
