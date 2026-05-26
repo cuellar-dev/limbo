@@ -30,7 +30,21 @@ const MENSAJE_SIN_RESULTADOS       = 'No se encontraron resultados.';
 const STORAGE_KEY_CARRITO          = 'levitad-carrito';
 const STORAGE_KEY_CARRITO_ENCARGUE = 'levitad-carrito-encargue';
 const STORAGE_KEY_MODAL_ENCARGUE   = 'levitad-modal-encargue-visto';
+const STORAGE_KEY_ULTIMO_PEDIDO    = 'levitad-ultimo-pedido';
+const PEDIDO_COOLDOWN_MS           = 3 * 60 * 1000; // 3 minutos entre pedidos
 const WHATSAPP_OWNER_NUMBER        = '+5359271359';
+
+/* ─── DUEÑOS / DESTINATARIOS DEL PEDIDO ───
+   REEMPLAZA por los datos reales:
+   - telefono: solo dígitos con código de país, SIN el signo +  (ej: 5359271359)
+   - foto: archivo dentro de imagenes/  (pon ahí las fotos reales)            */
+const DUENOS = [
+	{ nombre: 'Angel',   genero: 'hombre', telefono: '5300000000', foto: 'imagenes/dueno.jpg' },{ nombre: 'Erika', genero: 'mujer',  telefono: '5359271359', foto: 'imagenes/duena.jpg' }
+];
+// En local (Live Server) usa el PocketBase de tu PC; en producción (GitHub Pages) usa el público.
+const POCKETBASE_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+	? 'http://127.0.0.1:8090'
+	: 'https://levitad.pockethost.io'; // producción: cambiar cuando resuelvas el hosting público
 
 /* ─── ICONOS ─── */
 const iconoCarrito = `
@@ -87,6 +101,67 @@ const formatPrecio = (precio) => {
 	return `$${valor.toLocaleString('es-DO')}`;
 };
 
+/* Escape para inyecciones seguras dentro de innerHTML.
+   Cualquier string que provenga de datos.json o del usuario debe pasar por aquí. */
+function esc(s) {
+	if (s === null || s === undefined) return '';
+	return String(s)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
+}
+
+/* ─── AVISOS / TOASTS ─── */
+function mostrarAviso(tipo, mensaje, titulo) {
+	const ICONOS = {
+		exito:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12.5 11 15.5 16 9"/></svg>',
+		error:       '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+		advertencia: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
+	};
+	const t = ICONOS[tipo] ? tipo : 'advertencia';
+
+	let cont = document.querySelector('.aviso-container');
+	if (!cont) {
+		cont = document.createElement('div');
+		cont.className = 'aviso-container';
+		document.body.appendChild(cont);
+	}
+
+	const el = document.createElement('div');
+	el.className = `aviso aviso--${t}`;
+	el.innerHTML = `
+		<span class="aviso-icono">${ICONOS[t]}</span>
+		<div class="aviso-cuerpo">
+			${titulo ? '<span class="aviso-titulo"></span>' : ''}
+			<span class="aviso-texto"></span>
+		</div>
+		<button class="aviso-cerrar" type="button" aria-label="Cerrar aviso">✕</button>
+	`;
+	if (titulo) el.querySelector('.aviso-titulo').textContent = titulo;
+	el.querySelector('.aviso-texto').textContent = mensaje;
+	cont.appendChild(el);
+
+	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-visible')));
+
+	let cerrado = false;
+	const cerrar = () => {
+		if (cerrado) return;
+		cerrado = true;
+		clearTimeout(timer);
+		el.classList.remove('is-visible');
+		el.classList.add('is-saliendo');
+		setTimeout(() => {
+			el.remove();
+			if (cont && !cont.children.length) cont.remove();
+		}, 380);
+	};
+
+	el.querySelector('.aviso-cerrar').addEventListener('click', cerrar);
+	const timer = setTimeout(cerrar, 4000);
+}
+
 /* ─── CAMBIO 4: helpers para saber qué carrito usar ─── */
 function modoActual() {
 	return document.body.classList.contains('is-encargue') ? 'encargue' : 'stack';
@@ -142,7 +217,7 @@ const CARRITO_TEXTOS = {
 		subtitulo: 'Alimente su Outfit',
 		vacio:     'Aún no elegiste nada para encargar.\nSelecciona las prendas que quiera encargar',
 		vacioBadge:'✦',
-		whatsapp:  'Enviar Encargue por WhatsApp',
+		whatsapp:  'Enviar encargo vía WhatsApp',
 		nota:      'Coordinamos cada detalle juntos.'
 	}
 };
@@ -192,16 +267,24 @@ function renderizarCarrito() {
 			btnWhatsApp.style.opacity = "1";
 			btnWhatsApp.style.cursor = "pointer";
 		}
-		lista.innerHTML = carrito.map((item, index) => `
-			<li class="carrito-item" data-carrito-index="${index}">
-				<img class="carrito-item-img" src="${item.imagen || (estadoTienda.productos.find(p => p.nombre === item.nombre)?.imagenes?.[0]) || ''}" alt="${item.nombre}">
-				<div class="carrito-item-info">
-					<span class="carrito-item-nombre">${item.nombre}</span>
-					<span class="carrito-item-precio">${formatPrecio(item.precio)}</span>
-				</div>
-				<button class="carrito-item-eliminar" type="button" aria-label="Eliminar ${item.nombre}">✕</button>
-			</li>
-		`).join('');
+		lista.innerHTML = carrito.map((item, index) => {
+			const nombreEsc = esc(item.nombre);
+			const imgEsc = esc(
+				item.imagen ||
+				(estadoTienda.productos.find(p => p.nombre === item.nombre)?.imagenes?.[0]) ||
+				''
+			);
+			return `
+				<li class="carrito-item" data-carrito-index="${index}" role="button" tabindex="0" aria-label="Ver detalles de ${nombreEsc}">
+					<img class="carrito-item-img" src="${imgEsc}" alt="${nombreEsc}">
+					<div class="carrito-item-info">
+						<span class="carrito-item-nombre">${nombreEsc}</span>
+						<span class="carrito-item-precio">${formatPrecio(item.precio)}</span>
+					</div>
+					<button class="carrito-item-eliminar" type="button" aria-label="Eliminar ${nombreEsc}">✕</button>
+				</li>
+			`;
+		}).join('');
 	}
 
 	total.textContent = formatPrecio(obtenerTotalCarrito());
@@ -214,7 +297,7 @@ function renderizarCarrito() {
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
-		const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 		if (!producto) return;
 		if (obtenerProductoEnCarrito(producto.nombre)) {
 			marcarBotonComoAgregado(btn, isEncargue);
@@ -233,6 +316,7 @@ function abrirCarrito() {
 	panel.classList.add('is-active');
 	overlay.setAttribute('aria-hidden', 'false');
 	panel.setAttribute('aria-hidden',   'false');
+	enfocarModal(panel);
 }
 
 function cerrarCarrito() {
@@ -316,7 +400,8 @@ function agregarAlCarrito(producto, boton) {
 	carritoActivo().push({
 		nombre: producto.nombre,
 		precio: Number(producto.precio) || 0,
-		imagen: (Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen || ''
+		imagen: (Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen || '',
+		enlace: producto.enlace || 'none'
 	});
 
 	const isEncargue = modoActual() === 'encargue';
@@ -351,7 +436,7 @@ function desmarcarProductoEnGrid(nombre) {
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
-		const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 		if (producto && producto.nombre === nombre) {
 			desmarcarBotonAgregado(btn, isEncargue);
 		}
@@ -376,7 +461,7 @@ function vaciarCarrito() {
 				document.querySelectorAll('.btn-anadir').forEach(btn => {
 					const tarjeta = btn.closest('.tarjeta-producto');
 					if (!tarjeta) return;
-					const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+					const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 					if (producto && producto.nombre === item.nombre) {
 						desmarcarBotonAgregado(btn, isEncargue);
 					}
@@ -392,35 +477,192 @@ function vaciarCarrito() {
 }
 
 function construirMensajeWhatsApp() {
-	const carrito = carritoActivo();
+	const carrito    = carritoActivo();
+	const esEncargue = modoActual() === 'encargue';
+
 	if (!carrito.length) {
-		return 'Hola Lévitad quiero comprar estos productos:\n\nDonde podemos quedar para hacer ver el producto y realizar la compra?';
+		return esEncargue
+			? 'Hola Lévitad, quisiera encargar unas prendas. Cuando puedas me dices, gracias.'
+			: 'Hola Lévitad, ando viendo unas prendas. Cuando puedas me avisas, dale.';
 	}
-	const productosTexto = carrito.map(item => `${item.nombre} ${formatPrecio(item.precio)}`).join(' ');
-	return `Hola Lévitad quiero comprar estos productos:\n${productosTexto}\n\nDonde podemos quedar para hacer ver el producto y realizar la compra?`;
+
+	if (esEncargue) {
+		const lineas = carrito.map(item => {
+			const enlace = (item.enlace && item.enlace !== 'none')
+				? `\n  Enlace: ${item.enlace}`
+				: '';
+			return `- ${item.nombre} (${formatPrecio(item.precio)})${enlace}`;
+		}).join('\n');
+		return `Hola Lévitad, quisiera encargar estas prendas:\n${lineas}\n\n¿Cómo coordinamos el encargo? Gracias.`;
+	}
+
+	const lineas = carrito.map(item => `- ${item.nombre} (${formatPrecio(item.precio)})`).join('\n');
+	return `Hola Lévitad, me interesan estas prendas:\n${lineas}\n\n¿Dónde podemos vernos para verlas? Gracias.`;
 }
 
-function enviarPedidoWhatsApp() {
+async function enviarPedidoWhatsApp(numero) {
 	if (carritoActivo().length === 0) return;
-	const url = `https://wa.me/${WHATSAPP_OWNER_NUMBER}?text=${encodeURIComponent(construirMensajeWhatsApp())}`;
+	const tel = numero || DUENOS[0].telefono;
+
+	// El pedido va directo por WhatsApp; el mensaje ES el registro del pedido para el dueño.
+	const url = `https://wa.me/${tel}?text=${encodeURIComponent(construirMensajeWhatsApp())}`;
+
+	// Vaciar el carrito del modo activo (el pedido ya se envió)
+	carritoActivo().length = 0;
+	guardarCarrito();
+	renderizarCarrito();
+
+	// Marca para el cooldown: bloquea reenviar otro pedido durante PEDIDO_COOLDOWN_MS
+	localStorage.setItem(STORAGE_KEY_ULTIMO_PEDIDO, String(Date.now()));
+
+	// El aviso de éxito se muestra cuando el usuario VUELVE a la web (no ahora,
+	// porque al abrir WhatsApp se va de la página y no lo vería)
+	sessionStorage.setItem('levitad-pedido-ok', '1');
+
 	window.open(url, '_blank', 'noopener,noreferrer');
 }
 
+const ICONO_GENERO = {
+	mujer:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><line x1="12" y1="13" x2="12" y2="22"/><line x1="9" y1="18.5" x2="15" y2="18.5"/></svg>',
+	hombre: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="14" r="6"/><line x1="14.5" y1="9.5" x2="20.5" y2="3.5"/><polyline points="15 3.5 20.5 3.5 20.5 9"/></svg>'
+};
+const ICONO_WA = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 2.1.55 4.1 1.6 5.88L2 22l4.33-1.7a9.9 9.9 0 0 0 5.7 1.46h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm5.8 14.13c-.25.7-1.44 1.33-1.99 1.36-.53.04-1.02.23-3.43-.72-2.9-1.14-4.76-4.1-4.9-4.29-.14-.19-1.18-1.57-1.18-2.99 0-1.42.74-2.12 1-2.41.26-.29.57-.36.76-.36h.55c.18.01.42-.07.65.5.25.6.84 2.07.91 2.22.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.53 1.9 1.05.94 1.94 1.23 2.22 1.37.28.14.44.12.6-.07.16-.19.69-.8.87-1.08.18-.28.36-.23.6-.14.25.09 1.59.75 1.86.89.28.14.46.21.53.33.07.12.07.69-.18 1.39Z"/></svg>';
+
+function abrirSelectorDueno() {
+	if (carritoActivo().length === 0) return;
+	if (document.getElementById('dueno-sheet')) return;
+
+	const restante = PEDIDO_COOLDOWN_MS - (Date.now() - (Number(localStorage.getItem(STORAGE_KEY_ULTIMO_PEDIDO)) || 0));
+	if (restante > 0) {
+		const totalSeg = Math.ceil(restante / 1000);
+		const min = Math.floor(totalSeg / 60);
+		const seg = totalSeg % 60;
+		mostrarAviso(
+			'advertencia',
+			`Ya hizo un pedido casi ahora, puede volverlo a hacer en ${min} minuto/s y ${String(seg).padStart(2, '0')} segundos`,
+			'Ya realizó un pedido'
+		);
+		return;
+	}
+
+	const el = document.createElement('div');
+	el.id        = 'dueno-sheet';
+	el.className = 'dueno-sheet-overlay';
+	el.setAttribute('role', 'dialog');
+	el.setAttribute('aria-modal', 'true');
+	el.setAttribute('aria-label', 'Elige a quién enviar el pedido');
+
+	const opciones = DUENOS.map(d => `
+		<button class="dueno-opcion" type="button" data-tel="${d.telefono}">
+			<span class="dueno-foto">
+				<img src="${d.foto}" alt="${d.nombre}" loading="lazy"
+					onerror="this.style.display='none';this.parentNode.classList.add('sin-foto')">
+			</span>
+			<span class="dueno-info">
+				<span class="dueno-nombre">${d.nombre}</span>
+				<span class="dueno-genero dueno-genero--${d.genero}">
+					<span class="dueno-genero-ic">${ICONO_GENERO[d.genero] || ''}</span>
+					${d.genero === 'mujer' ? 'Mujer' : 'Hombre'}
+				</span>
+			</span>
+			<span class="dueno-wa">${ICONO_WA}</span>
+		</button>
+	`).join('');
+
+	el.innerHTML = `
+		<div class="dueno-sheet">
+			<span class="dueno-sheet-handle"></span>
+			<button class="dueno-sheet-cerrar" type="button" aria-label="Cerrar">✕</button>
+			<h2 class="dueno-sheet-titulo">¿Con quién quieres coordinar?</h2>
+			<p class="dueno-sheet-sub">Elige a quién enviarle tu pedido vía WhatsApp, según si prefieras un trato masculino o femenino para cerrar la compra.</p>
+			<div class="dueno-opciones">${opciones}</div>
+		</div>
+	`;
+
+	document.body.appendChild(el);
+
+	let cerrado = false;
+	const cerrar = () => {
+		if (cerrado) return;
+		cerrado = true;
+		el.classList.add('is-closing');
+		document.removeEventListener('keydown', onEsc);
+		setTimeout(() => el.remove(), 420);
+	};
+	const onEsc = e => { if (e.key === 'Escape') cerrar(); };
+
+	el.querySelector('.dueno-sheet-cerrar').addEventListener('click', cerrar);
+	el.addEventListener('click', e => { if (e.target === el) cerrar(); });
+	document.addEventListener('keydown', onEsc);
+
+	el.querySelectorAll('.dueno-opcion').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const tel = btn.dataset.tel;
+			cerrar();
+			enviarPedidoWhatsApp(tel);
+		});
+	});
+
+	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-active')));
+	enfocarModal(el, el.querySelector('.dueno-opcion'));
+}
+
+function mostrarExitoPedidoSiPendiente() {
+	if (sessionStorage.getItem('levitad-pedido-ok')) {
+		sessionStorage.removeItem('levitad-pedido-ok');
+		mostrarAviso('exito', 'Tu pedido fue enviado por WhatsApp. Pronto coordinamos el pago y la entrega.', '¡Pedido enviado!');
+	}
+}
+
+// Al volver de WhatsApp: si el usuario regresa a la pestaña o el navegador recarga la página
+document.addEventListener('visibilitychange', () => {
+	if (document.visibilityState === 'visible') mostrarExitoPedidoSiPendiente();
+});
+mostrarExitoPedidoSiPendiente();
+
 const carritoLista = document.getElementById('carrito-lista');
 if (carritoLista) {
+	const abrirDetalleDesdeCarrito = (item) => {
+		const index   = Number(item?.dataset.carritoIndex);
+		const entrada = carritoActivo()[index];
+		if (!entrada) return;
+		const producto = estadoTienda.productos.find(p => p.nombre === entrada.nombre);
+		if (!producto) return;
+		cerrarCarrito();
+		setTimeout(() => abrirDetalles(producto), 420);
+	};
+
 	carritoLista.addEventListener('click', (e) => {
 		const botonEliminar = e.target.closest('.carrito-item-eliminar');
-		if (!botonEliminar) return;
-		const item  = botonEliminar.closest('.carrito-item');
-		const index = Number(item?.dataset.carritoIndex);
-		eliminarDelCarrito(index, item);
+		if (botonEliminar) {
+			const item  = botonEliminar.closest('.carrito-item');
+			const index = Number(item?.dataset.carritoIndex);
+			eliminarDelCarrito(index, item);
+			return;
+		}
+		const item = e.target.closest('.carrito-item');
+		if (item) abrirDetalleDesdeCarrito(item);
+	});
+
+	// Accesibilidad: Enter/Espacio sobre el item enfocado abre su detalle.
+	// Solo si el foco está en el item (el botón eliminar se activa solo).
+	carritoLista.addEventListener('keydown', (e) => {
+		if (e.key !== 'Enter' && e.key !== ' ') return;
+		const item = e.target.closest('.carrito-item');
+		if (!item || e.target !== item) return;
+		e.preventDefault();
+		abrirDetalleDesdeCarrito(item);
 	});
 }
 
 function crearTarjetaProducto(producto, index) {
-	const etiquetas   = Array.isArray(producto.tags)
-		? producto.tags.map(tag => `<p class="etiquetas">#${tag}</p>`).join('')
+	const nombreEsc = esc(producto.nombre);
+	const etiquetas = Array.isArray(producto.tags)
+		? producto.tags.map(tag => `<p class="etiquetas">#${esc(tag)}</p>`).join('')
 		: '';
+	const imgSrc = esc(
+		(Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen || ''
+	);
 	const yaEnCarrito   = Boolean(obtenerProductoEnCarrito(producto.nombre));
 	const iconoStack    = yaEnCarrito ? iconoCarritoCheck    : iconoCarrito;
 	const iconoEncargue = yaEnCarrito ? iconoAnadirConViento : iconoAnadir;
@@ -428,17 +670,17 @@ function crearTarjetaProducto(producto, index) {
 	const deshabilitado = yaEnCarrito ? 'disabled' : '';
 
 	return `
-		<article class="tarjeta-producto" data-producto-id="${index}">
+		<article class="tarjeta-producto" data-producto-id="${index}" role="button" tabindex="0" aria-label="Ver detalles de ${nombreEsc}, ${formatPrecio(producto.precio)}">
 			<div class="imagen-contenedor">
-				<img class="img-producto" src="${(Array.isArray(producto.imagenes) && producto.imagenes[0]) || producto.imagen}" alt="${producto.nombre}" loading="lazy" decoding="async">
+				<img class="img-producto" src="${imgSrc}" alt="${nombreEsc}" loading="lazy" decoding="async">
 				<div class="sombra-interior"></div>
 			</div>
 			<div class="info-producto">
-				<h3 class="nombre-producto">${producto.nombre}</h3>
+				<h3 class="nombre-producto">${nombreEsc}</h3>
 				<div class="etiquetas-container">${etiquetas}</div>
 				<div class="contenedor-row">
 					<span class="precio">${formatPrecio(producto.precio)}</span>
-					<button class="${clasesBoton}" type="button" aria-label="Agregar ${producto.nombre}" ${deshabilitado}>
+					<button class="${clasesBoton}" type="button" aria-label="Agregar ${nombreEsc}" ${deshabilitado}>
 						<span class="icono-stack">${iconoStack}</span>
 						<span class="icono-encargue">${iconoEncargue}</span>
 					</button>
@@ -639,6 +881,28 @@ function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
 	}, 420); // mayor que la transición más larga (380ms)
 }
 
+/* Cierra el buscador al dispararse la animación del header, pero CONSERVA
+   la búsqueda (texto del input y resultados filtrados). Restaura el nav
+   para que al volver arriba el header muestre alas + nav normalmente. */
+function ocultarBuscadorConservandoBusqueda() {
+	const searchBar = document.getElementById('search-bar');
+	if (!searchBar ||
+		!searchBar.classList.contains('is-active') ||
+		searchBar.classList.contains('is-closing')) return;
+
+	clearTimeout(_searchCloseTimer);
+	searchBar.classList.remove('is-scroll-hidden');
+	searchBar.classList.add('is-closing');
+	document.getElementById('search-input')?.blur();
+	if (!document.getElementById('modal-producto')?.classList.contains('is-active')) {
+		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
+	}
+	_searchCloseTimer = setTimeout(() => {
+		searchBar.classList.remove('is-active', 'is-closing');
+		_searchCloseTimer = null;
+	}, 420);
+}
+
 function renderizarProductos(productos, opciones = {}) {
 	const { mostrarVacio = false } = opciones;
 	const grid = document.querySelector('.grid-productos');
@@ -719,18 +983,19 @@ function ordenarPorPesoAleatorio(productos) {
 
 async function cargarProductos() {
 	try {
-		const response = await fetch('datos/datos.json');
-		if (!response.ok) throw new Error(`No se pudo leer datos.json (${response.status})`);
-		const data = await response.json();
-		// Compat: acepta el formato viejo (array) o el nuevo ({productos, outfits})
+		const resp = await fetch('datos/datos.json', { cache: 'no-cache' });
+		if (!resp.ok) throw new Error(`No se pudo leer datos.json (${resp.status})`);
+		const data = await resp.json();
 		const productos = Array.isArray(data) ? data : (data.productos || []);
 		const outfits   = Array.isArray(data) ? []   : (data.outfits   || []);
+
 		estadoTienda.productos = ordenarPorPesoAleatorio(productos);
 		estadoTienda.outfits   = outfits;
 
-		renderizarProductos(estadoTienda.productos);
+		aplicarFiltros();
 	} catch (error) {
 		console.error('Error cargando productos:', error);
+		mostrarAviso('error', 'No pudimos cargar los productos. Revisa tu conexión e intenta recargar la página.', 'Error de conexión');
 	}
 }
 
@@ -801,7 +1066,7 @@ function crearModalEncargue() {
 				<span class="modal-encargue-badge">Modo Especial</span>
 			</div>
 
-			<h2 id="modal-encargue-titulo" class="modal-encargue-titulo">Modo Encargue</h2>
+			<h2 id="modal-encargue-titulo" class="modal-encargue-titulo">Modo Para Encargos</h2>
 			<p class="modal-encargue-subtitulo">Un espacio para pedir la ropa que anheles</p>
 
 			<ul class="modal-encargue-lista">
@@ -811,7 +1076,7 @@ function crearModalEncargue() {
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Diseños únicos que no tenemos en el stock habitual, pero pueden ser suyas</span>
+					<span>Diseños únicos que no tenemos ahora mismo, listos para la venta, pero pueden ser suyas</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
@@ -828,12 +1093,20 @@ function crearModalEncargue() {
 			<button class="modal-encargue-btn" id="modal-encargue-cerrar">
 				Entendido, explorar ✦
 			</button>
+			<label class="modal-encargue-no-mostrar">
+				<input type="checkbox" id="modal-encargue-check">
+				No mostrar de nuevo
+			</label>
 		</div>
 	`;
 
 	document.body.appendChild(el);
 
 	const cerrar = () => {
+		const check = document.getElementById('modal-encargue-check');
+		if (check && check.checked) {
+			localStorage.setItem(STORAGE_KEY_MODAL_ENCARGUE, '1');
+		}
 		el.classList.add('is-closing');
 		setTimeout(() => el.remove(), 420);
 	};
@@ -842,13 +1115,19 @@ function crearModalEncargue() {
 	el.addEventListener('click', e => { if (e.target === el) cerrar(); });
 
 	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-active')));
+	enfocarModal(el, document.getElementById('modal-encargue-cerrar'));
 }
 
 function mostrarModalEncargueUnaVez() {
 	if (localStorage.getItem(STORAGE_KEY_MODAL_ENCARGUE)) return;
-	localStorage.setItem(STORAGE_KEY_MODAL_ENCARGUE, '1');
 	setTimeout(crearModalEncargue, 350);
 }
+
+const estadoFiltros = {
+	termino: '',
+	tags:    new Set(),
+	orden:   null
+};
 
 /* ─── SWITCH ─── */
 if (switchContainer) {
@@ -857,6 +1136,8 @@ if (switchContainer) {
 
 	const setActiveSwitch = (button) => {
 		if (!switchIndicator || !button) return;
+
+		const modoAnterior = document.body.classList.contains('is-encargue');
 
 		// Reads primero — antes de cualquier write para evitar forced sync layout
 		const containerRect = switchContainer.getBoundingClientRect();
@@ -868,6 +1149,7 @@ if (switchContainer) {
 		button.classList.add('is-active');
 
 		const isEncargue = switchButtons.indexOf(button) === 1;
+		const modoCambio = isEncargue !== modoAnterior;
 		switchContainer.classList.toggle('is-encargue', isEncargue);
 		document.body.classList.toggle('is-encargue',   isEncargue);
 
@@ -878,9 +1160,11 @@ if (switchContainer) {
 
 		// CAMBIO 4: re-renderizar con el carrito del modo activo
 		renderizarCarrito();
+		// Solo reconstruir la grilla si el modo cambió de verdad (evita flicker en cada resize)
+		if (estadoTienda.productos.length > 0 && modoCambio) aplicarFiltros();
 
 		// CAMBIO 3: modal solo la primera vez que se activa encargue
-		if (isEncargue) mostrarModalEncargueUnaVez();
+		if (isEncargue && modoCambio) mostrarModalEncargueUnaVez();
 	};
 
 	switchButtons.forEach(button => {
@@ -916,6 +1200,23 @@ function registrarTagsVistos(tags) {
 	localStorage.setItem(key, JSON.stringify(datos));
 }
 
+/* Mueve el foco del teclado dentro de un modal/panel al abrirlo.
+   - Si se pasa `preferido`, enfoca ese elemento (ej. el botón de comprar).
+   - Si no, hace el contenedor enfocable con tabindex="-1" (NO entra al
+     orden de Tab, no se ve outline: el foco es programático, no de teclado)
+     y lo enfoca. preventScroll evita saltos visuales. */
+function enfocarModal(contenedor, preferido) {
+	if (!contenedor) return;
+	let objetivo = preferido;
+	if (!objetivo) {
+		if (!contenedor.hasAttribute('tabindex')) contenedor.setAttribute('tabindex', '-1');
+		objetivo = contenedor;
+	}
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		try { objetivo.focus({ preventScroll: true }); } catch (_) {}
+	}));
+}
+
 function abrirDetalles(datos) {
 	document.querySelector('.header-nav')?.classList.add('nav-oculta');
 	registrarInteraccion(datos.nombre);
@@ -930,8 +1231,8 @@ function abrirDetalles(datos) {
 	modalDetalles.innerHTML = especificaciones
 		.map(([clave, valor]) => `
 			<li class="detalle-item">
-				<span class="detalle-label">${clave}:</span>
-				<span class="detalle-valor">${valor}</span>
+				<span class="detalle-label">${esc(clave)}:</span>
+				<span class="detalle-valor">${esc(valor)}</span>
 			</li>
 		`).join('');
 
@@ -955,6 +1256,9 @@ function abrirDetalles(datos) {
 
 	modal.style.display = 'flex';
 	setTimeout(() => modal.classList.add('is-active'), 10);
+
+	const _btnComprar = document.getElementById('btn-comprar-ahora');
+	enfocarModal(modal, _btnComprar && !_btnComprar.disabled ? _btnComprar : null);
 }
 
 function cerrarModal() {
@@ -1036,15 +1340,44 @@ if (grid) {
 		const btnAnadir = e.target.closest('.btn-anadir');
 
 		if (btnAnadir && tarjeta) {
-			const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+			const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 			if (producto) agregarAlCarrito(producto, btnAnadir);
 			return;
 		}
 
 		if (tarjeta) {
-			const producto = estadoTienda.productos[Number(tarjeta.dataset.productoId)];
+			const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 			if (producto) abrirDetalles(producto);
 		}
+	});
+
+	// Accesibilidad: Enter/Espacio sobre la tarjeta enfocada abre el detalle.
+	// Solo si el foco está en la tarjeta misma (el botón añadir se activa solo).
+	grid.addEventListener('keydown', (e) => {
+		if (e.key !== 'Enter' && e.key !== ' ') return;
+		const tarjeta = e.target.closest('.tarjeta-producto');
+		if (!tarjeta || e.target !== tarjeta) return;
+		e.preventDefault();
+		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
+		if (producto) abrirDetalles(producto);
+	});
+}
+
+/* ─── NAV DEL HEADER: interactivo y accesible por teclado ─── */
+{
+	const _navAcciones = {
+		categorias: abrirCategoriasPanel,
+		parati:     abrirParaTiPanel,
+		outfits:    abrirOutfitsPanel,
+		contacto:   abrirContactoPanel
+	};
+	document.querySelectorAll('.header-nav ul li[data-nav]').forEach(li => {
+		const accion = _navAcciones[li.dataset.nav];
+		if (typeof accion !== 'function') return;
+		li.addEventListener('click', () => accion());
+		li.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); accion(); }
+		});
 	});
 }
 
@@ -1069,14 +1402,9 @@ if (trackEl) {
 
 /* ─── BÚSQUEDA Y FILTROS ─── */
 
-const estadoFiltros = {
-	termino: '',
-	tags:    new Set(),
-	orden:   null
-};
-
 function aplicarFiltros() {
-	let resultado = [...estadoTienda.productos];
+	const modo = modoActual();
+	let resultado = estadoTienda.productos.filter(p => !p.modo || p.modo === modo);
 
 	if (estadoFiltros.termino) {
 		const t = estadoFiltros.termino.toLowerCase();
@@ -1259,15 +1587,18 @@ function initMenuHamburguesa() {
 
 	let _hambTouchMoved   = false;
 	let _hambResetTimeout = null;
+	let _scrollResetTimer = null;
 
 	function abrirMenu() {
 		if (panel.classList.contains('is-active')) return;
+		_hambTouchMoved = false;
 		menuBtn.classList.add('is-open');
 		panel.style.display = 'flex';
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			ov.classList.add('is-active');
 			panel.classList.add('is-active');
 		}));
+		enfocarModal(panel, panel.querySelector('.menu-nav-item'));
 	}
 
 	function cerrarMenu() {
@@ -1285,7 +1616,11 @@ function initMenuHamburguesa() {
 
 	panel.addEventListener('touchstart', () => { clearTimeout(_hambResetTimeout); }, { passive: true });
 	panel.addEventListener('touchmove',  () => { _hambTouchMoved = true; },          { passive: true });
-	panel.addEventListener('scroll',     () => { _hambTouchMoved = true; },          { passive: true });
+	panel.addEventListener('scroll',     () => {
+		_hambTouchMoved = true;
+		clearTimeout(_scrollResetTimer);
+		_scrollResetTimer = setTimeout(() => { _hambTouchMoved = false; }, 300);
+	}, { passive: true });
 	panel.addEventListener('touchend',   () => {
 		_hambResetTimeout = setTimeout(() => { _hambTouchMoved = false; }, 400);
 	}, { passive: true });
@@ -1329,6 +1664,12 @@ function initMenuHamburguesa() {
 	menuBtn.addEventListener('click', () =>
 		panel.classList.contains('is-active') ? cerrarMenu() : abrirMenu()
 	);
+	menuBtn.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			panel.classList.contains('is-active') ? cerrarMenu() : abrirMenu();
+		}
+	});
 }
 
 
@@ -1362,6 +1703,7 @@ function abrirContactoPanel() {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
 	}));
+	enfocarModal(panel);
 }
 
 
@@ -1496,6 +1838,7 @@ function abrirSobreLevitadPanel() {
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		panel.classList.add('is-active');
 	}));
+	enfocarModal(panel);
 	document.addEventListener('keydown', _sobreLevitadEscHandler);
 }
 
@@ -1664,6 +2007,7 @@ function abrirOutfitsPanel() {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
 	}));
+	enfocarModal(panel);
 
 	// ─── Carrusel ──────────────────────────────────────────────
 	const track = panel.querySelector('.outfits-track');
@@ -1721,7 +2065,7 @@ function abrirOutfitsPanel() {
 				document.querySelectorAll('.btn-anadir').forEach(b => {
 					const t = b.closest('.tarjeta-producto');
 					if (!t) return;
-					const p = estadoTienda.productos[Number(t.dataset.productoId)];
+					const p = productosVisibles[Number(t.dataset.productoId)];
 					if (p && p.nombre === prod.nombre) marcarBotonComoAgregado(b);
 				});
 			});
@@ -1860,9 +2204,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	initHeaderNavLinks();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
+	if (carritoWrapper)  carritoWrapper.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirCarrito(); }
+	});
 	if (carritoOverlay)  carritoOverlay.addEventListener('click',  cerrarCarrito);
 	if (carritoCerrar)   carritoCerrar.addEventListener('click',   cerrarCarrito);
-	if (carritoWhatsapp) carritoWhatsapp.addEventListener('click', enviarPedidoWhatsApp);
+	if (carritoWhatsapp) carritoWhatsapp.addEventListener('click', abrirSelectorDueno);
 
 	const carritoVaciar = document.getElementById('carrito-vaciar');
 	if (carritoVaciar) carritoVaciar.addEventListener('click', vaciarCarrito);
@@ -1980,7 +2327,6 @@ if (header) {
 
 	// Caché de booleanos de threshold para evitar classList.toggle redundante cada frame
 	let lastExpandedState = null;
-	let lastSearchHidden  = null;
 
 	// ── Timeline scrubbed ────────────────────────────────────────────────────────
 	// scrub:0.3 → con animaciones puramente GPU (transforms+opacity) podemos usar
@@ -2016,11 +2362,13 @@ if (header) {
 					header.classList.toggle('is-expanded', expanded);
 				}
 
-				// Buscador: toggle solo cuando cruza el threshold
-				const searchHidden = p > 0.2;
-				if (searchBar && searchHidden !== lastSearchHidden) {
-					lastSearchHidden = searchHidden;
-					searchBar.classList.toggle('is-scroll-hidden', searchHidden);
+				// Buscador: al dispararse la animación del header se cierra la
+				// barra conservando la búsqueda (texto + resultados), para que
+				// al volver arriba el header muestre alas + nav con normalidad.
+				if (searchBar && p > 0.2 &&
+					searchBar.classList.contains('is-active') &&
+					!searchBar.classList.contains('is-closing')) {
+					ocultarBuscadorConservandoBusqueda();
 				}
 
 				// Hamburguesa: no clickeable mientras sea invisible (p < 0.65)
@@ -2099,7 +2447,6 @@ if (header) {
 	lastExpandedState = true;
 	header.classList.add('is-expanded');
 	if (searchBar) {
-		lastSearchHidden = false;
 		searchBar.classList.remove('is-scroll-hidden');
 	}
 	/* Fin: Ahora en la primera carga ya se ven alas y nav correctamente */
@@ -2187,6 +2534,7 @@ function abrirParaTiPanel() {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
 	}));
+	enfocarModal(panel);
 
 	function cerrar() {
 		ov.classList.add('is-closing');
@@ -2353,6 +2701,7 @@ function abrirCategoriasPanel() {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
 	}));
+	enfocarModal(panel);
 
 	function cerrar() {
 		ov.classList.add('is-closing');

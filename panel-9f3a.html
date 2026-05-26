@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<!-- CSP estricta: solo conexiones a la API de GitHub, sin scripts inline ajenos, sin object/embed. -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://api.github.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';">
+<title>Lévitad — Panel</title>
+<style>
+    :root {
+        --fondo:        #0a0d18;
+        --tarjeta:      #141a29;
+        --tarjeta-2:    #1b2233;
+        --borde:        rgba(202, 172, 71, 0.18);
+        --borde-fuerte: rgba(202, 172, 71, 0.40);
+        --acento:       #caac47;
+        --acento-rgb:   202, 172, 71;
+        --texto:        #E2E2E2;
+        --tenue:        #9BA4B5;
+        --rojo:         #e5484d;
+        --verde:        #3ecf8e;
+        --amarillo:     #e8b339;
+    }
+    body.is-light {
+        --fondo:        #F7F8FA;
+        --tarjeta:      #FFFFFF;
+        --tarjeta-2:    #EEF2F8;
+        --borde:        rgba(43, 47, 51, 0.13);
+        --borde-fuerte: rgba(43, 47, 51, 0.30);
+        --texto:        #2B2F33;
+        --tenue:        #6B7280;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--fondo); color: var(--texto); font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; font-size: 14px; }
+    body { min-height: 100vh; }
+    a { color: var(--acento); }
+
+    /* ─── Login ─── */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-card {
+        max-width: 460px; width: 100%;
+        background: linear-gradient(160deg, var(--tarjeta) 0%, var(--fondo) 100%);
+        border: 1px solid var(--borde); border-radius: 22px;
+        padding: 36px 28px; box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .login-eyebrow { display: inline-block; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--acento); margin-bottom: 10px; }
+    .login-card h1 { font-size: 28px; margin: 0 0 8px; letter-spacing: 1px; }
+    .login-card p.lead { color: var(--tenue); margin: 0 0 22px; line-height: 1.5; font-size: 13px; }
+    .login-card label { display: block; font-size: 12px; color: var(--tenue); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .login-card input[type="password"] {
+        width: 100%; padding: 12px 14px; background: var(--tarjeta-2); color: var(--texto);
+        border: 1px solid var(--borde); border-radius: 10px; font-size: 14px; font-family: inherit;
+        margin-bottom: 14px; outline: none; transition: border-color .2s;
+    }
+    .login-card input[type="password"]:focus { border-color: var(--borde-fuerte); }
+    .login-check { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--tenue); margin-bottom: 18px; cursor: pointer; user-select: none; }
+    .login-check input { accent-color: var(--acento); cursor: pointer; }
+    .btn-primary {
+        width: 100%; padding: 13px; border: none; border-radius: 12px; cursor: pointer;
+        background: linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%);
+        color: #0a0d18; font-weight: 700; letter-spacing: 0.5px; font-size: 14px;
+        transition: transform .15s, box-shadow .2s;
+    }
+    .btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(var(--acento-rgb), .35); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+    .login-help { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--borde); font-size: 12px; color: var(--tenue); line-height: 1.6; }
+    .login-help ol { padding-left: 18px; margin: 8px 0; }
+    .login-help li { margin: 4px 0; }
+    .login-help code { background: var(--tarjeta-2); padding: 1px 6px; border-radius: 4px; font-size: 11.5px; }
+
+    /* ─── App ─── */
+    .app { display: none; min-height: 100vh; }
+    .app.is-active { display: block; }
+    .top-bar {
+        position: sticky; top: 0; z-index: 50;
+        background: rgba(10, 13, 24, 0.92); backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--borde);
+        padding: 12px 20px; display: flex; align-items: center; gap: 14px;
+    }
+    body.is-light .top-bar { background: rgba(247, 248, 250, 0.92); }
+    .top-bar h1 { font-size: 18px; margin: 0; letter-spacing: 1px; flex: 1; }
+    .top-bar .estado { font-size: 12px; color: var(--tenue); }
+    .top-bar .estado.has-cambios { color: var(--amarillo); }
+    .btn-icon { background: transparent; border: 1px solid var(--borde); color: var(--tenue); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: color .2s, border-color .2s; }
+    .btn-icon:hover { color: var(--acento); border-color: var(--borde-fuerte); }
+    .btn-guardar {
+        padding: 9px 16px; border: none; border-radius: 10px; cursor: pointer;
+        background: linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%);
+        color: #0a0d18; font-weight: 700; font-size: 13px; letter-spacing: 0.3px;
+        transition: opacity .2s, transform .15s;
+    }
+    .btn-guardar:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-guardar.has-cambios { animation: pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(var(--acento-rgb), 0); } 50% { box-shadow: 0 0 0 8px rgba(var(--acento-rgb), 0); transform: translateY(-1px); } }
+
+    .tabs { display: flex; gap: 4px; padding: 18px 20px 0; max-width: 980px; margin: 0 auto; }
+    .tab { padding: 10px 18px; border-radius: 10px 10px 0 0; cursor: pointer; background: transparent; border: 1px solid transparent; color: var(--tenue); font-size: 13px; font-weight: 600; letter-spacing: 0.3px; }
+    .tab.is-active { background: var(--tarjeta); color: var(--texto); border-color: var(--borde); border-bottom-color: transparent; }
+
+    .panel { max-width: 980px; margin: 0 auto; padding: 18px 20px 60px; }
+
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 18px; }
+    .toolbar input[type="text"] { flex: 1; min-width: 180px; padding: 9px 14px; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px; color: var(--texto); font-size: 13px; outline: none; }
+    .toolbar input[type="text"]:focus { border-color: var(--borde-fuerte); }
+    .filtros { display: inline-flex; background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px; padding: 3px; }
+    .filtros button { background: transparent; border: none; color: var(--tenue); padding: 6px 12px; border-radius: 7px; cursor: pointer; font-size: 12px; font-weight: 600; }
+    .filtros button.is-active { background: var(--tarjeta-2); color: var(--acento); }
+    .btn-nuevo { background: var(--tarjeta); border: 1px solid var(--borde-fuerte); color: var(--acento); padding: 9px 16px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600; }
+    .btn-nuevo:hover { background: rgba(var(--acento-rgb), 0.08); }
+
+    .lista { display: flex; flex-direction: column; gap: 8px; }
+    .item {
+        display: flex; align-items: center; gap: 14px;
+        padding: 12px 14px; background: var(--tarjeta);
+        border: 1px solid var(--borde); border-radius: 12px;
+        transition: border-color .2s, background .2s;
+    }
+    .item:hover { border-color: var(--borde-fuerte); }
+    .item-thumb { width: 44px; height: 44px; border-radius: 8px; background: var(--tarjeta-2); object-fit: cover; flex-shrink: 0; }
+    .item-info { flex: 1; min-width: 0; }
+    .item-nombre { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-meta { font-size: 12px; color: var(--tenue); display: flex; gap: 10px; margin-top: 3px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; }
+    .badge--stack { background: rgba(var(--acento-rgb), 0.12); color: var(--acento); border: 1px solid rgba(var(--acento-rgb), 0.30); }
+    .badge--encargue { background: rgba(93, 114, 233, 0.12); color: #7b8dff; border: 1px solid rgba(93, 114, 233, 0.30); }
+    .item-acciones { display: flex; gap: 6px; flex-shrink: 0; }
+    .item-acciones button { background: transparent; border: 1px solid var(--borde); color: var(--tenue); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .item-acciones button:hover { color: var(--acento); border-color: var(--borde-fuerte); }
+    .item-acciones .btn-del:hover { color: var(--rojo); border-color: var(--rojo); }
+
+    .vacio { text-align: center; color: var(--tenue); padding: 60px 20px; font-size: 13px; }
+
+    /* ─── Modal de edición ─── */
+    .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; opacity: 0; transition: opacity .25s; }
+    .modal.is-active { display: flex; opacity: 1; }
+    .modal-card { width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; background: var(--tarjeta); border: 1px solid var(--borde-fuerte); border-radius: 16px; padding: 26px 24px; transform: translateY(20px) scale(.97); transition: transform .3s cubic-bezier(.22,1,.36,1); }
+    .modal.is-active .modal-card { transform: translateY(0) scale(1); }
+    .modal h2 { margin: 0 0 18px; font-size: 18px; letter-spacing: 0.5px; }
+    .campo { margin-bottom: 14px; }
+    .campo label { display: block; font-size: 11px; color: var(--tenue); margin-bottom: 5px; letter-spacing: 0.6px; text-transform: uppercase; font-weight: 600; }
+    .campo input[type="text"], .campo input[type="number"], .campo select, .campo textarea {
+        width: 100%; padding: 10px 12px; background: var(--tarjeta-2); color: var(--texto);
+        border: 1px solid var(--borde); border-radius: 9px; font-size: 14px; font-family: inherit;
+        outline: none; transition: border-color .2s;
+    }
+    .campo input:focus, .campo select:focus, .campo textarea:focus { border-color: var(--borde-fuerte); }
+    .campo textarea { resize: vertical; min-height: 80px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; }
+    .campo .ayuda { font-size: 11.5px; color: var(--tenue); margin-top: 4px; line-height: 1.4; }
+    .modo-radios { display: flex; gap: 8px; }
+    .modo-radios label { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; background: var(--tarjeta-2); border: 1px solid var(--borde); border-radius: 9px; cursor: pointer; font-size: 13px; text-transform: none; letter-spacing: 0; color: var(--texto); }
+    .modo-radios input[type="radio"] { accent-color: var(--acento); }
+    .modo-radios label:has(input:checked) { border-color: var(--borde-fuerte); background: rgba(var(--acento-rgb), 0.08); }
+
+    .detalles-list { display: flex; flex-direction: column; gap: 6px; }
+    .detalle-row { display: flex; gap: 6px; }
+    .detalle-row input { flex: 1; padding: 8px 10px; background: var(--tarjeta-2); color: var(--texto); border: 1px solid var(--borde); border-radius: 8px; font-size: 13px; outline: none; }
+    .detalle-row button { background: transparent; border: 1px solid var(--borde); color: var(--tenue); width: 32px; border-radius: 8px; cursor: pointer; }
+    .detalle-row button:hover { color: var(--rojo); border-color: var(--rojo); }
+    .btn-detalle-add { margin-top: 6px; background: transparent; border: 1px dashed var(--borde); color: var(--tenue); padding: 7px 10px; border-radius: 8px; cursor: pointer; font-size: 12px; width: 100%; }
+    .btn-detalle-add:hover { color: var(--acento); border-color: var(--borde-fuerte); }
+
+    .modal-acciones { display: flex; gap: 10px; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--borde); }
+    .btn-secundario { flex: 1; background: var(--tarjeta-2); border: 1px solid var(--borde); color: var(--texto); padding: 11px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 13px; }
+    .btn-secundario:hover { border-color: var(--borde-fuerte); }
+    .btn-confirmar { flex: 1; background: linear-gradient(135deg, #e3c878 0%, #caac47 50%, #a68966 100%); color: #0a0d18; border: none; padding: 11px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 13px; }
+    .btn-confirmar.is-danger { background: var(--rojo); color: white; }
+
+    /* ─── Avisos ─── */
+    .aviso-cont { position: fixed; top: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 10px; max-width: 320px; pointer-events: none; }
+    .aviso { pointer-events: auto; padding: 12px 14px; background: var(--tarjeta); border: 1px solid var(--borde); border-left: 4px solid var(--tenue); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); transform: translateX(120%); opacity: 0; transition: transform .35s cubic-bezier(.22,1,.36,1), opacity .35s; font-size: 13px; }
+    .aviso.is-visible { transform: translateX(0); opacity: 1; }
+    .aviso--exito { border-left-color: var(--verde); }
+    .aviso--error { border-left-color: var(--rojo); }
+    .aviso--info  { border-left-color: var(--acento); }
+    .aviso b { display: block; margin-bottom: 3px; font-size: 13.5px; }
+    .aviso span { display: block; color: var(--tenue); font-size: 12px; line-height: 1.4; }
+
+    /* Spinner */
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--borde); border-top-color: var(--acento); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: middle; margin-left: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ─── PANTALLA DE LOGIN ─── -->
+<div id="login-wrap" class="login-wrap">
+    <div class="login-card">
+        <span class="login-eyebrow">Panel privado</span>
+        <h1>Lévitad — Gestión</h1>
+        <p class="lead">Inicia sesión con tu token de GitHub para administrar el catálogo. Solo tú y los autorizados deben tener este token.</p>
+
+        <form id="login-form" autocomplete="off">
+            <label for="token">Token de acceso (GitHub PAT)</label>
+            <input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_..." required>
+            <label class="login-check"><input id="recordar" type="checkbox" checked> Recordar en esta sesión (se borra al cerrar la pestaña)</label>
+            <button type="submit" id="login-btn" class="btn-primary">Entrar</button>
+        </form>
+
+        <div class="login-help">
+            <strong>¿Cómo crear el token?</strong>
+            <ol>
+                <li>Entra a <code>github.com/settings/personal-access-tokens</code> → <em>Generate new token (fine-grained)</em>.</li>
+                <li><em>Repository access</em>: <strong>Only select repositories</strong> → marca <code>cuellar-dev/limbo</code>.</li>
+                <li><em>Permissions → Repository → Contents</em>: <strong>Read and write</strong>.</li>
+                <li>Pon una expiración corta (ej. 90 días). Copia el token y pégalo aquí.</li>
+            </ol>
+            <strong>Nunca</strong> compartas el token ni lo subas a otro sitio. Si lo expones por error, ve a la misma página de GitHub y revócalo.
+        </div>
+    </div>
+</div>
+
+<!-- ─── PANEL PRINCIPAL ─── -->
+<div id="app" class="app">
+    <div class="top-bar">
+        <h1>Lévitad — Panel</h1>
+        <span id="estado-cambios" class="estado">Al día</span>
+        <button id="btn-tema" class="btn-icon" type="button" title="Cambiar tema" aria-label="Cambiar tema">◐</button>
+        <button id="btn-guardar" class="btn-guardar" type="button" disabled>Guardar en GitHub</button>
+        <button id="btn-salir" class="btn-icon" type="button" title="Salir" aria-label="Salir">⏻</button>
+    </div>
+
+    <div class="tabs">
+        <button class="tab is-active" data-tab="productos" type="button">Productos</button>
+        <button class="tab" data-tab="outfits" type="button">Outfits</button>
+    </div>
+
+    <!-- Tab Productos -->
+    <section id="tab-productos" class="panel">
+        <div class="toolbar">
+            <input id="buscar-prod" type="text" placeholder="Buscar producto...">
+            <div class="filtros" role="tablist">
+                <button data-modo="todos" class="is-active" type="button">Todos</button>
+                <button data-modo="stack" type="button">Stack</button>
+                <button data-modo="encargue" type="button">Encargue</button>
+            </div>
+            <button id="btn-nuevo-prod" class="btn-nuevo" type="button">+ Nuevo producto</button>
+        </div>
+        <div id="lista-prod" class="lista"></div>
+    </section>
+
+    <!-- Tab Outfits -->
+    <section id="tab-outfits" class="panel" hidden>
+        <div class="toolbar">
+            <input id="buscar-out" type="text" placeholder="Buscar outfit...">
+            <button id="btn-nuevo-out" class="btn-nuevo" type="button">+ Nuevo outfit</button>
+        </div>
+        <div id="lista-out" class="lista"></div>
+    </section>
+</div>
+
+<!-- ─── Modal editor (común productos/outfits) ─── -->
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal-card" id="modal-card"></div>
+</div>
+
+<!-- ─── Contenedor de avisos ─── -->
+<div class="aviso-cont" id="aviso-cont" aria-live="polite"></div>
+
+<script defer src="js/admin.js"></script>
+</body>
+</html>

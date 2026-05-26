@@ -1,0 +1,22 @@
+# Si "levitad-backend" ya está tomado, cambia este nombre aquí y úsalo en los comandos.
+app = "levitad-backend"
+primary_region = "mia"  # Miami, lo más cercano a Cuba
+
+[build]
+
+# Disco persistente: aquí vive la base de datos. NO se borra al reiniciar/deploy.
+[mounts]
+  source = "pb_data"
+  destination = "/pb/pb_data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # Siempre encendido: no se apaga sola y siempre hay 1 máquina viva.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

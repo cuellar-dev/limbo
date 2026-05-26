@@ -1,0 +1,7 @@
+# Backend local (PocketBase) — pivote a GitHub-as-backend, pero queda por si vuelves
+backend/pocketbase.exe
+backend/pb_data/
+
+# Editor / herramientas
+.vscode/
+.claude/settings.local.json

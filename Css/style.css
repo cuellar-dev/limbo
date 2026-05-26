@@ -142,7 +142,7 @@ h1 {
 }
 /* --- CONTENEDOR PRINCIPAL --- */
 .contenedor {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
     padding: 40px 20px;
     padding-top: 70px;
@@ -867,6 +867,7 @@ svg.icono-transicion {
        → salto visual. Sin ellos el height va por CPU paint (síncrono).
        .is-collapsed activa backdrop-filter que crea su propia capa cuando
        el header ya está quieto en 70px fijo. */
+       border-radius: 0 0 26px 26px ;
 }
 
 .header-container {
@@ -956,7 +957,7 @@ h1 .logo-text {
 /* Eslogan */
 .header-slogan {
     font-family: 'Quicksand', sans-serif;
-    color: rgba(226, 226, 226, 0.28);
+
     font-size: 9px;
     letter-spacing: 6px;
     text-transform: uppercase;
@@ -996,7 +997,8 @@ body.is-encargue #header {
     width: 100%;
     max-width: min(350px, 100%);
     counter-reset: nav-counter;
-    background-color: transparent;
+    background: rgb(var(--header-bg-r) var(--header-bg-g) var(--header-bg-b) / var(--header-bg-alpha));
+
 }
 
 /* Tarjeta de navegación */
@@ -1122,6 +1124,7 @@ body.is-encargue .header-nav li:hover {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
 
 #carrito-btn {
@@ -1289,6 +1292,7 @@ body.is-encargue .carrito-cerrar:hover {
     border: 1px solid rgba(202, 172, 71, 0.16);
     background: rgba(255, 255, 255, 0.03);
     overflow: hidden;
+    cursor: pointer;
     transition:
         opacity        0.22s ease,
         transform      0.28s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1867,6 +1871,51 @@ body.is-encargue .filter-btn:active {
     filter: brightness(0.92);
     box-shadow: 0 4px 14px rgba(93, 114, 233, 0.3);
 }
+
+.modal-encargue-no-mostrar {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    cursor: pointer;
+    font-size: 12px;
+    color: rgba(200, 205, 255, 0.55);
+    user-select: none;
+}
+
+.modal-encargue-no-mostrar input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid rgba(93, 114, 233, 0.4);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.modal-encargue-no-mostrar input[type="checkbox"]:checked {
+    background: rgba(93, 114, 233, 0.7);
+    border-color: rgba(93, 114, 233, 0.9);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpolyline points='1.5%2C6 5%2C9.5 10.5%2C2.5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 10px;
+}
+
+body.is-light .modal-encargue-no-mostrar {
+    color: rgba(60, 70, 120, 0.5);
+}
+
+body.is-light .modal-encargue-no-mostrar input[type="checkbox"] {
+    border-color: rgba(93, 114, 233, 0.35);
+}
+
 /* ═══════════════════════════════════════════════════════════════
    PATCH — CARRITO PANEL PREMIUM + BUSCADOR CON SCROLL
    Agregá este bloque AL FINAL de tu style.css
@@ -4169,6 +4218,7 @@ body.is-encargue .outfit-detalle-head::after {
     flex-direction: column;
     gap: 10px;
     margin-top: 4px;
+    margin-bottom: 10px;
     padding-left: 3px;
 }
 
@@ -4251,14 +4301,15 @@ body.is-encargue .outfit-detalle-head::after {
 /* Botón grande premium: "Llevar todo el look al carrito" */
 @keyframes outfitBtnShine {
     0%   { transform: translateX(-120%) skewX(-18deg); }
-    100% { transform: translateX(220%)  skewX(-18deg); }
+    100% { transform: translateX(310%)  skewX(-18deg); }
 }
 
 .outfit-llevar-todo {
     position: relative;
-    margin-top: 22px;
-    width: 100%;
+    margin-top: 32px;
+    width: 90%;
     min-height: 64px;
+    margin: 0 auto 25px auto;
     padding: 20px 26px;
     border-radius: 16px;
     border: 1px solid rgba(202, 172, 71, 0.55);
@@ -4543,7 +4594,7 @@ body.is-light .parati-overlay { background: rgba(180, 186, 200, 0.75); }
 .parati-panel {
     position: fixed;
     top: 0; right: 0;
-    width: min(88vw, 440px);
+    width: 100vw;
     height: 100dvh;
     background: var(--color-superficie, #161928);
     border-left: 1px solid rgba(202, 172, 71, 0.16);
@@ -4655,6 +4706,7 @@ body.is-light .parati-tag { color: #8a6f1e; }
     padding: 4px 28px 10px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
+    scroll-padding-inline: 28px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
@@ -4738,12 +4790,11 @@ body.is-light .parati-card-precio { color: #8a6f1e; }
 body.is-light .parati-vacio-texto { color: rgba(30, 30, 50, 0.50); }
 
 @media (max-width: 480px) {
-    .parati-panel { width: 94vw; }
     .parati-header { padding: 30px 20px 18px; }
     .parati-titulo { font-size: 38px; }
     .parati-body { padding: 22px 0 28px; }
     .parati-seccion-titulo { padding: 0 20px; }
-    .parati-cards { padding: 4px 20px 10px; }
+    .parati-cards { padding: 4px 20px 10px; scroll-padding-inline: 20px; }
 }
 
 body.parati-abierto { overflow: hidden; }
@@ -4830,7 +4881,7 @@ body.is-light .categorias-overlay { background: rgba(180, 186, 200, 0.45); }
 .categorias-panel {
     position: fixed;
     top: 0; right: 0;
-    width: min(88vw, 460px);
+    width: 100vw;
     height: 100dvh;
     background: var(--color-superficie, #161928);
     border-left: 1px solid rgba(202, 172, 71, 0.16);
@@ -4956,7 +5007,7 @@ body.is-light .cat-chip { color: rgba(30, 30, 50, 0.70); border-color: rgba(0,0,
 body.is-light .cat-chip:hover { color: #8a6f1e; }
 
 /* Secciones */
-.cat-seccion { margin-bottom: 30px; scroll-margin-top: 8px; }
+.cat-seccion { margin-bottom: 30px; scroll-margin-top: 8px; padding-left: 10px;}
 .cat-seccion:last-child { margin-bottom: 0; }
 
 .cat-seccion-head {
@@ -4994,7 +5045,7 @@ body.is-light .cat-seccion-titulo { color: #1a1a2e; }
 
 /* Sección destacada (Más vendidos) */
 .cat-seccion-destacada {
-    padding: 18px 0 22px;
+    padding: 18px 0 22px 10px;
     margin: 0 18px 26px;
     border-radius: 18px;
     touch-action: pan-x;
@@ -5057,7 +5108,7 @@ body.is-light .cat-card {
     letter-spacing: 0.04em;
     color: #1a1a2e;
     background: var(--color-dorado, #caac47);
-    font-family: 'Quicksand', sans-serif;
+    font-family: 'drink', sans-serif;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
@@ -5116,7 +5167,6 @@ body.is-light .cat-card-precio { color: #8a6f1e; }
 body.is-light .cat-vacio-texto { color: rgba(30, 30, 50, 0.50); }
 
 @media (max-width: 480px) {
-    .categorias-panel { width: 94vw; }
     .cat-header { padding: 30px 20px 18px; }
     .cat-titulo { font-size: 38px; }
     .cat-body { padding: 18px 0 28px; }
@@ -5126,6 +5176,31 @@ body.is-light .cat-vacio-texto { color: rgba(30, 30, 50, 0.50); }
     .cat-seccion-destacada { margin: 0 12px 26px; }
     .cat-seccion-destacada .cat-seccion-head { padding: 0 14px; }
     .cat-seccion-destacada .cat-cards { padding: 4px 14px; }
+}
+
+@media (min-width: 1024px) {
+    .categorias-panel,
+    .parati-panel {
+        width: 100vw;
+    }
+    .cat-cards {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+    .cat-card {
+        flex-shrink: 0;
+        width: 180px;
+    }
+    .parati-cards {
+        flex-wrap: wrap;
+        overflow-x: visible;
+        scroll-snap-type: none;
+    }
+    .parati-card {
+        flex-shrink: 0;
+        width: 180px;
+    }
 }
 
 body.categorias-abierto { overflow: hidden; }
@@ -5381,4 +5456,357 @@ body.sobre-abierto {
         width: 38px;
         height: 38px;
     }
+}
+
+/* ─── AVISOS / TOASTS ─── */
+.aviso-container {
+    position: fixed;
+    top: 15vh;
+    right: 20px;
+    z-index: 100000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+    max-width: min(300px, calc(100vw - 32px));
+}
+.aviso {
+    pointer-events: auto;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    padding: 16px 16px;
+    border-radius: 12px;
+    background: var(--fondo-header);
+    color: var(--texto-brillante);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    border-left: 4px solid var(--texto-secundario);
+    font-size: 13.5px;
+    line-height: 1.4;
+    transform: translateX(120%);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(.22, 1, .36, 1), opacity 0.35s ease;
+}
+.aviso.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+}
+.aviso.is-saliendo {
+    transform: translateX(120%);
+    opacity: 0;
+}
+.aviso-icono {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+.aviso-icono svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.aviso-cuerpo {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 1px;
+}
+.aviso-titulo {
+    font-size: 14.5px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    word-break: break-word;
+}
+.aviso-texto {
+    font-size: 12.5px;
+    opacity: 0.82;
+    word-break: break-word;
+}
+.aviso-cerrar {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 2px 4px;
+    opacity: 0.65;
+    transition: opacity 0.2s ease;
+}
+.aviso-cerrar:hover {
+    opacity: 1;
+}
+.aviso--exito {
+    border-left-color: #3ecf8e;
+}
+.aviso--exito .aviso-icono {
+    color: #3ecf8e;
+}
+.aviso--error {
+    border-left-color: #e5484d;
+}
+.aviso--error .aviso-icono {
+    color: #e5484d;
+}
+.aviso--advertencia {
+    border-left-color: #e8b339;
+}
+.aviso--advertencia .aviso-icono {
+    color: #e8b339;
+}
+body.is-light .aviso {
+    background: #ffffff;
+    color: #2a2f3a;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+body.is-light .aviso-cerrar {
+    color: #8a93a3;
+}
+@media (max-width: 480px) {
+    .aviso-container {
+        top: 9vh;
+        right: 12px;
+        left: 12px;
+        max-width: none;
+    }
+}
+
+/* ─── SHEET: ELEGIR DUEÑO PARA EL PEDIDO ─── */
+.dueno-sheet-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+    transition: background 0.42s ease, opacity 0.42s ease;
+}
+.dueno-sheet-overlay.is-active {
+    background: rgba(0, 0, 0, 0.82);
+    opacity: 1;
+    pointer-events: auto;
+}
+.dueno-sheet-overlay.is-closing {
+    background: rgba(0, 0, 0, 0);
+    opacity: 0;
+    pointer-events: none;
+}
+.dueno-sheet {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+    min-height: 40vh;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 34px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+    background: var(--contacto-panel-bg);
+    border: 1px solid var(--carrito-borde);
+    border-bottom: none;
+    border-radius: 26px 26px 0 0;
+    box-shadow:
+        0 -24px 60px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(var(--carrito-acento-rgb), 0.08) inset;
+    transform: translateY(102%);
+    transition: transform 0.46s cubic-bezier(.22, 1, .36, 1);
+}
+.dueno-sheet-overlay.is-active .dueno-sheet { transform: translateY(0); }
+.dueno-sheet-overlay.is-closing .dueno-sheet { transform: translateY(102%); }
+
+.dueno-sheet-handle {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--drag-pill-bg);
+}
+.dueno-sheet-cerrar {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--carrito-borde);
+    background: var(--glass-btn-bg);
+    color: var(--texto-secundario);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.dueno-sheet-cerrar:hover {
+    color: var(--carrito-acento);
+    border-color: var(--carrito-borde-fuerte);
+}
+.dueno-sheet-titulo {
+    margin: 16px 0 6px;
+    text-align: center;
+    font-family: 'drink', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--texto-brillante);
+}
+.dueno-sheet-sub {
+    margin: 0 auto 24px;
+    max-width: 360px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--texto-secundario);
+}
+.dueno-opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.dueno-opcion {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: pointer;
+    background: var(--glass-btn-bg);
+    border: 1px solid var(--carrito-borde);
+    border-radius: 18px;
+    color: var(--texto-brillante);
+    transition: border-color 0.22s ease, background 0.22s ease, transform 0.22s ease;
+}
+.dueno-opcion:hover {
+    border-color: var(--carrito-borde-fuerte);
+    background: rgba(var(--carrito-acento-rgb), 0.07);
+    transform: translateY(-2px);
+}
+.dueno-opcion:active { transform: translateY(0); }
+.dueno-foto {
+    position: relative;
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--carrito-borde-fuerte);
+    background: linear-gradient(140deg, rgba(var(--carrito-acento-rgb), 0.32), rgba(var(--carrito-acento-rgb), 0.08));
+}
+.dueno-foto img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.dueno-foto.sin-foto::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 36%, rgba(var(--carrito-acento-rgb), 0.40), transparent 72%);
+}
+.dueno-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+.dueno-nombre {
+    font-family: 'drink', sans-serif;
+    font-size: 16.5px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: var(--texto-brillante);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dueno-genero {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    padding: 3px 11px 3px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-family: 'Quicksand', sans-serif;
+    letter-spacing: 0.3px;
+    color: var(--carrito-acento);
+    background: rgba(var(--carrito-acento-rgb), 0.12);
+    border: 1px solid rgba(var(--carrito-acento-rgb), 0.25);
+}
+.dueno-genero-ic {
+    width: 13px;
+    height: 13px;
+    display: block;
+}
+.dueno-genero-ic svg { width: 100%; height: 100%; display: block; }
+.dueno-wa {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    color: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.92;
+    transition: transform 0.22s ease;
+}
+.dueno-wa svg { width: 26px; height: 26px; display: block; }
+.dueno-opcion:hover .dueno-wa { transform: scale(1.12); }
+
+@media (max-width: 480px) {
+    .dueno-sheet { padding: 30px 18px calc(24px + env(safe-area-inset-bottom, 0px)); }
+    .dueno-sheet-titulo { font-size: 19px; }
+    .dueno-foto { width: 54px; height: 54px; }
+    .dueno-opcion { gap: 12px; padding: 13px 14px; }
+}
+
+/* ─── ACCESIBILIDAD: foco visible por teclado ───
+   Solo aparece en navegación con teclado (:focus-visible), nunca con mouse.
+   outline no reflowea: no afecta el layout ni el diseño existente. */
+.header-nav ul li[data-nav] { cursor: pointer; }
+
+.tarjeta-producto:focus-visible,
+.header-nav ul li[data-nav]:focus-visible,
+.search-input:focus-visible,
+#menu-hamb:focus-visible,
+.carrito-wrapper:focus-visible,
+#buscar-btn:focus-visible,
+#filter-btn:focus-visible,
+.carrito-item:focus-visible {
+    outline: 2px solid var(--carrito-acento, #caac47);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+.tarjeta-producto:focus-visible,
+.carrito-item:focus-visible {
+    outline-offset: -2px;
+}
+
+/* ─── Tamaño uniforme de las X de cierre de modales ───
+   (excluye el menú hamburguesa, que es un toggle, no una X).
+   Solo normaliza tamaño del botón y del glifo; no toca posición ni centrado. */
+.btn-cerrar-modal,
+.carrito-cerrar,
+.modal-filtros-cerrar,
+.contacto-cerrar,
+.outfits-cerrar,
+.parati-cerrar,
+.cat-cerrar,
+.sobre-cerrar,
+.dueno-sheet-cerrar {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
 }
