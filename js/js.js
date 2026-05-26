@@ -1125,8 +1125,9 @@ function mostrarModalEncargueUnaVez() {
 
 const estadoFiltros = {
 	termino: '',
-	tags:    new Set(),
-	orden:   null
+	tags:        new Set(),
+	categorias:  new Set(),
+	orden:       null
 };
 
 /* ─── SWITCH ─── */
@@ -1200,6 +1201,15 @@ function registrarTagsVistos(tags) {
 	localStorage.setItem(key, JSON.stringify(datos));
 }
 
+function registrarCategoriaVista(categoria) {
+	if (!categoria) return;
+	const key = 'levitad-categorias-vistas';
+	const datos = JSON.parse(localStorage.getItem(key) || '{}');
+	const cat = String(categoria).toLowerCase();
+	datos[cat] = (datos[cat] || 0) + 1;
+	localStorage.setItem(key, JSON.stringify(datos));
+}
+
 /* Mueve el foco del teclado dentro de un modal/panel al abrirlo.
    - Si se pasa `preferido`, enfoca ese elemento (ej. el botón de comprar).
    - Si no, hace el contenedor enfocable con tabindex="-1" (NO entra al
@@ -1221,6 +1231,7 @@ function abrirDetalles(datos) {
 	document.querySelector('.header-nav')?.classList.add('nav-oculta');
 	registrarInteraccion(datos.nombre);
 	registrarTagsVistos(datos.tags);
+	registrarCategoriaVista(datos.categoria);
 
 	estadoTienda.productoDetalleActual = datos;
 	document.getElementById('modal-titulo').innerText = datos.nombre;
@@ -1421,6 +1432,12 @@ function aplicarFiltros() {
 		);
 	}
 
+	if (estadoFiltros.categorias.size > 0) {
+		resultado = resultado.filter(p =>
+			p.categoria && estadoFiltros.categorias.has(String(p.categoria).toLowerCase())
+		);
+	}
+
 	if (estadoFiltros.orden === 'precio-asc')  resultado.sort((a, b) => a.precio - b.precio);
 	if (estadoFiltros.orden === 'precio-desc') resultado.sort((a, b) => b.precio - a.precio);
 	if (estadoFiltros.orden === 'nombre')      resultado.sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -1438,7 +1455,7 @@ function filtrarProductos(termino) {
 function actualizarIndicadorFiltros() {
 	const filterBtn = document.getElementById('filter-btn');
 	if (!filterBtn) return;
-	const hayFiltros = estadoFiltros.tags.size > 0 || estadoFiltros.orden !== null;
+	const hayFiltros = estadoFiltros.tags.size > 0 || estadoFiltros.categorias.size > 0 || estadoFiltros.orden !== null;
 	filterBtn.classList.toggle('has-filters', hayFiltros);
 	let dot = filterBtn.querySelector('.filter-dot');
 	if (hayFiltros && !dot) {
@@ -1472,6 +1489,14 @@ function obtenerTodosLosTags() {
 	return [...set].sort();
 }
 
+function obtenerTodasLasCategorias() {
+	const set = new Set();
+	estadoTienda.productos.forEach(p => {
+		if (p.categoria) set.add(String(p.categoria).toLowerCase());
+	});
+	return [...set].sort();
+}
+
 function abrirModalFiltros() {
 	const existe = document.getElementById('modal-filtros');
 	if (existe) { cerrarModalFiltros(); return; }
@@ -1483,6 +1508,7 @@ function abrirModalFiltros() {
 	el.setAttribute('aria-modal', 'true');
 
 	const todos = obtenerTodosLosTags();
+	const todasCats = obtenerTodasLasCategorias();
 
 	el.innerHTML = `
 		<div class="modal-filtros-card">
@@ -1505,6 +1531,16 @@ function abrirModalFiltros() {
 						`).join('')}
 					</div>
 				</div>
+				${todasCats.length ? `
+				<div class="filtros-seccion">
+					<p class="filtros-seccion-label">Categorías</p>
+					<div class="filtros-tags-grid">
+						${todasCats.map(cat => `
+							<button class="filtros-tag-btn ${estadoFiltros.categorias.has(cat) ? 'is-active' : ''}" data-categoria="${cat}">${cat}</button>
+						`).join('')}
+					</div>
+				</div>
+				` : ''}
 				<div class="filtros-seccion">
 					<p class="filtros-seccion-label">Etiquetas</p>
 					<div class="filtros-tags-grid">
@@ -1534,7 +1570,7 @@ function abrirModalFiltros() {
 		});
 	});
 
-	el.querySelectorAll('.filtros-tag-btn').forEach(btn => {
+	el.querySelectorAll('.filtros-tag-btn[data-tag]').forEach(btn => {
 		btn.addEventListener('click', () => {
 			const tag = btn.dataset.tag;
 			if (estadoFiltros.tags.has(tag)) {
@@ -1547,8 +1583,22 @@ function abrirModalFiltros() {
 		});
 	});
 
+	el.querySelectorAll('.filtros-tag-btn[data-categoria]').forEach(btn => {
+		btn.addEventListener('click', () => {
+			const cat = btn.dataset.categoria;
+			if (estadoFiltros.categorias.has(cat)) {
+				estadoFiltros.categorias.delete(cat);
+				btn.classList.remove('is-active');
+			} else {
+				estadoFiltros.categorias.add(cat);
+				btn.classList.add('is-active');
+			}
+		});
+	});
+
 	el.querySelector('#filtros-reset').addEventListener('click', () => {
 		estadoFiltros.tags.clear();
+		estadoFiltros.categorias.clear();
 		estadoFiltros.orden = null;
 		el.querySelectorAll('.filtros-tag-btn').forEach(b => b.classList.remove('is-active'));
 		el.querySelectorAll('.filtros-orden-btn').forEach(b => b.classList.remove('is-active'));
@@ -2461,9 +2511,13 @@ function abrirParaTiPanel() {
 	if (document.getElementById('parati-panel')) return;
 
 	const tagsRaw   = JSON.parse(localStorage.getItem('levitad-tags-vistos') || '{}');
+	const catsRaw   = JSON.parse(localStorage.getItem('levitad-categorias-vistas') || '{}');
 	const tagsOrden = Object.entries(tagsRaw)
 		.sort(([, a], [, b]) => b - a)
 		.map(([tag]) => tag);
+	const catsOrden = Object.entries(catsRaw)
+		.sort(([, a], [, b]) => b - a)
+		.map(([cat]) => cat);
 
 	const ov = document.createElement('div');
 	ov.id = 'parati-overlay';
@@ -2474,7 +2528,7 @@ function abrirParaTiPanel() {
 	panel.className = 'parati-panel';
 
 	let bodyHTML;
-	if (!tagsOrden.length) {
+	if (!tagsOrden.length && !catsOrden.length) {
 		bodyHTML = `
 			<div class="parati-vacio">
 				<p class="parati-vacio-icono">✦</p>
@@ -2484,7 +2538,47 @@ function abrirParaTiPanel() {
 	} else {
 		const productoContador = {};
 		const MAX_APARICIONES = 2;
-		const secciones = tagsOrden.map(tag => {
+
+		// Sección sin título: recomendaciones por categorías vistas.
+		// Se muestra primero, sin <h3>, para no revelar al usuario la lógica.
+		let seccionCategorias = '';
+		if (catsOrden.length) {
+			const prodsCat = [];
+			const yaIncluidos = new Set();
+			const LIMITE_CARDS_CAT = 8;
+			for (const cat of catsOrden) {
+				if (prodsCat.length >= LIMITE_CARDS_CAT) break;
+				const candidatos = (estadoTienda.productos || []).filter(
+					p => p.categoria && String(p.categoria).toLowerCase() === cat &&
+					     !yaIncluidos.has(p.nombre) &&
+					     (productoContador[p.nombre] || 0) < MAX_APARICIONES
+				);
+				for (const p of candidatos) {
+					if (prodsCat.length >= LIMITE_CARDS_CAT) break;
+					prodsCat.push(p);
+					yaIncluidos.add(p.nombre);
+					productoContador[p.nombre] = (productoContador[p.nombre] || 0) + 1;
+				}
+			}
+			if (prodsCat.length) {
+				const cardsCatHTML = prodsCat.map(p => `
+					<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
+						<span class="parati-card-img" style="background-image:url('${(Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || ''}')"></span>
+						<span class="parati-card-info">
+							<span class="parati-card-nombre">${p.nombre}</span>
+							<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
+						</span>
+					</button>
+				`).join('');
+				seccionCategorias = `
+					<section class="parati-seccion">
+						<div class="parati-cards">${cardsCatHTML}</div>
+					</section>
+				`;
+			}
+		}
+
+		const seccionesTags = tagsOrden.map(tag => {
 			const prods = (estadoTienda.productos || []).filter(
 				p => Array.isArray(p.tags) && p.tags.includes(tag) &&
 				     (productoContador[p.nombre] || 0) < MAX_APARICIONES
@@ -2508,7 +2602,7 @@ function abrirParaTiPanel() {
 			`;
 		}).filter(Boolean).join('');
 
-		bodyHTML = secciones || `
+		bodyHTML = (seccionCategorias + seccionesTags) || `
 			<div class="parati-vacio">
 				<p class="parati-vacio-icono">✦</p>
 				<p class="parati-vacio-texto">No hay prendas disponibles con esas etiquetas todavía.</p>
