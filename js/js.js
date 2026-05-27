@@ -41,11 +41,6 @@ const WHATSAPP_OWNER_NUMBER        = '+5359271359';
 const DUENOS = [
 	{ nombre: 'Angel',   genero: 'hombre', telefono: '5300000000', foto: 'imagenes/dueno.jpg' },{ nombre: 'Erika', genero: 'mujer',  telefono: '5359271359', foto: 'imagenes/duena.jpg' }
 ];
-// En local (Live Server) usa el PocketBase de tu PC; en producción (GitHub Pages) usa el público.
-const POCKETBASE_URL = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
-	? 'http://127.0.0.1:8090'
-	: 'https://levitad.pockethost.io'; // producción: cambiar cuando resuelvas el hosting público
-
 /* ─── ICONOS ─── */
 const iconoCarrito = `
 	<svg xmlns="http://www.w3.org/2000/svg" id="Outline" viewBox="0 0 24 24" class="carrito-add">
@@ -888,7 +883,7 @@ function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
 	document.querySelector('.header-nav')?.classList.add('nav-oculta');
 }
 
-function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
+function cerrarBuscador(searchBar, searchInput) {
 	clearTimeout(_searchCloseTimer);
 	searchBar.classList.add('is-closing');
 	searchInput.value = '';
@@ -901,28 +896,6 @@ function cerrarBuscador(searchBar, searchInput, searchSubmitBtn) {
 		searchBar.classList.remove('is-active', 'is-closing');
 		_searchCloseTimer = null;
 	}, 420); // mayor que la transición más larga (380ms)
-}
-
-/* Cierra el buscador al dispararse la animación del header, pero CONSERVA
-   la búsqueda (texto del input y resultados filtrados). Restaura el nav
-   para que al volver arriba el header muestre alas + nav normalmente. */
-function ocultarBuscadorConservandoBusqueda() {
-	const searchBar = document.getElementById('search-bar');
-	if (!searchBar ||
-		!searchBar.classList.contains('is-active') ||
-		searchBar.classList.contains('is-closing')) return;
-
-	clearTimeout(_searchCloseTimer);
-	searchBar.classList.remove('is-scroll-hidden');
-	searchBar.classList.add('is-closing');
-	document.getElementById('search-input')?.blur();
-	if (!document.getElementById('modal-producto')?.classList.contains('is-active')) {
-		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
-	}
-	_searchCloseTimer = setTimeout(() => {
-		searchBar.classList.remove('is-active', 'is-closing');
-		_searchCloseTimer = null;
-	}, 420);
 }
 
 function renderizarProductos(productos, opciones = {}) {
@@ -2276,7 +2249,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		searchSubmitBtn.addEventListener('click', () =>
-			cerrarBuscador(searchBar, searchInput, searchSubmitBtn)
+			cerrarBuscador(searchBar, searchInput)
 		);
 
 		if (filterBtn) {
