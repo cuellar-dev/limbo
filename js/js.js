@@ -293,16 +293,15 @@ function renderizarCarrito() {
 	guardarCarrito();
 
 	// Actualizar botones según el carrito activo
-	const isEncargue = modo === 'encargue';
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
 		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 		if (!producto) return;
 		if (obtenerProductoEnCarrito(producto.nombre)) {
-			marcarBotonComoAgregado(btn, isEncargue);
+			marcarBotonComoAgregado(btn);
 		} else {
-			desmarcarBotonAgregado(btn, isEncargue);
+			desmarcarBotonAgregado(btn);
 		}
 	});
 }
@@ -404,9 +403,8 @@ function agregarAlCarrito(producto, boton) {
 		enlace: producto.enlace || 'none'
 	});
 
-	const isEncargue = modoActual() === 'encargue';
 	animarBotonAnadir(boton);
-	marcarBotonComoAgregado(boton, isEncargue);
+	marcarBotonComoAgregado(boton);
 	renderizarCarrito();
 }
 
@@ -414,13 +412,19 @@ function eliminarDelCarrito(index, itemEl) {
 	const carrito = carritoActivo();
 	if (!Number.isInteger(index) || index < 0 || index >= carrito.length) return;
 
+	// Evita doble-click durante la animación: si ya está saliendo, ignora.
+	if (itemEl?.classList.contains('is-removing')) return;
+
 	const productoEliminado = carrito[index];
 
 	// Si viene el elemento DOM, lo animamos antes de volver a renderizar
 	if (itemEl) {
 		itemEl.classList.add('is-removing');
+		// Capturamos el nombre para localizar el ítem en el array al ejecutarse el timeout,
+		// ya que el índice puede haber cambiado si otros elementos fueron eliminados antes.
 		setTimeout(() => {
-			carrito.splice(index, 1);
+			const idxActual = carrito.findIndex(it => it === productoEliminado);
+			if (idxActual !== -1) carrito.splice(idxActual, 1);
 			desmarcarProductoEnGrid(productoEliminado.nombre);
 			renderizarCarrito();
 		}, 340); // 340ms > 320ms del transition más largo (max-height)
@@ -432,13 +436,12 @@ function eliminarDelCarrito(index, itemEl) {
 }
 
 function desmarcarProductoEnGrid(nombre) {
-	const isEncargue = modoActual() === 'encargue';
 	document.querySelectorAll('.btn-anadir').forEach(btn => {
 		const tarjeta = btn.closest('.tarjeta-producto');
 		if (!tarjeta) return;
 		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 		if (producto && producto.nombre === nombre) {
-			desmarcarBotonAgregado(btn, isEncargue);
+			desmarcarBotonAgregado(btn);
 		}
 	});
 }
@@ -456,14 +459,13 @@ function vaciarCarrito() {
 		});
 		const delay = items.length * 40 + 330;
 		setTimeout(() => {
-			const isEncargue = modoActual() === 'encargue';
 			carrito.forEach(item => {
 				document.querySelectorAll('.btn-anadir').forEach(btn => {
 					const tarjeta = btn.closest('.tarjeta-producto');
 					if (!tarjeta) return;
 					const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
 					if (producto && producto.nombre === item.nombre) {
-						desmarcarBotonAgregado(btn, isEncargue);
+						desmarcarBotonAgregado(btn);
 					}
 				});
 			});
@@ -954,10 +956,21 @@ function renderizarProductos(productos, opciones = {}) {
 
 // --------- LA FUNCION DEL ALGORITMO DE PESO ----------//
 //cogemos los productos que tenemos y lo ordenamos por un peso que le asignamos por sus ventas, sus interacciones y por el peso que le asignemos//
+function leerJSONLocal(clave, fallback) {
+	try {
+		const raw = localStorage.getItem(clave);
+		if (!raw) return fallback;
+		const val = JSON.parse(raw);
+		return val ?? fallback;
+	} catch (_) {
+		return fallback;
+	}
+}
+
 function ordenarPorPesoAleatorio(productos) {
 	// aqui cogemos las interacciones que teniamos guardadas en el localstorage, si no habian, tomamos un arreglo vacio//
 
-	const interaccionesLocales = JSON.parse(localStorage.getItem('levitad-interacciones') || '{}');
+	const interaccionesLocales = leerJSONLocal('levitad-interacciones', {});
 	// Aqui creamos un nuevo arreglo de productos creandole la propiedad peso, que se rige por las ventas y eso//
 	const productosConPeso = productos.map(producto => {
 		const ventas = producto.ventas || 0;
@@ -1072,7 +1085,7 @@ function crearModalEncargue() {
 			<ul class="modal-encargue-lista">
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Prendas pedidas por usted, buscando alimentar sus Outifits</span>
+					<span>Prendas pedidas por usted, buscando alimentar sus Outfits</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
@@ -1187,27 +1200,33 @@ let sliderImagenes = [];
 let sliderActual   = 0;
 
 function registrarInteraccion(nombreProducto) {
-	const key = 'levitad-interacciones';
-	const interacciones = JSON.parse(localStorage.getItem(key) || '{}');
-	interacciones[nombreProducto] = (interacciones[nombreProducto] || 0) + 1;
-	localStorage.setItem(key, JSON.stringify(interacciones));
+	try {
+		const key = 'levitad-interacciones';
+		const interacciones = leerJSONLocal(key, {});
+		interacciones[nombreProducto] = (interacciones[nombreProducto] || 0) + 1;
+		localStorage.setItem(key, JSON.stringify(interacciones));
+	} catch (_) {}
 }
 
 function registrarTagsVistos(tags) {
 	if (!Array.isArray(tags) || !tags.length) return;
-	const key = 'levitad-tags-vistos';
-	const datos = JSON.parse(localStorage.getItem(key) || '{}');
-	tags.forEach(tag => { datos[tag] = (datos[tag] || 0) + 1; });
-	localStorage.setItem(key, JSON.stringify(datos));
+	try {
+		const key = 'levitad-tags-vistos';
+		const datos = leerJSONLocal(key, {});
+		tags.forEach(tag => { datos[tag] = (datos[tag] || 0) + 1; });
+		localStorage.setItem(key, JSON.stringify(datos));
+	} catch (_) {}
 }
 
 function registrarCategoriaVista(categoria) {
 	if (!categoria) return;
-	const key = 'levitad-categorias-vistas';
-	const datos = JSON.parse(localStorage.getItem(key) || '{}');
-	const cat = String(categoria).toLowerCase();
-	datos[cat] = (datos[cat] || 0) + 1;
-	localStorage.setItem(key, JSON.stringify(datos));
+	try {
+		const key = 'levitad-categorias-vistas';
+		const datos = leerJSONLocal(key, {});
+		const cat = String(categoria).toLowerCase();
+		datos[cat] = (datos[cat] || 0) + 1;
+		localStorage.setItem(key, JSON.stringify(datos));
+	} catch (_) {}
 }
 
 /* Mueve el foco del teclado dentro de un modal/panel al abrirlo.
@@ -1257,11 +1276,10 @@ function abrirDetalles(datos) {
 	// y bloqueado para cualquier producto siguiente que se abra.
 	const btnModal = document.getElementById('btn-comprar-ahora');
 	if (btnModal) {
-		const isEncargue = modoActual() === 'encargue';
 		if (obtenerProductoEnCarrito(datos.nombre)) {
-			marcarBotonComoAgregado(btnModal, isEncargue);
+			marcarBotonComoAgregado(btnModal);
 		} else {
-			desmarcarBotonAgregado(btnModal, isEncargue);
+			desmarcarBotonAgregado(btnModal);
 		}
 	}
 
@@ -1305,7 +1323,7 @@ function renderizarSlider(imagenes, nombre) {
 
 	track.innerHTML = imagenes.map(src => `
 		<div class="modal-slide">
-			<img src="${src}" alt="${nombre}" class="modal-slide-img" decoding="async">
+			<img src="${esc(src)}" alt="${esc(nombre)}" class="modal-slide-img" decoding="async">
 		</div>
 	`).join('');
 	track.style.transform = 'translateX(0)';
@@ -1951,10 +1969,11 @@ function cerrarSobreLevitadPanel() {
 ═══════════════════════════════════════════════════════════ */
 function abrirOutfitsPanel() {
 	if (document.getElementById('outfits-panel')) return;
-	document.body.classList.add('outfits-abierto');
 
 	const outfits = (estadoTienda.outfits || []);
 	if (!outfits.length) return;
+
+	document.body.classList.add('outfits-abierto');
 
 	const ov = document.createElement('div');
 	ov.id = 'outfits-overlay';
@@ -1971,12 +1990,16 @@ function abrirOutfitsPanel() {
 
 	// HTML de cada slide ─────────────────────────────────────────
 	const slidesHTML = outfits.map((outfit, idx) => {
-		const markersHTML = outfit.prendas.map((pr, i) => `
-			<span class="outfit-marker" data-idx="${i}"
-			      style="left:${pr.puntoX}%;top:${pr.puntoY}%">
-				<span class="outfit-marker-num">${i + 1}</span>
-			</span>
-		`).join('');
+		const markersHTML = outfit.prendas.map((pr, i) => {
+			const px = Math.max(0, Math.min(100, Number(pr.puntoX) || 0));
+			const py = Math.max(0, Math.min(100, Number(pr.puntoY) || 0));
+			return `
+				<span class="outfit-marker" data-idx="${i}"
+				      style="left:${px}%;top:${py}%">
+					<span class="outfit-marker-num">${i + 1}</span>
+				</span>
+			`;
+		}).join('');
 
 		const cardsHTML = outfit.prendas.map((pr, i) => {
 			const prod = mapaProductos.get(pr.producto);
@@ -1987,14 +2010,14 @@ function abrirOutfitsPanel() {
 			const noProd = prod ? '' : 'is-placeholder';
 			return `
 				<button class="outfit-prenda ${noProd}" data-idx="${i}"
-				        data-producto="${nom.replace(/"/g, '&quot;')}"
+				        data-producto="${esc(nom)}"
 				        ${prod ? '' : 'disabled aria-disabled="true"'}>
 					<span class="outfit-prenda-num">${i + 1}</span>
-					<span class="outfit-prenda-img" style="background-image:url('${img}')"></span>
+					<span class="outfit-prenda-img" style="background-image:url('${encodeURI(img)}')"></span>
 					<span class="outfit-prenda-info">
-						<span class="outfit-prenda-cat">${cat}</span>
-						<span class="outfit-prenda-nombre">${nom}</span>
-						${prec ? `<span class="outfit-prenda-precio">${prec}</span>` : ''}
+						<span class="outfit-prenda-cat">${esc(cat)}</span>
+						<span class="outfit-prenda-nombre">${esc(nom)}</span>
+						${prec ? `<span class="outfit-prenda-precio">${esc(prec)}</span>` : ''}
 					</span>
 					<span class="outfit-prenda-arrow">→</span>
 				</button>
@@ -2002,18 +2025,18 @@ function abrirOutfitsPanel() {
 		}).join('');
 
 		return `
-			<article class="outfit-slide" data-outfit-id="${outfit.id}" data-slide="${idx}">
+			<article class="outfit-slide" data-outfit-id="${esc(outfit.id)}" data-slide="${idx}">
 				<div class="outfit-imagen-wrap">
-					<div class="outfit-imagen" style="background-image:url('${outfit.imagen}')"></div>
+					<div class="outfit-imagen" style="background-image:url('${encodeURI(outfit.imagen || '')}')"></div>
 					<div class="outfit-markers">${markersHTML}</div>
 				</div>
 
 				<aside class="outfit-detalle">
 					<header class="outfit-detalle-head">
 						<span class="outfit-detalle-eyebrow">Look ${String(idx + 1).padStart(2, '0')}</span>
-						<h3 class="outfit-detalle-titulo">${outfit.nombre}</h3>
-						<p class="outfit-detalle-estilo">${outfit.estilo}</p>
-						<p class="outfit-detalle-desc">${outfit.descripcion}</p>
+						<h3 class="outfit-detalle-titulo">${esc(outfit.nombre)}</h3>
+						<p class="outfit-detalle-estilo">${esc(outfit.estilo)}</p>
+						<p class="outfit-detalle-desc">${esc(outfit.descripcion)}</p>
 					</header>
 					<div class="outfit-prendas-lista">${cardsHTML}</div>
 					<button class="outfit-llevar-todo" data-outfit-idx="${idx}" type="button">
@@ -2185,32 +2208,6 @@ function initTema() {
 	}
 }
 
-/* ── Header Nav Links ── */
-function initHeaderNavLinks() {
-	const navItems = document.querySelectorAll('.header-nav li');
-	if (!navItems.length) return;
-
-	navItems.forEach(item => {
-		item.addEventListener('click', (e) => {
-			e.preventDefault();
-			const text = item.textContent.trim().toUpperCase();
-			
-			// Abrir el panel correspondiente según el texto
-			setTimeout(() => {
-				if (text.includes('CATEGOR')) {
-					abrirCategoriasPanel();
-				} else if (text.includes('PARA TI')) {
-					abrirParaTiPanel();
-				} else if (text.includes('OUTFITS')) {
-					abrirOutfitsPanel();
-				} else if (text.includes('CONTACTO')) {
-					abrirContactoPanel();
-				}
-			}, 100);
-		});
-	});
-}
-
 document.addEventListener('DOMContentLoaded', () => {
 	initTema();
 	cargarCarritoGuardado();
@@ -2258,7 +2255,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	initMenuHamburguesa();
 	initContactoPanel();
 	initSobrePanel();
-	initHeaderNavLinks();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
 	if (carritoWrapper)  carritoWrapper.addEventListener('keydown', (e) => {
@@ -2279,6 +2275,26 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 	}
+
+	// Tecla Escape: cierra modales/paneles abiertos en orden de prioridad.
+	document.addEventListener('keydown', (e) => {
+		if (e.key !== 'Escape') return;
+		const filtros  = document.getElementById('modal-filtros');
+		const dueno    = document.getElementById('dueno-sheet');
+		const encargue = document.getElementById('modal-encargue');
+		const modalProd = document.getElementById('modal-producto');
+		const carrito  = document.getElementById('carrito-panel');
+		const search   = document.getElementById('search-bar');
+
+		if (filtros)  { cerrarModalFiltros(); return; }
+		if (dueno)    { dueno.querySelector('.dueno-sheet-cerrar')?.click(); return; }
+		if (encargue) { document.getElementById('modal-encargue-cerrar')?.click(); return; }
+		if (modalProd?.classList.contains('is-active')) { cerrarModal(); return; }
+		if (carrito?.classList.contains('is-active'))   { cerrarCarrito(); return; }
+		if (search?.classList.contains('is-active') && !search.classList.contains('is-closing')) {
+			cerrarBuscador(search, document.getElementById('search-input'), document.getElementById('search-submit-btn'));
+		}
+	});
 
 	// Service Worker: cachea imágenes (Cloudinary + locales) para que las
 	// próximas visitas las carguen del disco. Ver sw.js.

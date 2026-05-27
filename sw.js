@@ -13,7 +13,7 @@
    versión en CACHE_NAME. El activate borra los cachés viejos.
    ═══════════════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME = 'levitad-img-v1';
+const CACHE_NAME = 'levitad-img-v2';
 
 self.addEventListener('install', () => {
     self.skipWaiting();
@@ -46,10 +46,14 @@ self.addEventListener('fetch', (e) => {
         caches.open(CACHE_NAME).then(cache =>
             cache.match(req).then(cached => {
                 if (cached) return cached;
-                return fetch(req).then(res => {
-                    // Guardamos también respuestas "opaque" (cross-origin sin CORS).
-                    // No bloquea la respuesta al usuario si el cache.put falla.
-                    if (res && (res.ok || res.type === 'opaque')) {
+                // Para Cloudinary forzamos modo CORS (lo soporta) para obtener
+                // respuestas con status legible — así evitamos cachear 404/500
+                // como "opaque" y dejar imágenes rotas permanentes.
+                const fetchReq = esCloudinary
+                    ? new Request(req.url, { mode: 'cors', credentials: 'omit' })
+                    : req;
+                return fetch(fetchReq).then(res => {
+                    if (res && res.ok && res.status === 200) {
                         cache.put(req, res.clone()).catch(() => {});
                     }
                     return res;
