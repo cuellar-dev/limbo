@@ -5,6 +5,18 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- ── Content Security Policy ──
+         Bloquea inyección de scripts maliciosos, embeds no autorizados y phishing.
+         - script-src: solo nuestros JS y GSAP desde cdnjs (la única CDN remota).
+         - style-src 'unsafe-inline': necesario por los <style> dentro de los SVG de alas
+           y por los `element.style.*` que setea JS en tiempo de ejecución.
+         - img-src https:: el panel admin permite cualquier URL de imagen (Cloudinary, ImgBB...).
+         - connect-src: fetch a datos.json (self) y al backend de formsubmit.co (contacto).
+         - frame-ancestors 'none': previene clickjacking (no se puede embeber en iframes).
+         - object-src 'none' + base-uri 'self': cierran vectores clásicos de XSS. -->
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
+
     <!-- ── SEO básico ── -->
     <title>Lévitad</title>
     <meta name="description" content="Lévitad — Tienda Online para prendas traidas desde el extranjero, con precios rentables y calidad soñada">
