@@ -821,7 +821,14 @@ function cargarMas() {
 
 		nuevasTarjetas.forEach(tarjeta => {
 			tarjeta.querySelectorAll('.img-producto').forEach(img => {
-				if (!img.complete) img.addEventListener('load', () => estadoTienda.masonry?.layout(), { once: true });
+				const contenedor = img.closest('.imagen-contenedor');
+				const desmarcar  = () => contenedor?.classList.remove('is-loading');
+				if (img.complete && img.naturalHeight > 0) {
+					desmarcar();
+				} else {
+					img.addEventListener('load',  () => { desmarcar(); estadoTienda.masonry?.layout(); }, { once: true });
+					img.addEventListener('error', () => { desmarcar(); estadoTienda.masonry?.layout(); }, { once: true });
+				}
 			});
 		});
 
