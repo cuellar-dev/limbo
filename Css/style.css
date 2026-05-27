@@ -717,6 +717,34 @@ svg.icono-transicion {
     -webkit-user-drag: none;
     pointer-events: none;
     margin-bottom: 26px;
+    transition: opacity 0.35s ease;
+}
+
+/* Skeleton del slider de detalle: shimmer dorado mientras carga la foto.
+   La clase `is-loading` se quita en JS al disparar `load` o `error`. */
+.modal-slide.is-loading {
+    min-height: 320px;
+    border-radius: 10px;
+    margin: 24px 16px 34px;
+    padding: 0;
+    background-color: #141a29;
+    background-image: linear-gradient(110deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(202, 172, 71, 0.10) 50%,
+        rgba(255, 255, 255, 0.03) 75%);
+    background-size: 220% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.modal-slide.is-loading .modal-slide-img { opacity: 0; }
+body.is-light .modal-slide.is-loading {
+    background-color: #eef2f8;
+    background-image: linear-gradient(110deg,
+        rgba(43, 47, 51, 0.04) 25%,
+        rgba(202, 172, 71, 0.14) 50%,
+        rgba(43, 47, 51, 0.04) 75%);
+}
+@media (prefers-reduced-motion: reduce) {
+    .modal-slide.is-loading { animation: none; }
 }
 
 .modal-slider-btn {

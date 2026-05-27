@@ -983,21 +983,90 @@ function ordenarPorPesoAleatorio(productos) {
 
 
 
+/* Inyecta `f_auto,q_auto` en URLs de Cloudinary que no las tengan, para que
+   Cloudinary entregue WebP/AVIF al navegador en vez del JPG/PNG original.
+   Las URLs nuevas que NO se subieron desde el panel admin a veces no traen
+   estas transformaciones — esto las arregla en el render. */
+function optimizarUrlImagen(url) {
+	if (typeof url !== 'string' || !url.includes('res.cloudinary.com')) return url;
+	if (url.includes('/upload/f_auto') || url.includes(',f_auto')) return url;
+	return url.replace('/upload/', '/upload/f_auto,q_auto/');
+}
+
+function optimizarImagenesProducto(p) {
+	const out = { ...p };
+	if (Array.isArray(p.imagenes)) out.imagenes = p.imagenes.map(optimizarUrlImagen);
+	if (p.imagen) out.imagen = optimizarUrlImagen(p.imagen);
+	return out;
+}
+
 async function cargarProductos() {
 	try {
 		const resp = await fetch('datos/datos.json', { cache: 'no-cache' });
 		if (!resp.ok) throw new Error(`No se pudo leer datos.json (${resp.status})`);
 		const data = await resp.json();
-		const productos = Array.isArray(data) ? data : (data.productos || []);
-		const outfits   = Array.isArray(data) ? []   : (data.outfits   || []);
+		const productosRaw = Array.isArray(data) ? data : (data.productos || []);
+		const outfitsRaw   = Array.isArray(data) ? []   : (data.outfits   || []);
+		// Optimizamos URLs antes de guardar en estado: todos los render leen ya optimizado.
+		const productos = productosRaw.map(optimizarImagenesProducto);
+		const outfits   = outfitsRaw.map(o => o.imagen
+			? { ...o, imagen: optimizarUrlImagen(o.imagen) }
+			: o
+		);
 
 		estadoTienda.productos = ordenarPorPesoAleatorio(productos);
 		estadoTienda.outfits   = outfits;
 
 		aplicarFiltros();
+		prefetchImagenesEnIdle();
 	} catch (error) {
 		console.error('Error cargando productos:', error);
 		mostrarAviso('error', 'No pudimos cargar los productos. Revisa tu conexión e intenta recargar la página.', 'Error de conexión');
+	}
+}
+
+/* Después de cargar el catálogo, en momentos de inactividad del navegador,
+   pide en segundo plano todas las imágenes que NO están aún en el DOM. Así
+   el SW las cachea y la próxima navegación (filtrar, abrir detalle, scrollear)
+   es instantánea. No corre en conexiones lentas o con "ahorro de datos". */
+function prefetchImagenesEnIdle() {
+	const conn = navigator.connection;
+	if (conn && (conn.saveData || conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g')) {
+		return;
+	}
+	const ejecutar = () => {
+		const urls = new Set();
+		estadoTienda.productos.forEach(p => {
+			if (Array.isArray(p.imagenes)) p.imagenes.forEach(u => u && urls.add(u));
+			if (p.imagen) urls.add(p.imagen);
+		});
+		estadoTienda.outfits.forEach(o => { if (o.imagen) urls.add(o.imagen); });
+
+		// Sacar las que el browser ya descargó (están en el DOM completas)
+		document.querySelectorAll('img').forEach(img => {
+			if (img.complete && img.naturalHeight > 0) {
+				urls.delete(img.currentSrc || img.src);
+			}
+		});
+
+		// Pedir de a una con espaciado (no saturar la red ni el SW)
+		const lista = [...urls];
+		let i = 0;
+		const siguiente = () => {
+			if (i >= lista.length) return;
+			const img = new Image();
+			img.decoding = 'async';
+			const seguir = () => { i++; setTimeout(siguiente, 120); };
+			img.onload = seguir;
+			img.onerror = seguir;
+			img.src = lista[i];
+		};
+		siguiente();
+	};
+	if ('requestIdleCallback' in window) {
+		requestIdleCallback(ejecutar, { timeout: 5000 });
+	} else {
+		setTimeout(ejecutar, 2500);
 	}
 }
 
@@ -1306,11 +1375,24 @@ function renderizarSlider(imagenes, nombre) {
 	if (!track) return;
 
 	track.innerHTML = imagenes.map(src => `
-		<div class="modal-slide">
+		<div class="modal-slide is-loading">
 			<img src="${src}" alt="${nombre}" class="modal-slide-img" decoding="async">
 		</div>
 	`).join('');
 	track.style.transform = 'translateX(0)';
+
+	// Quitar el shimmer cuando la imagen carga (o falla). Mismo patrón que las
+	// tarjetas del grid: si la imagen ya está completa (caché), desmarcamos al instante.
+	track.querySelectorAll('.modal-slide-img').forEach(img => {
+		const slide = img.closest('.modal-slide');
+		const desmarcar = () => slide?.classList.remove('is-loading');
+		if (img.complete && img.naturalHeight > 0) {
+			desmarcar();
+		} else {
+			img.addEventListener('load',  desmarcar, { once: true });
+			img.addEventListener('error', desmarcar, { once: true });
+		}
+	});
 
 	const hasMult = imagenes.length > 1;
 	if (dots) {
