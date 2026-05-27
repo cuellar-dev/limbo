@@ -5,3 +5,10 @@ backend/pb_data/
 # Editor / herramientas
 .vscode/
 .claude/settings.local.json
+
+# Dependencias y lockfiles (instalación local de herramientas de build)
+node_modules/
+package.json
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

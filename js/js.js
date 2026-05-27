@@ -669,10 +669,16 @@ function crearTarjetaProducto(producto, index) {
 	const clasesBoton   = yaEnCarrito ? 'btn-anadir is-agregado' : 'btn-anadir';
 	const deshabilitado = yaEnCarrito ? 'disabled' : '';
 
+	const claseLoading = imgSrc ? ' is-loading' : '';
+	// Las primeras 4 tarjetas son LCP (el usuario las ve sin scrollear). Las cargamos
+	// con prioridad alta y sin lazy. El resto sigue lazy/async como antes.
+	const esLcp = index < 4;
+	const loadingAttr  = esLcp ? 'eager' : 'lazy';
+	const priorityAttr = esLcp ? ' fetchpriority="high"' : '';
 	return `
 		<article class="tarjeta-producto" data-producto-id="${index}" role="button" tabindex="0" aria-label="Ver detalles de ${nombreEsc}, ${formatPrecio(producto.precio)}">
-			<div class="imagen-contenedor">
-				<img class="img-producto" src="${imgSrc}" alt="${nombreEsc}" loading="lazy" decoding="async">
+			<div class="imagen-contenedor${claseLoading}">
+				<img class="img-producto" src="${imgSrc}" alt="${nombreEsc}" loading="${loadingAttr}" decoding="async"${priorityAttr}>
 				<div class="sombra-interior"></div>
 			</div>
 			<div class="info-producto">
@@ -728,8 +734,17 @@ function inicializarMasonry() {
 	}
 
 	// Reatach solo a imágenes del render actual (con once para no acumular).
+	// Además quita la clase `is-loading` del contenedor cuando carga (o falla)
+	// para que el skeleton-shimmer desaparezca.
 	productosGrid.querySelectorAll('.img-producto').forEach(img => {
-		if (!img.complete) img.addEventListener('load', relayout, { once: true });
+		const contenedor = img.closest('.imagen-contenedor');
+		const desmarcar  = () => contenedor?.classList.remove('is-loading');
+		if (img.complete && img.naturalHeight > 0) {
+			desmarcar();
+		} else {
+			img.addEventListener('load',  () => { desmarcar(); relayout(); }, { once: true });
+			img.addEventListener('error', () => { desmarcar(); relayout(); }, { once: true });
+		}
 	});
 
 	setTimeout(relayout, 120);
@@ -970,7 +985,14 @@ function ordenarPorPesoAleatorio(productos) {
 		// LA FORMULA DEL PESO//
 		const pesoTotal = (ventas*3) + (interaccionesTotales*2) + (pesoManual*5);
 		const bloquePeso = Math.floor(pesoTotal / 10) * 10;
-		const pesoFinal = bloquePeso + Math.random() // Agrega un componente aleatorio dentro del bloque de peso
+		// Antes: `Math.random()` daba orden distinto en cada visita → rompía
+		// el cache del HTML y confundía al usuario. Ahora un hash estable del
+		// nombre desempata dentro del bloque: misma prenda siempre misma
+		// posición, pero el orden dentro del bloque sigue siendo "variado".
+		let h = 0;
+		const n = producto.nombre || '';
+		for (let i = 0; i < n.length; i++) h = ((h << 5) - h + n.charCodeAt(i)) | 0;
+		const pesoFinal = bloquePeso + (Math.abs(h) % 1000) / 1000;
 		//aqui retornamos todo el arrgelo original de producto pero con la propiedad _pesoOrdenamiento con el valor de pesoFinal//
 		return { ...producto, _pesoOrdenamiento: pesoFinal };
 	});

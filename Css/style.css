@@ -353,6 +353,36 @@ body.is-encargue #menu-hamb g {
     width: 100%;
     height: auto;
     display: block;
+    transition: opacity 0.35s ease;
+}
+/* Skeleton: shimmer animado mientras la imagen del producto carga.
+   La clase `is-loading` se quita en JS al disparar `load` o `error`. */
+.imagen-contenedor.is-loading {
+    min-height: 260px;
+    background-color: #141a29;
+    background-image: linear-gradient(110deg,
+        rgba(255, 255, 255, 0.03) 25%,
+        rgba(202, 172, 71, 0.10) 50%,
+        rgba(255, 255, 255, 0.03) 75%);
+    background-size: 220% 100%;
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+.imagen-contenedor.is-loading .img-producto {
+    opacity: 0;
+}
+body.is-light .imagen-contenedor.is-loading {
+    background-color: #eef2f8;
+    background-image: linear-gradient(110deg,
+        rgba(43, 47, 51, 0.04) 25%,
+        rgba(202, 172, 71, 0.14) 50%,
+        rgba(43, 47, 51, 0.04) 75%);
+}
+@keyframes skeleton-shimmer {
+    0%   { background-position: 220% 0; }
+    100% { background-position: -220% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .imagen-contenedor.is-loading { animation: none; }
 }
 
 /* Sombra interior muy sutil solo en la base de la imagen */
