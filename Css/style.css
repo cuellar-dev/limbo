@@ -5484,6 +5484,15 @@ body.is-encargue .sobre-divider {
 body.is-encargue .sobre-firma {
     color: var(--acento-encargue) !important;
 }
+.sobre-firma-link {
+    color: inherit;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;
+    transition: opacity 0.2s ease;
+    opacity: 0.85;
+}
+.sobre-firma-link:hover { opacity: 1; }
 
 .sobre-pais {
     margin-top: 6px;
@@ -5867,4 +5876,325 @@ body.is-light .aviso-cerrar {
     width: 36px;
     height: 36px;
     font-size: 15px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Modal Kouma — créditos del desarrollador
+   Se activa al pulsar [data-kouma-trigger]. Pantalla completa, paleta
+   dorado-sobre-negro para encajar con Lévitad. Animación en dos tiempos:
+     1) Una "cortina" sólida sube de abajo a arriba (~700ms).
+     2) Cuando termina, el logo se dibuja (clip-path wipe + line scale)
+        y el resto del contenido entra escalonado.
+   Todo respeta prefers-reduced-motion al final del bloque.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.kouma-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1400; /* por encima de cualquier modal/sheet del sitio */
+    display: none;
+    background: transparent;
+    overflow: hidden;
+    color: #f5e7b8;
+}
+
+.kouma-modal.is-active {
+    display: block;
+}
+
+/* Cortina: el fondo negro que cubre la pantalla. Empieza fuera (translateY 100%)
+   y sube. Usamos un radial gradient idéntico al sitio para que se sienta
+   continuidad de marca. */
+.kouma-modal__curtain {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top center, #1B2233 0%, #000000 60%);
+    transform: translateY(100%);
+    will-change: transform;
+}
+
+.kouma-modal.is-opening .kouma-modal__curtain {
+    animation: kouma-curtain-up 700ms cubic-bezier(0.7, 0, 0.2, 1) forwards;
+}
+
+.kouma-modal.is-closing .kouma-modal__curtain {
+    animation: kouma-curtain-down 500ms cubic-bezier(0.7, 0, 0.2, 1) forwards;
+}
+
+@keyframes kouma-curtain-up {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+@keyframes kouma-curtain-down {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-100%); }
+}
+
+/* Botón cerrar — esquina superior derecha, sutil. */
+.kouma-modal__close {
+    position: absolute;
+    top: max(18px, env(safe-area-inset-top, 0px));
+    right: 18px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(202, 172, 71, 0.25);
+    border-radius: 50%;
+    color: #caac47;
+    cursor: pointer;
+    z-index: 2;
+    opacity: 0;
+    transition: background 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+
+.kouma-modal__close:hover,
+.kouma-modal__close:focus-visible {
+    background: rgba(202, 172, 71, 0.12);
+    border-color: rgba(202, 172, 71, 0.55);
+    transform: scale(1.05);
+    outline: none;
+}
+
+.kouma-modal.is-opening .kouma-modal__close {
+    animation: kouma-fade-in 400ms ease 800ms forwards;
+}
+
+/* Contenedor del contenido: centrado, scroll vertical si hace falta. */
+.kouma-modal__content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    width: 100%;
+    padding: clamp(40px, 8vh, 80px) 24px clamp(32px, 6vh, 60px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(22px, 4vh, 36px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+}
+
+.kouma-modal.is-opening .kouma-modal__content {
+    animation: kouma-fade-in 1ms ease 700ms forwards; /* solo "encender" tras la cortina */
+}
+
+/* ─────── LOGO ─────── */
+.kouma-logo {
+    text-align: center;
+    user-select: none;
+    margin-bottom: clamp(6px, 1.5vh, 14px);
+}
+
+/* コウマ (katakana) — sistema CJK del dispositivo. clip-path wipe L→R */
+.kouma-logo__kana {
+    font-family: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Noto Sans JP',
+                 'Microsoft YaHei', 'PingFang SC', system-ui, sans-serif;
+    font-size: clamp(38px, 9vw, 64px);
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    color: #caac47;
+    line-height: 1;
+    margin-bottom: clamp(10px, 1.6vh, 16px);
+    /* Empieza oculto cortado a la izquierda; el wipe lo revela. */
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+}
+
+.kouma-modal.is-opening .kouma-logo__kana {
+    animation: kouma-wipe-in 700ms cubic-bezier(0.65, 0, 0.35, 1) 820ms forwards;
+}
+
+/* Línea dorada — escala de 0 a 1 horizontal, delay tras el kana. */
+.kouma-logo__line {
+    width: clamp(60px, 12vw, 90px);
+    height: 1.5px;
+    margin: 0 auto clamp(10px, 1.8vh, 18px);
+    background: linear-gradient(90deg, transparent 0%, #caac47 20%, #caac47 80%, transparent 100%);
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0;
+}
+
+.kouma-modal.is-opening .kouma-logo__line {
+    animation: kouma-line-grow 500ms cubic-bezier(0.65, 0, 0.35, 1) 1280ms forwards;
+}
+
+/* KOUMA — wordmark display. Tipografía serif del sitio si existe;
+   si no, serif del sistema con feel editorial. */
+.kouma-logo__wordmark {
+    font-family: 'Cinzel', 'Trajan Pro', 'Playfair Display', Georgia, serif;
+    font-size: clamp(36px, 8vw, 56px);
+    font-weight: 400;
+    letter-spacing: clamp(0.18em, 1vw, 0.32em);
+    margin: 0 0 clamp(8px, 1.4vh, 12px);
+    color: #f5e7b8;
+    /* leve sombra dorada para profundidad */
+    text-shadow: 0 0 18px rgba(202, 172, 71, 0.18);
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+    /* el padding-right evita que el último carácter se corte por el letter-spacing */
+    padding-right: clamp(0.18em, 1vw, 0.32em);
+}
+
+.kouma-modal.is-opening .kouma-logo__wordmark {
+    animation: kouma-wipe-in 800ms cubic-bezier(0.65, 0, 0.35, 1) 1480ms forwards;
+}
+
+.kouma-logo__subtitle {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: clamp(11px, 2.6vw, 13px);
+    font-weight: 400;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(202, 172, 71, 0.7);
+    opacity: 0;
+}
+
+.kouma-modal.is-opening .kouma-logo__subtitle {
+    animation: kouma-fade-in 500ms ease 2080ms forwards;
+}
+
+/* ─────── BIO ─────── */
+.kouma-bio {
+    max-width: 520px;
+    text-align: center;
+    color: rgba(245, 231, 184, 0.78);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(14px, 2.6vw, 16px);
+    line-height: 1.65;
+    opacity: 0;
+}
+
+.kouma-bio p {
+    margin: 0 0 12px;
+}
+
+.kouma-bio p:last-child {
+    margin-bottom: 0;
+}
+
+.kouma-modal.is-opening .kouma-bio {
+    animation: kouma-rise-in 700ms cubic-bezier(0.25, 0.5, 0.25, 1) 2280ms forwards;
+}
+
+/* ─────── CTA ─────── */
+.kouma-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: #caac47;
+    color: #1B2233;
+    text-decoration: none;
+    border-radius: 999px;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: clamp(14px, 2.8vw, 15px);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    box-shadow: 0 4px 20px rgba(202, 172, 71, 0.25);
+    transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+    opacity: 0;
+}
+
+.kouma-cta:hover,
+.kouma-cta:focus-visible {
+    background: #d9bd5c;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(202, 172, 71, 0.35);
+    outline: none;
+}
+
+.kouma-cta:active {
+    transform: translateY(0);
+}
+
+.kouma-modal.is-opening .kouma-cta {
+    animation: kouma-rise-in 600ms cubic-bezier(0.25, 0.5, 0.25, 1) 2480ms forwards;
+}
+
+/* ─────── REDES ─────── */
+.kouma-socials {
+    display: flex;
+    gap: 14px;
+    opacity: 0;
+}
+
+.kouma-social {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(202, 172, 71, 0.22);
+    border-radius: 50%;
+    color: #caac47;
+    text-decoration: none;
+    transition: background 200ms ease, border-color 200ms ease, transform 200ms ease, color 200ms ease;
+}
+
+.kouma-social:hover,
+.kouma-social:focus-visible {
+    background: rgba(202, 172, 71, 0.12);
+    border-color: rgba(202, 172, 71, 0.6);
+    color: #f5e7b8;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.kouma-modal.is-opening .kouma-socials {
+    animation: kouma-rise-in 600ms cubic-bezier(0.25, 0.5, 0.25, 1) 2620ms forwards;
+}
+
+/* ─────── KEYFRAMES compartidos ─────── */
+@keyframes kouma-wipe-in {
+    from { clip-path: inset(0 100% 0 0); opacity: 1; }
+    to   { clip-path: inset(0 0 0 0);     opacity: 1; }
+}
+
+@keyframes kouma-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes kouma-line-grow {
+    from { transform: scaleX(0); opacity: 1; }
+    to   { transform: scaleX(1); opacity: 1; }
+}
+
+@keyframes kouma-rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Pantallas muy bajas: bajar gaps. */
+@media (max-height: 640px) {
+    .kouma-modal__content {
+        gap: 18px;
+        padding-top: 56px;
+    }
+    .kouma-bio p {
+        margin-bottom: 8px;
+    }
+}
+
+/* Reducir movimiento: el modal aparece directo, sin cortina ni wipes. */
+@media (prefers-reduced-motion: reduce) {
+    .kouma-modal.is-opening .kouma-modal__curtain { animation: none; transform: translateY(0); }
+    .kouma-modal.is-closing .kouma-modal__curtain { animation: none; transform: translateY(0); }
+    .kouma-modal.is-opening .kouma-logo__kana,
+    .kouma-modal.is-opening .kouma-logo__wordmark { animation: none; clip-path: inset(0 0 0 0); opacity: 1; }
+    .kouma-modal.is-opening .kouma-logo__line { animation: none; transform: scaleX(1); opacity: 1; }
+    .kouma-modal.is-opening .kouma-logo__subtitle,
+    .kouma-modal.is-opening .kouma-bio,
+    .kouma-modal.is-opening .kouma-cta,
+    .kouma-modal.is-opening .kouma-socials,
+    .kouma-modal.is-opening .kouma-modal__close,
+    .kouma-modal.is-opening .kouma-modal__content { animation: none; opacity: 1; transform: none; }
 }

@@ -2001,6 +2001,72 @@ function cerrarSobreLevitadPanel() {
 	}
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Modal Kouma — créditos del desarrollador.
+   Se dispara desde cualquier elemento con [data-kouma-trigger]
+   (los dos enlaces "Kouma" en el footer del sitio y del menú).
+   La animación de cortina + draw está en CSS; aquí solo gestionamos
+   las clases is-active / is-opening / is-closing y los listeners.
+   ═══════════════════════════════════════════════════════════════ */
+function initKoumaModal() {
+	const modal = document.getElementById('kouma-modal');
+	if (!modal) return;
+
+	document.querySelectorAll('[data-kouma-trigger]').forEach(el => {
+		el.addEventListener('click', (e) => {
+			e.preventDefault();
+			abrirKoumaModal();
+		});
+	});
+
+	modal.querySelector('.kouma-modal__close')?.addEventListener('click', cerrarKoumaModal);
+
+	// Click sobre la cortina (fondo) cierra. El contenido NO cierra al hacer click.
+	modal.querySelector('.kouma-modal__curtain')?.addEventListener('click', cerrarKoumaModal);
+}
+
+function _koumaEscHandler(e) {
+	if (e.key === 'Escape') cerrarKoumaModal();
+}
+
+function abrirKoumaModal() {
+	const modal = document.getElementById('kouma-modal');
+	if (!modal || modal.classList.contains('is-active')) return;
+
+	modal.classList.remove('is-closing');
+	modal.classList.add('is-active');
+	modal.setAttribute('aria-hidden', 'false');
+	// is-opening se aplica en el siguiente frame para que las animaciones disparen
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		modal.classList.add('is-opening');
+	}));
+
+	document.body.style.overflow = 'hidden';
+	document.addEventListener('keydown', _koumaEscHandler);
+
+	// Foco al botón cerrar tras la cortina (mejora a11y)
+	setTimeout(() => {
+		modal.querySelector('.kouma-modal__close')?.focus();
+	}, 850);
+}
+
+function cerrarKoumaModal() {
+	const modal = document.getElementById('kouma-modal');
+	if (!modal || !modal.classList.contains('is-active')) return;
+
+	modal.classList.remove('is-opening');
+	modal.classList.add('is-closing');
+
+	document.removeEventListener('keydown', _koumaEscHandler);
+
+	// Tras la animación de salida, ocultar de verdad
+	setTimeout(() => {
+		modal.classList.remove('is-active', 'is-closing');
+		modal.setAttribute('aria-hidden', 'true');
+		document.body.style.overflow = '';
+	}, 520);
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    Panel de Outfits — mostruario tipo lookbook.
@@ -2342,6 +2408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	initMenuHamburguesa();
 	initContactoPanel();
 	initSobrePanel();
+	initKoumaModal();
 	initHeaderNavLinks();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);

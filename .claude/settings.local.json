@@ -10,7 +10,12 @@
       "PowerShell(Get-ChildItem 'd:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\\\\Fuentes\\\\' -Recurse | Select-Object Name, @{N='KB';E={[math]::Round\\($_.Length/1KB,1\\)}})",
       "Bash(node -e ' *)",
       "Bash(node --input-type=module)",
-      "Bash(node --check js/js.js)"
+      "Bash(node --check js/js.js)",
+      "PowerShell(Get-ChildItem -Path \"d:\\\\diseñoWeb\\\\pinchas\\\\Lévitad\" -File | Where-Object { $_.Name -match \"^\\\\.env|config|settings\" } | Select-Object Name)",
+      "Bash(git pull *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
