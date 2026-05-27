@@ -14,8 +14,12 @@
          - connect-src: fetch a datos.json (self) y al backend de formsubmit.co (contacto).
          - frame-ancestors 'none': previene clickjacking (no se puede embeber en iframes).
          - object-src 'none' + base-uri 'self': cierran vectores clásicos de XSS. -->
+    <!-- Nota: el hash sha256-vvt4... permite el script inline que Live Server inyecta
+         en desarrollo para auto-recarga. En producción (GitHub Pages) ese script no
+         existe; el hash no concede acceso a otros scripts inline (cada hash matchea
+         contenido exacto). Si actualizas Live Server y el hash cambia, actualízalo. -->
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
+          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
 
     <!-- ── SEO básico ── -->
     <title>Lévitad</title>
