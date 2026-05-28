@@ -39,7 +39,7 @@ const WHATSAPP_OWNER_NUMBER        = '+5359271359';
    - telefono: solo dígitos con código de país, SIN el signo +  (ej: 5359271359)
    - foto: archivo dentro de imagenes/  (pon ahí las fotos reales)            */
 const DUENOS = [
-	{ nombre: 'Angel',   genero: 'hombre', telefono: '5300000000', foto: 'imagenes/dueno.jpg' },{ nombre: 'Erika', genero: 'mujer',  telefono: '5359271359', foto: 'imagenes/duena.jpg' }
+	{ nombre: 'Angel',   genero: 'hombre', telefono: '5359271359', foto: 'imagenes/dueno.jpg' },{ nombre: 'Erika', genero: 'mujer',  telefono: '5350462333', foto: 'imagenes/duena.jpg' }
 ];
 /* ─── ICONOS ─── */
 const iconoCarrito = `
@@ -205,12 +205,12 @@ const CARRITO_TEXTOS = {
 		vacio:     'Aún no agregaste nada.\nExplora el catálogo y suma lo que te guste.',
 		vacioBadge:'🛍️',
 		whatsapp:  'Enviar Pedido por WhatsApp',
-		nota:      'Escribenos para coordinar pago y entrega'
+		nota:      'Escríbenos para coordinar pago y entrega'
 	},
 	encargue: {
-		titulo:    'Listo para Encargar ?',
-		subtitulo: 'Alimente su Outfit',
-		vacio:     'Aún no elegiste nada para encargar.\nSelecciona las prendas que quiera encargar',
+		titulo:    '¿Listo para Encargar?',
+		subtitulo: 'Alimenta tu Outfit',
+		vacio:     'Aún no elegiste nada para encargar.\nSelecciona las prendas que quieras encargar.',
 		vacioBadge:'✦',
 		whatsapp:  'Enviar encargo vía WhatsApp',
 		nota:      'Coordinamos cada detalle juntos.'
@@ -534,8 +534,8 @@ function abrirSelectorDueno() {
 		const seg = totalSeg % 60;
 		mostrarAviso(
 			'advertencia',
-			`Ya hizo un pedido casi ahora, puede volverlo a hacer en ${min} minuto/s y ${String(seg).padStart(2, '0')} segundos`,
-			'Ya realizó un pedido'
+			`Ya hiciste un pedido hace un momento, puedes volver a hacerlo en ${min} minuto/s y ${String(seg).padStart(2, '0')} segundos`,
+			'Ya hiciste un pedido'
 		);
 		return;
 	}
@@ -911,7 +911,10 @@ function abrirBuscador(searchBar, searchInput, searchSubmitBtn) {
 	searchBar.classList.add('is-active');
 	actualizarBotonBusqueda(searchSubmitBtn);
 	setTimeout(() => searchInput.focus(), 150);
-	document.querySelector('.header-nav')?.classList.add('nav-oculta');
+	// NO ocultamos el header-nav: la visibilidad de las opciones la controla
+	// únicamente el estado expandido/colapsado del header (GSAP). Antes se
+	// forzaba nav-oculta al abrir el buscador, lo que escondía las opciones
+	// aunque el header estuviera expandido.
 }
 
 function cerrarBuscador(searchBar, searchInput) {
@@ -986,7 +989,7 @@ function renderizarProductos(productos, opciones = {}) {
 	// Restaurar scroll: el rebuild del DOM puede forzar al navegador a volver al top.
 	// Si hay búsqueda activa, desplaza suavemente al inicio del grid (header colapsado visible).
 	const _scrollTarget = estadoFiltros.termino
-		? Math.max(100, window.innerHeight * 0.45 - 60)
+		? Math.max(100, window.innerHeight * 0.6 - 60)
 		: savedY;
 
 	if (_scrollTarget > 0 || savedY > 0) {
@@ -1225,6 +1228,7 @@ function crearModalEncargue() {
 	document.body.appendChild(el);
 
 	const cerrar = () => {
+		document.body.classList.remove('modal-encargue-abierto');
 		const check = document.getElementById('modal-encargue-check');
 		if (check && check.checked) {
 			localStorage.setItem(STORAGE_KEY_MODAL_ENCARGUE, '1');
@@ -1237,6 +1241,7 @@ function crearModalEncargue() {
 	el.addEventListener('click', e => { if (e.target === el) cerrar(); });
 
 	requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('is-active')));
+	document.body.classList.add('modal-encargue-abierto');
 	enfocarModal(el, document.getElementById('modal-encargue-cerrar'));
 }
 
@@ -1537,13 +1542,73 @@ if (btnSliderPrev) btnSliderPrev.addEventListener('click', e => { e.stopPropagat
 if (btnSliderNext) btnSliderNext.addEventListener('click', e => { e.stopPropagation(); irASlide(sliderActual + 1); });
 
 const trackEl = document.getElementById('modal-img-track');
-if (trackEl) {
-	let _touchX = 0;
-	// Swipe-to-change-image disabled per request. To re-enable, listen
-	// touchstart/touchend, compute delta horizontal and call `irASlide(...)`.
-	trackEl.addEventListener('touchstart', e => { /* swipe disabled */ }, { passive: true });
-	trackEl.addEventListener('touchend',   e => { /* swipe disabled */ }, { passive: true });
-}
+	if (trackEl) {
+		// Swipe táctil para pasar imágenes — misma lógica que los botones prev/next
+		// (irASlide ±1), pero con arrastre en vivo y snap-back si el gesto es corto.
+		let _startX = 0, _startY = 0, _deltaX = 0, _arrastrando = false, _anchoTrack = 1;
+		// Detección de "tap" (toque sin arrastre): abre la imagen a pantalla completa.
+		let _tapMoved = false, _tapStartX = 0, _tapStartY = 0;
+
+		const _swipeInicio = (e) => {
+			const t = e.touches[0];
+			_tapStartX = t.clientX;
+			_tapStartY = t.clientY;
+			_tapMoved  = false;
+			if (sliderImagenes.length <= 1) return;
+			_startX = t.clientX;
+			_startY = t.clientY;
+			_deltaX = 0;
+			_arrastrando = true;
+			_anchoTrack = trackEl.offsetWidth || 1;
+			trackEl.style.transition = 'none'; // seguir el dedo sin lag
+		};
+
+		const _swipeMover = (e) => {
+			const _t0 = e.touches[0];
+			if (_t0 && (Math.abs(_t0.clientX - _tapStartX) > 10 ||
+			            Math.abs(_t0.clientY - _tapStartY) > 10)) _tapMoved = true;
+			if (!_arrastrando) return;
+			const t  = e.touches[0];
+			const dx = t.clientX - _startX;
+			const dy = t.clientY - _startY;
+			// Si el gesto es claramente vertical, cancelar el swipe y soltar.
+			if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 10) {
+				_arrastrando = false;
+				trackEl.style.transition = '';
+				irASlide(sliderActual);
+				return;
+			}
+			_deltaX = dx;
+			const base = -sliderActual * 100;
+			const pct  = (dx / _anchoTrack) * 100;
+			trackEl.style.transform = `translateX(${base + pct}%)`;
+		};
+
+		const _swipeFin = () => {
+			if (!_arrastrando) return;
+			_arrastrando = false;
+			trackEl.style.transition = ''; // vuelve a la transición del CSS
+			const umbral = _anchoTrack * 0.18;
+			if (_deltaX <= -umbral)      irASlide(sliderActual + 1);
+			else if (_deltaX >= umbral)  irASlide(sliderActual - 1);
+			else                          irASlide(sliderActual); // snap-back
+		};
+
+		// Tap sobre la imagen → abrir a pantalla completa con zoom.
+		const _abrirDesdeTrack = () => {
+			if (_tapMoved) { _tapMoved = false; return; }
+			const src = sliderImagenes[sliderActual];
+			if (!src) return;
+			const imgEl = trackEl.children[sliderActual]?.querySelector('img');
+			abrirLightbox(src, imgEl ? imgEl.alt : '');
+		};
+
+		trackEl.addEventListener('touchstart',  _swipeInicio, { passive: true });
+		trackEl.addEventListener('touchmove',   _swipeMover,  { passive: true });
+		trackEl.addEventListener('touchend',    _swipeFin,    { passive: true });
+		trackEl.addEventListener('touchcancel', _swipeFin,    { passive: true });
+		trackEl.addEventListener('click',       _abrirDesdeTrack);
+	}
 
 /* ─── BÚSQUEDA Y FILTROS ─── */
 
@@ -1923,11 +1988,11 @@ function validarContacto({ nombre, email, mensaje }) {
 	const nombreRe = /^[a-zA-ZÀ-ÿñÑ\s'\-\.]{2,60}$/;
 	const emailRe  = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-	if (!nombre || nombre.length < 2) errores.nombre = 'Ingresá tu nombre.';
+	if (!nombre || nombre.length < 2) errores.nombre = 'Ingresa tu nombre.';
 	else if (nombre.length > 60) errores.nombre = 'Máximo 60 caracteres.';
 	else if (!nombreRe.test(nombre)) errores.nombre = 'El nombre contiene caracteres no permitidos.';
 
-	if (!email) errores.email = 'Ingresá tu correo electrónico.';
+	if (!email) errores.email = 'Ingresa tu correo electrónico.';
 	else if (email.length > 120) errores.email = 'Máximo 120 caracteres.';
 	else if (!emailRe.test(email)) errores.email = 'Correo electrónico inválido.';
 
@@ -2005,7 +2070,7 @@ async function manejarEnvioContacto(e) {
 			throw new Error(data.message || 'Error al enviar el mensaje');
 		}
 	} catch (err) {
-		status.textContent = 'No se pudo enviar el mensaje. Probá de nuevo en unos minutos.';
+		status.textContent = 'No se pudo enviar el mensaje. Prueba de nuevo en unos minutos.';
 		status.className = 'contacto-status is-error';
 	} finally {
 		submitBtn.disabled = false;
@@ -2060,9 +2125,9 @@ function cerrarSobreLevitadPanel() {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   Modal Kouma — créditos del desarrollador.
+   Modal Kuroma — créditos del desarrollador.
    Se dispara desde cualquier elemento con [data-kouma-trigger]
-   (los dos enlaces "Kouma" en el footer del sitio y del menú).
+   (los dos enlaces "Kuroma" en el footer del sitio y del menú).
    La animación de cortina + draw está en CSS; aquí solo gestionamos
    las clases is-active / is-opening / is-closing y los listeners.
    ═══════════════════════════════════════════════════════════════ */
@@ -2481,6 +2546,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	initSobrePanel();
 	initKoumaModal();
 	initHeaderNavLinks();
+	initLightbox();
+	initCompartir();
 
 	if (carritoWrapper)  carritoWrapper.addEventListener('click',  abrirCarrito);
 	if (carritoWrapper)  carritoWrapper.addEventListener('keydown', (e) => {
@@ -2567,14 +2634,13 @@ if (header) {
 		gsap.registerPlugin(ScrollTrigger);
 		estadoTienda.headerScrollTriggerEnabled = true;
 
-	// Normaliza el scroll en iOS: evita que la barra de URL afecte la posición de scroll
-	// e impide que el comportamiento "rubber-band" dispare eventos de scroll falsos.
-	ScrollTrigger.normalizeScroll({ allowNestedScroll: true });
-	// Después:
+	/* normalizeScroll() eliminado: secuestraba el touch-scroll de la página y
+		   desactivaba el pull-to-refresh nativo del navegador (la página no se podía
+		   recargar arrastrando hacia abajo en móvil). El jitter de la barra de URL
+		   en iOS ya lo cubre ignoreMobileResize. */
 
-
-	// Ignora resize causados por la barra de URL móvil (solo cambia altura, no ancho).
-	ScrollTrigger.config({ ignoreMobileResize: true });
+		// Ignora resize causados por la barra de URL móvil (solo cambia altura, no ancho).
+		ScrollTrigger.config({ ignoreMobileResize: true });
 
 	const logoArea        = header.querySelector('.logo-area');
 	const h1El            = header.querySelector('h1');
@@ -2753,14 +2819,41 @@ if (header) {
 function abrirParaTiPanel() {
 	if (document.getElementById('parati-panel')) return;
 
-	const tagsRaw   = JSON.parse(localStorage.getItem('levitad-tags-vistos') || '{}');
-	const catsRaw   = JSON.parse(localStorage.getItem('levitad-categorias-vistas') || '{}');
-	const tagsOrden = Object.entries(tagsRaw)
-		.sort(([, a], [, b]) => b - a)
-		.map(([tag]) => tag);
-	const catsOrden = Object.entries(catsRaw)
-		.sort(([, a], [, b]) => b - a)
-		.map(([cat]) => cat);
+	const tagsRaw  = JSON.parse(localStorage.getItem('levitad-tags-vistos') || '{}');
+	const catsRaw  = JSON.parse(localStorage.getItem('levitad-categorias-vistas') || '{}');
+	const interRaw = JSON.parse(localStorage.getItem('levitad-interacciones') || '{}');
+
+	const modo     = modoActual();
+	const universo = (estadoTienda.productos || []).filter(p => !p.modo || p.modo === modo);
+
+	// ── Motor de afinidad ─────────────────────────────────────────────
+	// Cada prenda recibe un puntaje según cuánto coincide con lo que el
+	// usuario miró: tags (peso alto), categoría (medio) e interacción
+	// directa con la prenda (bajo). Luego se normaliza a un "% para ti"
+	// en el rango 70–99 para que toda recomendación se sienta acertada.
+	const PESO_TAG = 3, PESO_CAT = 2, PESO_INT = 1;
+	const scored = universo.map(p => {
+		let score = 0;
+		if (Array.isArray(p.tags)) {
+			p.tags.forEach(t => { if (tagsRaw[t]) score += tagsRaw[t] * PESO_TAG; });
+		}
+		const cat = p.categoria ? String(p.categoria).toLowerCase() : '';
+		if (cat && catsRaw[cat]) score += catsRaw[cat] * PESO_CAT;
+		if (interRaw[p.nombre])  score += interRaw[p.nombre] * PESO_INT;
+		return { p, score };
+	}).filter(x => x.score > 0)
+	  .sort((a, b) => b.score - a.score);
+
+	const maxScore  = scored.length ? scored[0].score : 0;
+	const matchPct  = s => maxScore ? Math.max(70, Math.min(99, Math.round(70 + 29 * (s / maxScore)))) : 0;
+	const pctDe     = nombre => {
+		const e = scored.find(x => x.p.nombre === nombre);
+		return e ? matchPct(e.score) : 0;
+	};
+
+	const tagsOrden = Object.entries(tagsRaw).sort(([, a], [, b]) => b - a).map(([t]) => t);
+	const totalActividad = Object.values(tagsRaw).reduce((a, b) => a + b, 0)
+	                     + Object.values(catsRaw).reduce((a, b) => a + b, 0);
 
 	const ov = document.createElement('div');
 	ov.id = 'parati-overlay';
@@ -2770,95 +2863,100 @@ function abrirParaTiPanel() {
 	panel.id = 'parati-panel';
 	panel.className = 'parati-panel';
 
+	const escAttr = s => String(s).replace(/"/g, '&quot;');
+	const imgDe   = p => (Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || '';
+
+	const cardHTML = (p, pct) => `
+		<button class="parati-card" data-producto="${escAttr(p.nombre)}">
+			<span class="parati-card-img" style="background-image:url('${imgDe(p)}')">
+				${pct ? `<span class="parati-card-match">${pct}%</span>` : ''}
+			</span>
+			<span class="parati-card-info">
+				<span class="parati-card-nombre">${p.nombre}</span>
+				<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
+			</span>
+		</button>
+	`;
+
 	let bodyHTML;
-	if (!tagsOrden.length && !catsOrden.length) {
+	if (!scored.length) {
 		bodyHTML = `
 			<div class="parati-vacio">
-				<p class="parati-vacio-icono">✦</p>
-				<p class="parati-vacio-texto">Todavía no registramos actividad.<br>Explorá la tienda y te iremos recomendando prendas.</p>
+				<span class="parati-vacio-icono">✦</span>
+				<p class="parati-vacio-texto">Todavía no conocemos tu estilo.<br>Explora algunas prendas y armaremos tu selección.</p>
+				<button class="parati-vacio-cta" type="button">Explorar la tienda</button>
 			</div>
 		`;
 	} else {
-		const productoContador = {};
-		const MAX_APARICIONES = 2;
-
-		// Sección sin título: recomendaciones por categorías vistas.
-		// Se muestra primero, sin <h3>, para no revelar al usuario la lógica.
-		let seccionCategorias = '';
-		if (catsOrden.length) {
-			const prodsCat = [];
-			const yaIncluidos = new Set();
-			const LIMITE_CARDS_CAT = 8;
-			for (const cat of catsOrden) {
-				if (prodsCat.length >= LIMITE_CARDS_CAT) break;
-				const candidatos = (estadoTienda.productos || []).filter(
-					p => p.categoria && String(p.categoria).toLowerCase() === cat &&
-					     !yaIncluidos.has(p.nombre) &&
-					     (productoContador[p.nombre] || 0) < MAX_APARICIONES
-				);
-				for (const p of candidatos) {
-					if (prodsCat.length >= LIMITE_CARDS_CAT) break;
-					prodsCat.push(p);
-					yaIncluidos.add(p.nombre);
-					productoContador[p.nombre] = (productoContador[p.nombre] || 0) + 1;
-				}
-			}
-			if (prodsCat.length) {
-				const cardsCatHTML = prodsCat.map(p => `
-					<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
-						<span class="parati-card-img" style="background-image:url('${(Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || ''}')"></span>
-						<span class="parati-card-info">
-							<span class="parati-card-nombre">${p.nombre}</span>
-							<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
+		const hero    = scored[0].p;
+		const heroPct = matchPct(scored[0].score);
+		const heroHTML = `
+			<section class="parati-hero-wrap">
+				<button class="parati-hero" data-producto="${escAttr(hero.nombre)}">
+					<span class="parati-hero-media" style="background-image:url('${imgDe(hero)}')"></span>
+					<span class="parati-hero-scrim"></span>
+					<span class="parati-hero-content">
+						<span class="parati-hero-badge"><span class="parati-match-dot"></span>${heroPct}% para ti</span>
+						<span class="parati-hero-nombre">${hero.nombre}</span>
+						<span class="parati-hero-foot">
+							<span class="parati-hero-precio">${formatPrecio(hero.precio)}</span>
+							<span class="parati-hero-cta">Ver prenda<svg viewBox="0 0 24 24" width="15" height="15" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
 						</span>
-					</button>
-				`).join('');
-				seccionCategorias = `
-					<section class="parati-seccion">
-						<div class="parati-cards">${cardsCatHTML}</div>
-					</section>
-				`;
-			}
-		}
-
-		const seccionesTags = tagsOrden.map(tag => {
-			const prods = (estadoTienda.productos || []).filter(
-				p => Array.isArray(p.tags) && p.tags.includes(tag) &&
-				     (productoContador[p.nombre] || 0) < MAX_APARICIONES
-			);
-			if (!prods.length) return '';
-			prods.forEach(p => { productoContador[p.nombre] = (productoContador[p.nombre] || 0) + 1; });
-			const cardsHTML = prods.map(p => `
-				<button class="parati-card" data-producto="${p.nombre.replace(/"/g, '&quot;')}">
-					<span class="parati-card-img" style="background-image:url('${(Array.isArray(p.imagenes) && p.imagenes[0]) || p.imagen || ''}')"></span>
-					<span class="parati-card-info">
-						<span class="parati-card-nombre">${p.nombre}</span>
-						<span class="parati-card-precio">${formatPrecio(p.precio)}</span>
 					</span>
 				</button>
-			`).join('');
+			</section>
+		`;
+
+		// Carrusel "mejores coincidencias": del 2.º al 11.º mejor puntaje.
+		const topResto = scored.slice(1, 11);
+		const topHTML = topResto.length ? `
+			<section class="parati-seccion">
+				<div class="parati-seccion-head">
+					<span class="parati-seccion-icon">✶</span>
+					<h3 class="parati-seccion-titulo">Tus mejores coincidencias</h3>
+				</div>
+				<div class="parati-cards">
+					${topResto.map(e => cardHTML(e.p, matchPct(e.score))).join('')}
+				</div>
+			</section>
+		` : '';
+
+		// Filas por tag: "Porque viste #tag", sin repetir la prenda hero.
+		const usado = {};
+		const MAX_APARICIONES = 2;
+		const seccionesTags = tagsOrden.map(tag => {
+			const prods = universo.filter(p =>
+				p.nombre !== hero.nombre &&
+				Array.isArray(p.tags) && p.tags.includes(tag) &&
+				(usado[p.nombre] || 0) < MAX_APARICIONES
+			).slice(0, 12);
+			if (!prods.length) return '';
+			prods.forEach(p => { usado[p.nombre] = (usado[p.nombre] || 0) + 1; });
 			return `
 				<section class="parati-seccion">
-					<h3 class="parati-seccion-titulo">Porque viste <span class="parati-tag">#${tag}</span></h3>
-					<div class="parati-cards">${cardsHTML}</div>
+					<div class="parati-seccion-head">
+						<h3 class="parati-seccion-titulo">Porque viste <span class="parati-tag">#${tag}</span></h3>
+					</div>
+					<div class="parati-cards">
+						${prods.map(p => cardHTML(p, pctDe(p.nombre))).join('')}
+					</div>
 				</section>
 			`;
 		}).filter(Boolean).join('');
 
-		bodyHTML = (seccionCategorias + seccionesTags) || `
-			<div class="parati-vacio">
-				<p class="parati-vacio-icono">✦</p>
-				<p class="parati-vacio-texto">No hay prendas disponibles con esas etiquetas todavía.</p>
-			</div>
-		`;
+		bodyHTML = heroHTML + topHTML + seccionesTags;
 	}
+
+	const metaHTML = totalActividad
+		? `<span class="parati-meta"><span class="parati-meta-dot"></span>Basado en tu actividad reciente</span>`
+		: '';
 
 	panel.innerHTML = `
 		<button class="parati-cerrar" aria-label="Cerrar Para Ti">✕</button>
 		<header class="parati-header">
 			<span class="parati-eyebrow">Selección personal</span>
 			<h2 class="parati-titulo">Para Ti</h2>
-			<p class="parati-sub">Prendas que quizás te gusten, según tu actividad en la tienda.</p>
+			${metaHTML}
 		</header>
 		<div class="parati-body">${bodyHTML}</div>
 	`;
@@ -2882,6 +2980,7 @@ function abrirParaTiPanel() {
 
 	panel.querySelector('.parati-cerrar').addEventListener('click', cerrar);
 	ov.addEventListener('click', cerrar);
+	panel.querySelector('.parati-vacio-cta')?.addEventListener('click', cerrar);
 
 	let _paratiTouchMoved = false, _paratiScrollY0 = 0;
 	const paratiBody = panel.querySelector('.parati-body');
@@ -2893,13 +2992,12 @@ function abrirParaTiPanel() {
 		paratiBody.addEventListener('touchmove', () => {
 			_paratiTouchMoved = true;
 		}, { passive: true });
-		// scroll: señal definitiva aunque touchmove no se dispare (iOS compositor scroll)
 		paratiBody.addEventListener('scroll', () => {
 			if (Math.abs(paratiBody.scrollTop - _paratiScrollY0) > 6) _paratiTouchMoved = true;
 		}, { passive: true });
 	}
 
-	// Mismo patrón para scroll horizontal en cada fila .parati-cards
+	// Mismo patrón anti-tap-accidental para el scroll horizontal de cada fila.
 	panel.querySelectorAll('.parati-cards').forEach(row => {
 		let _paratiScrollX0 = 0;
 		row.addEventListener('touchstart', () => {
@@ -2911,14 +3009,16 @@ function abrirParaTiPanel() {
 		}, { passive: true });
 	});
 
-	panel.querySelectorAll('.parati-card').forEach(btn => {
-		btn.addEventListener('click', () => {
-			if (_paratiTouchMoved) { _paratiTouchMoved = false; return; }
-			const prod = estadoTienda.productos.find(p => p.nombre === btn.dataset.producto);
-			if (!prod) return;
-			cerrar();
-			setTimeout(() => abrirDetalles(prod), 420);
-		});
+	const abrirProd = nombre => {
+		if (_paratiTouchMoved) { _paratiTouchMoved = false; return; }
+		const prod = estadoTienda.productos.find(p => p.nombre === nombre);
+		if (!prod) return;
+		cerrar();
+		setTimeout(() => abrirDetalles(prod), 420);
+	};
+
+	panel.querySelectorAll('.parati-card, .parati-hero').forEach(btn => {
+		btn.addEventListener('click', () => abrirProd(btn.dataset.producto));
 	});
 }
 
@@ -3025,7 +3125,7 @@ function abrirCategoriasPanel() {
 		<header class="cat-header">
 			<span class="cat-eyebrow">Explorar</span>
 			<h2 class="cat-titulo">Categor&#237;as</h2>
-			<p class="cat-sub">Descubr&#237; prendas por estilo y popularidad.</p>
+			<p class="cat-sub">Descubre prendas por estilo y popularidad.</p>
 		</header>
 		<div class="cat-body">${bodyHTML}</div>
 	`;
@@ -3099,5 +3199,202 @@ function abrirCategoriasPanel() {
 			cerrar();
 			setTimeout(() => abrirDetalles(prod), 420);
 		});
+	});
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LIGHTBOX — imagen del producto a pantalla completa con zoom
+   - Pellizco (pinch) con dos dedos para hacer zoom en móvil.
+   - Arrastre con un dedo para desplazar cuando hay zoom.
+   - Doble toque / doble clic para alternar el zoom.
+   - Rueda del ratón para zoom en escritorio.
+   Se abre tocando la imagen del slider en el modal de detalle.
+   ═══════════════════════════════════════════════════════════ */
+let _lbScale = 1, _lbTx = 0, _lbTy = 0;
+
+function _lbAplicar() {
+	const img = document.getElementById('lightbox-img');
+	if (!img) return;
+	img.style.transform = `translate(${_lbTx}px, ${_lbTy}px) scale(${_lbScale})`;
+	img.classList.toggle('is-zoomed', _lbScale > 1.02);
+}
+
+function _lbClamp() {
+	const vp  = document.getElementById('lightbox-viewport');
+	const img = document.getElementById('lightbox-img');
+	if (!vp || !img) return;
+	// getBoundingClientRect ya refleja la escala aplicada; limitamos el paneo
+	// para que la imagen no se aleje más allá de sus propios bordes.
+	const rect = img.getBoundingClientRect();
+	const maxX = Math.max(0, (rect.width  - vp.clientWidth)  / 2);
+	const maxY = Math.max(0, (rect.height - vp.clientHeight) / 2);
+	_lbTx = Math.max(-maxX, Math.min(maxX, _lbTx));
+	_lbTy = Math.max(-maxY, Math.min(maxY, _lbTy));
+}
+
+function _lbReset() {
+	_lbScale = 1; _lbTx = 0; _lbTy = 0;
+	_lbAplicar();
+}
+
+function _lbToggleZoom() {
+	_lbScale = _lbScale > 1.02 ? 1 : 2.5;
+	_lbTx = 0; _lbTy = 0;
+	_lbClamp();
+	_lbAplicar();
+}
+
+function abrirLightbox(src, alt) {
+	const lb  = document.getElementById('lightbox');
+	const img = document.getElementById('lightbox-img');
+	if (!lb || !img) return;
+	img.src = src;
+	img.alt = alt || '';
+	_lbReset();
+	lb.classList.add('is-active');
+	lb.setAttribute('aria-hidden', 'false');
+	const hint = document.getElementById('lightbox-hint');
+	if (hint) {
+		hint.classList.remove('is-hidden');
+		clearTimeout(abrirLightbox._t);
+		abrirLightbox._t = setTimeout(() => hint.classList.add('is-hidden'), 2200);
+	}
+}
+
+function cerrarLightbox() {
+	const lb  = document.getElementById('lightbox');
+	const img = document.getElementById('lightbox-img');
+	if (!lb || !lb.classList.contains('is-active')) return;
+	lb.classList.remove('is-active');
+	lb.setAttribute('aria-hidden', 'true');
+	setTimeout(() => { if (img) { img.src = ''; img.style.transform = ''; } }, 300);
+}
+
+function initLightbox() {
+	const lb   = document.getElementById('lightbox');
+	const vp   = document.getElementById('lightbox-viewport');
+	const img  = document.getElementById('lightbox-img');
+	const btnX = document.getElementById('lightbox-cerrar');
+	if (!lb || !vp || !img) return;
+
+	const MIN = 1, MAX = 4;
+	const clamp = (v) => Math.max(MIN, Math.min(MAX, v));
+	const dist  = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+
+	// ── Cerrar ──
+	if (btnX) btnX.addEventListener('click', cerrarLightbox);
+	// Tap/clic en el fondo (no sobre la imagen) cierra el visor.
+	lb.addEventListener('click', (e) => {
+		if (e.target === lb || e.target === vp) cerrarLightbox();
+	});
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') cerrarLightbox();
+	});
+
+	// ── Gestos táctiles ──
+	let startDist = 0, startScale = 1;
+	let panning = false, pinching = false, moved = false;
+	let sx = 0, sy = 0, tx0 = 0, ty0 = 0, lastTap = 0;
+
+	vp.addEventListener('touchstart', (e) => {
+		if (e.touches.length === 2) {
+			pinching = true; panning = false; moved = true;
+			startDist  = dist(e.touches[0], e.touches[1]) || 1;
+			startScale = _lbScale;
+		} else if (e.touches.length === 1) {
+			moved = false;
+			sx = e.touches[0].clientX;
+			sy = e.touches[0].clientY;
+			if (_lbScale > 1) { panning = true; tx0 = _lbTx; ty0 = _lbTy; }
+		}
+	}, { passive: true });
+
+	vp.addEventListener('touchmove', (e) => {
+		if (pinching && e.touches.length === 2) {
+			const d = dist(e.touches[0], e.touches[1]);
+			_lbScale = clamp(startScale * (d / startDist));
+			_lbClamp(); _lbAplicar();
+			e.preventDefault();
+		} else if (e.touches.length === 1) {
+			const t = e.touches[0];
+			if (Math.abs(t.clientX - sx) > 8 || Math.abs(t.clientY - sy) > 8) moved = true;
+			if (panning) {
+				_lbTx = tx0 + (t.clientX - sx);
+				_lbTy = ty0 + (t.clientY - sy);
+				_lbClamp(); _lbAplicar();
+				e.preventDefault();
+			}
+		}
+	}, { passive: false });
+
+	vp.addEventListener('touchend', (e) => {
+		if (e.touches.length > 0) return;
+		const wasPinching = pinching;
+		pinching = false; panning = false;
+		if (_lbScale < 1.02) _lbReset();
+		if (wasPinching || moved) { lastTap = 0; return; }
+		// Toque limpio → detectar doble toque para alternar zoom.
+		const now = Date.now();
+		if (now - lastTap < 300) { _lbToggleZoom(); lastTap = 0; }
+		else lastTap = now;
+	});
+
+	// ── Escritorio: rueda para zoom, doble clic para alternar, arrastre para paneo ──
+	vp.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+		_lbScale = clamp(_lbScale * factor);
+		if (_lbScale <= 1.02) { _lbReset(); return; }
+		_lbClamp(); _lbAplicar();
+	}, { passive: false });
+
+	img.addEventListener('dblclick', (e) => { e.preventDefault(); _lbToggleZoom(); });
+
+	let mouseDown = false, mx = 0, my = 0, mtx = 0, mty = 0;
+	img.addEventListener('mousedown', (e) => {
+		if (_lbScale <= 1) return;
+		mouseDown = true; mx = e.clientX; my = e.clientY; mtx = _lbTx; mty = _lbTy;
+		e.preventDefault();
+	});
+	window.addEventListener('mousemove', (e) => {
+		if (!mouseDown) return;
+		_lbTx = mtx + (e.clientX - mx);
+		_lbTy = mty + (e.clientY - my);
+		_lbClamp(); _lbAplicar();
+	});
+	window.addEventListener('mouseup', () => { mouseDown = false; });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   COMPARTIR — botón del menú hamburguesa
+   Usa la Web Share API nativa (móvil) y, si no existe, copia el
+   enlace al portapapeles con feedback en el propio botón.
+   ═══════════════════════════════════════════════════════════ */
+function initCompartir() {
+	const btn = document.getElementById('btn-compartir');
+	if (!btn) return;
+	const label = btn.querySelector('.menu-nav-compartir-label');
+	const textoOriginal = label ? label.textContent : '';
+
+	btn.addEventListener('click', async () => {
+		const datos = {
+			title: 'Lévitad',
+			text:  'Lévitad — Prendas que elevan',
+			url:   window.location.href
+		};
+		if (navigator.share) {
+			try { await navigator.share(datos); } catch (_) { /* el usuario canceló */ }
+			return;
+		}
+		try {
+			await navigator.clipboard.writeText(datos.url);
+			if (label) {
+				label.textContent = '¡Enlace copiado!';
+				clearTimeout(initCompartir._t);
+				initCompartir._t = setTimeout(() => { label.textContent = textoOriginal; }, 1800);
+			}
+		} catch (_) {
+			window.prompt('Copia el enlace:', datos.url);
+		}
 	});
 }

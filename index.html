@@ -22,36 +22,76 @@
           content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
 
     <!-- ── SEO básico ── -->
-    <title>Lévitad</title>
-    <meta name="description" content="Lévitad — Tienda Online para prendas traidas desde el extranjero, con precios rentables y calidad soñada">
-    <meta name="keywords" content="Lévitad, Levitad, Levita, ropa, encargos, encargar ropa, Cuba, Sancti Spiritus, tienda online, encargos para cuba, encargos para Sancti Spiritus">
-    <meta name="author" content="Luis Ernesto Cuellar ">
-    <meta name="robots" content="index, follow">
+    <title>Lévitad | Tienda de ropa y encargos a Cuba — Sancti Spíritus</title>
+    <meta name="description" content="Lévitad: tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.">
+    <meta name="keywords" content="Lévitad, Levitad, ropa, encargos, encargar ropa, Cuba, Sancti Spíritus, tienda online, encargos para Cuba, moda, prendas importadas">
+    <meta name="author" content="Luis Ernesto Cuellar">
+    <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://levitad.com/">
 
     <!-- ── Open Graph (Facebook, WhatsApp, LinkedIn) ── -->
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Lévitad">
-    <meta property="og:title" content="Lévitad | Prendas encargadas con el mejor estilo">
-    <meta property="og:description" content="Moda con distinción y estilo único. Descubre nuestras piezas exclusivas para usted.">
+    <meta property="og:title" content="Lévitad | Ropa y encargos a Cuba con estilo">
+    <meta property="og:description" content="Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.">
     <meta property="og:url" content="https://levitad.com/">
-    <meta property="og:image" content="https://levitad.com/img/og-image.jpg">
+    <meta property="og:image" content="https://levitad.com/imagenes/sudadera.jpg">
+    <meta property="og:image:alt" content="Prenda de Lévitad">
     <meta property="og:locale" content="es_ES">
 
     <!-- ── Twitter / X Card ── -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Lévitad | Artesanía · Distinción · Estilo">
-    <meta name="twitter:description" content="Moda, con distinción y estilo único.">
-    <meta name="twitter:image" content="https://levitad.com/img/og-image.jpg">
+    <meta name="twitter:title" content="Lévitad | Ropa y encargos a Cuba con estilo">
+    <meta name="twitter:description" content="Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles.">
+    <meta name="twitter:image" content="https://levitad.com/imagenes/sudadera.jpg">
+    <meta name="twitter:image:alt" content="Prenda de Lévitad">
 
     <!-- ── Apariencia móvil ── -->
     <meta name="theme-color" content="#caac47">
-    <meta name="color-scheme" content="light">
+    <meta name="color-scheme" content="dark light">
     <meta name="format-detection" content="telephone=no">
 
-    <!-- ── Iconos ── -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- ── Iconos + PWA ── -->
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="site.webmanifest">
+
+    <!-- ── Datos estructurados (schema.org) ── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://levitad.com/#website",
+          "url": "https://levitad.com/",
+          "name": "Lévitad",
+          "description": "Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus.",
+          "inLanguage": "es"
+        },
+        {
+          "@type": "ClothingStore",
+          "@id": "https://levitad.com/#store",
+          "name": "Lévitad",
+          "url": "https://levitad.com/",
+          "image": "https://levitad.com/imagenes/sudadera.jpg",
+          "logo": "https://levitad.com/favicon.svg",
+          "description": "Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Sancti Spíritus",
+            "addressCountry": "CU"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "Cuba"
+          },
+          "sameAs": [
+            "https://instagram.com/levitad"
+          ]
+        }
+      ]
+    }
+    </script>
 
     <!-- ── Preconnect CDNs ── -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -69,7 +109,7 @@
             <div class="logo-wrapper">
                 <h1>LÉVIT
                     <span class="logo-a">A
-                        <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                             <path class="halo-path" d="M20,25 A30,12 0 1,1 75,22" fill="none" stroke-width="8" stroke-linecap="round" />
                         </svg>
                     </span>
@@ -144,6 +184,14 @@
                 <button type="button" aria-pressed="false">Encargos</button>
             </div>
     <main class="contenedor" id="main-content" tabindex="-1">
+        <noscript>
+            <section style="max-width:680px;margin:40px auto;padding:0 20px;text-align:center;color:#e8e4d8;font-family:sans-serif;">
+                <h2>Lévitad — Ropa y encargos a Cuba</h2>
+                <p>Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.</p>
+                <p>Para ver el catálogo completo activa JavaScript en tu navegador, o escríbenos por
+                    <a href="https://instagram.com/levitad" rel="noopener">Instagram @levitad</a>.</p>
+            </section>
+        </noscript>
         <div class="grid-productos" id="grid-productos">
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -177,10 +225,19 @@
         </div>
 
         <div class="modal-footer">
-            <button id="btn-comprar-ahora" class="btn-comprar-ahora" type="button">Añadir al Pedido</button>
+            <button id="btn-comprar-ahora" class="btn-comprar-ahora" type="button"><span class="btn-comprar-label">Añadir al Pedido</span></button>
         </div>
     </div>
 </div>
+
+    <!-- ── Lightbox: imagen del producto a pantalla completa con zoom ── -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Imagen ampliada" aria-hidden="true">
+        <button id="lightbox-cerrar" class="lightbox-cerrar" type="button" aria-label="Cerrar imagen ampliada">✕</button>
+        <div class="lightbox-viewport" id="lightbox-viewport">
+            <img id="lightbox-img" class="lightbox-img" src="" alt="" draggable="false">
+        </div>
+        <span class="lightbox-hint" id="lightbox-hint" aria-hidden="true">Pellizca o doble toque para ampliar</span>
+    </div>
 
     <div id="carrito-overlay" class="carrito-overlay" aria-hidden="true"></div>
     <aside id="carrito-panel" class="carrito-panel" aria-hidden="true" aria-label="Carrito de compras">
@@ -208,7 +265,7 @@
         <ul id="carrito-lista" class="carrito-lista"></ul>
         <p id="carrito-vacio" class="carrito-vacio">
             <span class="carrito-vacio-icono">🛍️</span>
-            Aún no agregaste nada.<br>Explorá el catálogo y sumá lo que te guste.
+            Aún no agregaste nada.<br>Explora el catálogo y suma lo que te guste.
         </p>
     </div>
 
@@ -336,10 +393,19 @@
                     </svg>
                     <span>WhatsApp</span>
                 </a>
+                <button type="button" class="menu-nav-red menu-nav-compartir" id="btn-compartir" aria-label="Compartir Lévitad">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="18" cy="5" r="3" stroke="currentColor" stroke-width="1.6"/>
+                        <circle cx="6" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>
+                        <circle cx="18" cy="19" r="3" stroke="currentColor" stroke-width="1.6"/>
+                        <path d="M8.59 10.51l6.83-3.98M8.59 13.49l6.83 3.98" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                    </svg>
+                    <span class="menu-nav-compartir-label">Compartir</span>
+                </button>
             </div>
             <div class="menu-nav-divider"></div>
             <div class="menu-nav-creditos">
-                <span class="menu-nav-dev">Hecho con ♡ por <button type="button" class="menu-nav-dev-link" data-kouma-trigger>Kouma</button></span>
+                <span class="menu-nav-dev">Hecho con ♡ por <button type="button" class="menu-nav-dev-link" data-kouma-trigger>Kuroma</button></span>
                 <span class="menu-nav-copy">© <span id="menu-footer-year">2025</span> Lévitad. Todos los derechos reservados.</span>
             </div>
         </footer>
@@ -368,7 +434,7 @@
             </div>
             <div class="contacto-campo">
                 <label for="contacto-mensaje">Mensaje</label>
-                <textarea id="contacto-mensaje" name="mensaje" rows="5" required minlength="5" maxlength="1000" placeholder="Escribí tu mensaje..."></textarea>
+                <textarea id="contacto-mensaje" name="mensaje" rows="5" required minlength="5" maxlength="1000" placeholder="Escribe tu mensaje..."></textarea>
                 <span class="contacto-error" data-error-for="mensaje"></span>
             </div>
             <div class="contacto-hp" aria-hidden="true">
@@ -407,10 +473,10 @@
                 <div class="sobre-divider"></div>
             </header>
             <div class="sobre-body">
-                <p><strong>Lévitad</strong> nace de convertir lo simple a algo nuevo en <strong>Cuba</strong>, no es solo importar hacia acá prendas que <strong>elevan</strong>, que distinguen, que cuentan algo. Un puente entre la originalidad y lo clásico. No queríamos tener simplemente un negocio, queríamos dejar una marca, crear una experiencia de diseño y accesibilidad</p>
+                <p><strong>Lévitad</strong> nace de convertir lo simple a algo nuevo en <strong>Cuba</strong>, no es solo importar hacia acá prendas que <strong>elevan</strong>, que distinguen, que cuentan algo. Un puente entre la originalidad y lo clásico. No queríamos tener simplemente un negocio, queríamos dejar una marca, crear una experiencia de diseño y accesibilidad.</p>
                 <p>Detrás de cada línea de código de este sitio, hay solo una persona. Un desarrollador que pone su empeño para que todo lo que toca se sienta único. Esto que estás viendo se construyó con un cuidado artesanal — pixel a pixel, palabra por palabra — con ayuda de muchos e ideas de otros pocos.</p>
                 <p>Siempre espero que les haya gustado la experiencia, como tanto me esforcé lográndola.</p>
-                <p class="sobre-firma">— Hecho con ♡ desde <button type="button" class="sobre-firma-link" data-kouma-trigger>Kouma</button></p>
+                <p class="sobre-firma">— Hecho con ♡ por <button type="button" class="sobre-firma-link" data-kouma-trigger>Kuroma</button></p>
                 <p class="sobre-pais">Made in Cuba</p>
             </div>
         </div>
@@ -422,7 +488,7 @@
         <div class="site-footer-inner">
             <div class="footer-col footer-col-marca">
                 <h2 class="footer-logo">LÉVIT<span class="logo-a">A
-                    <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="halo-icon" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                         <defs>
                             <filter id="halo-glow" x="-50%" y="-50%" width="200%" height="200%">
                                 <feGaussianBlur stdDeviation="1.5" result="blur"/>
@@ -463,11 +529,11 @@
         <div class="site-footer-bottom">
             <span class="footer-made-cuba"><span>Made</span> in <span class="footer-made-rojo">Cuba</span></span>
             <span class="footer-copy">© <span id="footer-year">2025</span> Lévitad. Todos los derechos reservados.</span>
-            <span class="footer-dev">Diseñado por <button type="button" class="footer-dev-link" data-kouma-trigger>Kouma</button></span>
+            <span class="footer-dev">Diseñado por <button type="button" class="footer-dev-link" data-kouma-trigger>Kuroma</button></span>
         </div>
     </footer>
 
-    <!-- ══════════ Modal Kouma — créditos del desarrollador ══════════
+    <!-- ══════════ Modal Kuroma — créditos del desarrollador ══════════
          Se abre al tocar cualquier link con [data-kouma-trigger].
          La cortina sube de abajo a arriba; cuando termina, el logo
          se "dibuja" (clip-path wipe + line scale). Paleta dorada
@@ -483,20 +549,20 @@
             <div class="kouma-logo">
                 <div class="kouma-logo__kana" lang="ja" aria-hidden="true">コウマ</div>
                 <div class="kouma-logo__line" aria-hidden="true"></div>
-                <h2 id="kouma-logo-title" class="kouma-logo__wordmark">KOUMA</h2>
-                <div class="kouma-logo__subtitle">developer · made in Cuba</div>
+                <h2 id="kouma-logo-title" class="kouma-logo__wordmark">KUROMA</h2>
+                <div class="kouma-logo__subtitle">desarrollador · made in Cuba</div>
             </div>
 
             <div class="kouma-bio">
                 <p>Soy quien convierte ideas en interfaces que funcionan. Cuido cada pixel, cada interacción, cada milisegundo que un usuario espera. Si lo viste en este sitio, lo escribí yo.</p>
-                <p>Diseño y desarrollo sitios web con cuidado quirúrgico — sin plantillas, sin atajos, todo 100% personalizable. Si necesitas algo así para tu marca, no dude en contactar.</p>
+                <p>Diseño y desarrollo sitios web con cuidado quirúrgico — sin plantillas, sin atajos, todo 100% personalizable. Si necesitas algo así para tu marca, no dudes en contactarme.</p>
             </div>
 
             <div class="kouma-socials">
                 <a class="kouma-social" href="https://wa.me/+5351354067" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M20.52 3.48A11.86 11.86 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.9c0 2.1.55 4.14 1.6 5.94L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.9a11.83 11.83 0 0 0-3.43-8.42zM12.06 21.8h-.01a9.86 9.86 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.89-9.88 2.64 0 5.12 1.03 6.99 2.9a9.82 9.82 0 0 1 2.89 6.99c0 5.45-4.44 9.88-9.88 9.88zm5.42-7.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.96-.94 1.16-.17.2-.35.22-.64.07-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.87 1.22 3.07.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.08 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35z"/></svg>
                 </a>
-                <a class="kouma-social" href="https://instagram.com/kouma.dev" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                <a class="kouma-social" href="https://instagram.com/kouma_dev" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none"/></svg>
                 </a>
                 <a class="kouma-social" href="https://github.com/kouma-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub">

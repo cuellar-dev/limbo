@@ -46,8 +46,10 @@
     --glass-btn-bg:        rgba(255, 255, 255, 0.05);
     --drag-pill-bg:        rgba(255, 255, 255, 0.18);
     --modal-sheet-end:     #000000;
-    --modal-img-gradient:  linear-gradient(to bottom, rgba(27, 34, 51, 0.95), rgba(0, 0, 0, 0.95));
-    --modal-body-bg:       rgba(17, 21, 34, 0.72);
+    --modal-img-gradient:  linear-gradient(to bottom, #1f273b, #1b2233);
+    /* Arranca exactamente en el color del fondo de la imagen (#1b2233) para que
+       no se note el salto entre la foto y los detalles, y baja muy sutilmente. */
+    --modal-body-bg:       linear-gradient(180deg, #1b2233 0%, #161c2b 100%);
     --modal-indicator-bg:  rgba(255, 255, 255, 0.20);
     --detalle-item-bg:     rgba(0, 0, 0, 0.22);
     --filtros-card-bg:     linear-gradient(160deg, #1a2040 0%, #0d1224 55%, #060a15 100%);
@@ -710,6 +712,7 @@ svg.icono-transicion {
     width: 100%;
     height: 100%;
     touch-action: none;
+    cursor: zoom-in;
     transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
@@ -811,27 +814,157 @@ body.is-light .modal-slide.is-loading {
     background: var(--carrito-acento);
     transform: scale(1.4);
 }
+
+/* ── Lightbox: imagen a pantalla completa con zoom ── */
+.lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    background: rgba(0, 0, 0, 0.96);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    touch-action: none;
+    overflow: hidden;
+}
+.lightbox.is-active {
+    display: flex;
+    opacity: 1;
+}
+.lightbox-viewport {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    touch-action: none;
+}
+.lightbox-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    transform-origin: center center;
+    will-change: transform;
+    user-select: none;
+    -webkit-user-drag: none;
+    touch-action: none;
+    cursor: zoom-in;
+}
+.lightbox-img.is-zoomed {
+    cursor: zoom-out;
+}
+.lightbox-cerrar {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s ease, transform 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+.lightbox-cerrar:hover  { background: rgba(255, 255, 255, 0.22); }
+.lightbox-cerrar:active { transform: scale(0.9); }
+.lightbox-hint {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.72);
+    font-family: 'drink', sans-serif;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+.lightbox-hint.is-hidden {
+    opacity: 0;
+}
 .modal-body {
+    position: relative;
     padding: 25px;
     background: var(--modal-body-bg);
-    border-top: 1px solid rgba(166, 137, 102, 0.18);
+    border-top: 1px solid var(--carrito-borde);
     border-bottom: 1px solid rgba(166, 137, 102, 0.12);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+/* Brillo ambiental dorado/azul en la esquina (mismo lenguaje que carrito/contacto) */
+.modal-body::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -30px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(
+        ellipse,
+        rgba(var(--carrito-acento-rgb), 0.13) 0%,
+        transparent 68%
+    );
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.35s ease;
+}
+
+.modal-body > * {
+    position: relative;
+    z-index: 1;
 }
 
 #modal-titulo {
+    position: relative;
     font-family: 'Quicksand', sans-serif;
     font-size: 24px;
-    margin-bottom: 10px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
     color: var(--texto-brillante);
+}
+
+/* Línea de acento metálica bajo el título */
+#modal-titulo::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 46px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--carrito-btn-bg);
 }
 
 .precio-modal {
     font-family: 'drink', sans-serif; /* Si Arcane ya no pega, podemos cambiarla luego */
-    color: var(--acento-dorado);
-    font-size: 28px;
-    display: block;
-    margin-bottom: 18px;
+    color: var(--carrito-acento);
+    font-size: 26px;
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 6px 18px;
+    border-radius: 999px;
+    background: var(--carrito-glow);
+    border: 1px solid var(--carrito-borde-fuerte);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        0 6px 18px rgba(var(--carrito-acento-rgb), 0.12);
+    transition: color 0.3s ease, background 0.3s ease, border-color 0.3s ease;
 }
 
 .modal-especificaciones h4 {
@@ -855,17 +988,20 @@ body.is-light .modal-slide.is-loading {
     grid-template-columns: minmax(92px, 120px) 1fr;
     gap: 8px;
     align-items: start;
-    border: 1px solid rgba(202, 172, 71, 0.2);
+    border: 1px solid var(--carrito-borde);
+    border-left: 2px solid var(--carrito-acento);
     border-radius: 10px;
     background: var(--detalle-item-bg);
-    padding: 9px 10px;
+    padding: 9px 12px;
+    transition: border-color 0.25s ease, background 0.25s ease;
 }
 
 .detalle-label {
     font-family: 'drink', sans-serif;
-    color: rgba(202, 172, 71, 0.95);
+    color: var(--carrito-acento);
     font-size: 12px;
     letter-spacing: 0.5px;
+    transition: color 0.3s ease;
 }
 
 .detalle-valor {
@@ -886,26 +1022,97 @@ body.is-light .modal-slide.is-loading {
 }
 
 .btn-comprar-ahora {
+    position: relative;
     width: 80%;
     padding: 18px;
-    background-color: var(--acento-dorado);
+    z-index: 1000;
+    /* Gradiente metálico mode-aware (oro en stack, azul en encargo) */
+    background: var(--carrito-btn-bg);
     border: none;
     border-radius: 15px;
     font-weight: bold;
     font-size: 20px;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.35s ease, filter 0.3s ease;
     font-family: 'drink', sans-serif;
     margin: auto;
-    color: var(--tarjeta-fondo);
+    /* El fondo (oro/azul) no cambia con el tema claro/oscuro, así que el texto
+       se fija por modo: oscuro sobre oro, blanco sobre azul. Buen contraste siempre. */
+    color: #1b2233;
+    overflow: hidden;
+    isolation: isolate;
+    box-shadow:
+        0 10px 26px var(--carrito-btn-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        inset 0 -8px 18px rgba(0, 0, 0, 0.12);
 }
+body.is-encargue .btn-comprar-ahora {
+    color: #ffffff;
+}
+
+/* Barrido de luz premium (reusa el keyframe del botón de Outfits) */
+.btn-comprar-ahora::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 34%;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        transparent 100%);
+    transform: translateX(-120%) skewX(-18deg);
+    pointer-events: none;
+    z-index: 1;
+    animation: outfitBtnShine 4.5s ease-in-out infinite;
+}
+
+.btn-comprar-label {
+    position: relative;
+    z-index: 2;
+}
+
 .btn-comprar-ahora:active {
     transform: scale(0.95);
+}
+
+/* Sin barrido cuando ya está agregado/deshabilitado */
+.btn-comprar-ahora:disabled::before,
+.btn-comprar-ahora.is-agregado::before {
+    animation: none;
+    opacity: 0;
 }
 
 .btn-comprar-ahora[data-estado="agregado"] {
     cursor: default;
     opacity: 0.78;
+}
+
+/* Entrada escalonada del contenido del modal de detalle */
+@keyframes modalContentIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.modal-overlay.is-active #modal-titulo {
+    animation: modalContentIn 0.45s ease both;
+    animation-delay: 0.12s;
+}
+.modal-overlay.is-active .precio-modal {
+    animation: modalContentIn 0.45s ease both;
+    animation-delay: 0.20s;
+}
+.modal-overlay.is-active .modal-especificaciones {
+    animation: modalContentIn 0.45s ease both;
+    animation-delay: 0.28s;
+}
+@media (prefers-reduced-motion: reduce) {
+    .btn-comprar-ahora::before { animation: none; }
+    .modal-overlay.is-active #modal-titulo,
+    .modal-overlay.is-active .precio-modal,
+    .modal-overlay.is-active .modal-especificaciones {
+        animation: none;
+    }
 }
 #header {
     height: 45vh; /* JS sets inline px on first frame */
@@ -1205,6 +1412,17 @@ body.is-encargue .header-nav li:hover {
 #header.is-expanded .iconos-container,
 #header.is-expanded .iconos-container * {
     pointer-events: none;
+}
+
+/* Con el header expandido la hamburguesa es invisible (opacity 0 por GSAP):
+   bloquear su interacción. Necesita mayor especificidad que `#menu-hamb`
+   (arriba) porque el valor `auto` del botón reactivaría el hit-testing aunque
+   el wrap tenga pointer-events:none. El menú abierto la vuelve a habilitar. */
+#header.is-expanded ~ #menu-hamb-wrap #menu-hamb {
+    pointer-events: none;
+}
+body.menu-open #menu-hamb {
+    pointer-events: auto;
 }
 
 .carrito-wrapper {
@@ -1783,6 +2001,9 @@ body.is-encargue .filter-btn:active {
     align-items: center;
     justify-content: center;
     padding: 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     background: rgba(0, 0, 0, 0);
     opacity: 0;
     pointer-events: none;
@@ -1803,11 +2024,18 @@ body.is-encargue .filter-btn:active {
     pointer-events: none;
 }
 
+/* Bloquea el scroll del fondo mientras el aviso de encargo está abierto:
+   evita que el gesto de scroll se "filtre" al body. */
+body.modal-encargue-abierto {
+    overflow: hidden;
+}
+
 .modal-encargue-card {
     position: relative;
     overflow: hidden;
     width: 100%;
     max-width: 420px;
+    margin: auto;
     background: linear-gradient(160deg, #1a2040 0%, #0d1224 60%, #060a15 100%);
     border: 1px solid rgba(93, 114, 233, 0.35);
     border-radius: 28px;
@@ -3055,6 +3283,13 @@ body.is-encargue .menu-nav-footer {
     margin-bottom: 18px;
 }
 
+button.menu-nav-red {
+    background: none;
+    cursor: pointer;
+    width: 100%;
+    text-align: left;
+}
+
 .menu-nav-red {
     display: flex;
     align-items: center;
@@ -3841,8 +4076,8 @@ body.is-light {
 
     /* Modal detalle */
     --modal-sheet-end:     var(--tarjeta-fondo);
-    --modal-img-gradient:  linear-gradient(to bottom, rgba(220, 228, 237, 0.95), rgba(200, 212, 228, 0.95));
-    --modal-body-bg:       rgba(240, 242, 247, 0.88);
+    --modal-img-gradient:  linear-gradient(to bottom, #e3e8ee, #dde2e8);
+    --modal-body-bg:       linear-gradient(180deg, #dde2e8 0%, #d4dae2 100%);
     --modal-indicator-bg:  rgba(43, 47, 51, 0.20);
     --detalle-item-bg:     rgba(240, 242, 247, 0.70);
 
@@ -4721,8 +4956,10 @@ body.is-light .parati-overlay { background: rgba(180, 186, 200, 0.75); }
     top: 0; right: 0;
     width: 100vw;
     height: 100dvh;
-    background: var(--color-superficie, #161928);
-    border-left: 1px solid rgba(202, 172, 71, 0.16);
+    background:
+        radial-gradient(120% 60% at 100% 0%, rgba(var(--carrito-acento-rgb), 0.10) 0%, transparent 55%),
+        linear-gradient(180deg, #12151f 0%, #0c0f17 100%);
+    border-left: 1px solid var(--carrito-borde-fuerte);
     box-shadow: -24px 0 70px rgba(0, 0, 0, 0.55);
     overflow: hidden;
     display: flex;
@@ -4733,8 +4970,10 @@ body.is-light .parati-overlay { background: rgba(180, 186, 200, 0.75); }
     z-index: 1310;
 }
 body.is-light .parati-panel {
-    background: #f4f6fa;
-    border-color: rgba(202, 172, 71, 0.20);
+    background:
+        radial-gradient(120% 60% at 100% 0%, rgba(var(--carrito-acento-rgb), 0.12) 0%, transparent 55%),
+        linear-gradient(180deg, #f6f8fc 0%, #eef1f7 100%);
+    border-left-color: var(--carrito-borde-fuerte);
     box-shadow: -24px 0 70px rgba(0, 0, 0, 0.12);
 }
 .parati-panel.is-active  { opacity: 1; transform: translateX(0); }
@@ -4743,251 +4982,358 @@ body.is-light .parati-panel {
 .parati-cerrar {
     position: absolute;
     top: 18px; right: 18px;
-    width: 36px; height: 36px;
+    width: 38px; height: 38px;
     border-radius: 50%;
-    border: 1px solid rgba(202, 172, 71, 0.18);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--color-texto, #e8e4d8);
+    border: 1px solid var(--carrito-borde);
+    background: rgba(var(--carrito-acento-rgb), 0.06);
+    color: #e8e4d8;
     font-size: 13px;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     z-index: 10;
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     transition: background 0.25s ease, border-color 0.25s ease, transform 0.28s ease;
 }
-body.is-light .parati-cerrar { background: rgba(0,0,0,0.06); border-color: rgba(0,0,0,0.12); color: #1a1a2e; }
-.parati-cerrar:hover { background: rgba(202, 172, 71, 0.14); border-color: rgba(202, 172, 71, 0.40); transform: rotate(90deg); }
+body.is-light .parati-cerrar { color: #1a1a2e; }
+.parati-cerrar:hover {
+    background: rgba(var(--carrito-acento-rgb), 0.16);
+    border-color: var(--carrito-borde-fuerte);
+    transform: rotate(90deg);
+}
 
 .parati-header {
-    padding: 38px 28px 22px;
+    padding: 40px 26px 20px;
     flex-shrink: 0;
     position: relative;
 }
 .parati-header::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 28px; right: 28px;
+    bottom: 0; left: 26px; right: 26px;
     height: 1px;
-    background: linear-gradient(90deg, rgba(202,172,71,0.28) 0%, rgba(202,172,71,0.06) 70%, transparent 100%);
+    background: linear-gradient(90deg, var(--carrito-borde-fuerte) 0%, var(--carrito-borde) 60%, transparent 100%);
 }
 .parati-eyebrow {
     display: block;
     font-size: 10px;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: rgba(202, 172, 71, 0.68);
-    margin-bottom: 9px;
+    color: var(--carrito-acento);
+    opacity: 0.78;
+    margin-bottom: 8px;
     font-family: 'Quicksand', sans-serif;
 }
 .parati-titulo {
     font-family: 'drink', serif;
-    font-size: 44px;
+    font-size: 46px;
     font-weight: 600;
-    color: var(--color-dorado, #caac47);
-    margin: 0 0 10px;
-    line-height: 1.0;
+    color: var(--carrito-acento);
+    margin: 0 0 12px;
+    line-height: 0.98;
 }
-body.is-light .parati-titulo { color: #8a6f1e; }
-.parati-sub {
-    font-size: 13px;
-    color: var(--color-texto-suave, rgba(232, 228, 216, 0.52));
-    margin: 0;
-    line-height: 1.65;
+.parati-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11.5px;
+    letter-spacing: 0.02em;
+    color: rgba(232, 228, 216, 0.58);
     font-family: 'Quicksand', sans-serif;
-    max-width: 310px;
+    padding: 5px 12px 5px 10px;
+    border: 1px solid var(--carrito-borde);
+    border-radius: 999px;
+    background: rgba(var(--carrito-acento-rgb), 0.05);
 }
-body.is-light .parati-sub { color: rgba(30, 30, 50, 0.52); }
+body.is-light .parati-meta { color: rgba(30, 30, 50, 0.6); }
+.parati-meta-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--carrito-acento);
+    box-shadow: 0 0 0 0 rgba(var(--carrito-acento-rgb), 0.5);
+    animation: paratiPulse 2.4s ease-out infinite;
+}
+@keyframes paratiPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(var(--carrito-acento-rgb), 0.5); }
+    70%  { box-shadow: 0 0 0 7px rgba(var(--carrito-acento-rgb), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--carrito-acento-rgb), 0); }
+}
 
 .parati-body {
     flex: 1;
     overflow-y: auto;
-    padding: 26px 0 36px 10px;
+    padding: 24px 0 40px;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
 .parati-body::-webkit-scrollbar { width: 3px; }
 .parati-body::-webkit-scrollbar-track { background: transparent; }
-.parati-body::-webkit-scrollbar-thumb { background: rgba(202, 172, 71, 0.18); border-radius: 4px; }
+.parati-body::-webkit-scrollbar-thumb { background: rgba(var(--carrito-acento-rgb), 0.22); border-radius: 4px; }
 
-.parati-seccion { margin-bottom: 34px; }
+/* ── Hero: la mejor coincidencia ── */
+.parati-hero-wrap { padding: 4px 22px 6px; margin-bottom: 30px; }
+.parati-hero {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 250px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--carrito-borde-fuerte);
+    padding: 0;
+    background: #0c0f17;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(var(--carrito-acento-rgb), 0.05);
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+.parati-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 54px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--carrito-borde-fuerte);
+}
+.parati-hero-media {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center top;
+    transition: transform 0.5s ease;
+}
+.parati-hero:hover .parati-hero-media { transform: scale(1.05); }
+.parati-hero-scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 28%, rgba(0,0,0,0.38) 62%, rgba(0,0,0,0.86) 100%);
+}
+.parati-hero-content {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 9px;
+    padding: 18px;
+    text-align: left;
+}
+.parati-hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'drink', sans-serif;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--carrito-badge-color);
+    background: var(--carrito-btn-bg);
+    padding: 5px 11px;
+    border-radius: 999px;
+    box-shadow: 0 4px 14px rgba(var(--carrito-acento-rgb), 0.4);
+}
+.parati-match-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.parati-hero-nombre {
+    font-family: 'drink', serif;
+    font-size: 25px; font-weight: 600; line-height: 1.05;
+    color: #fff;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.6);
+}
+.parati-hero-foot {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; gap: 12px; margin-top: 2px;
+}
+.parati-hero-precio {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 18px; font-weight: 600;
+    color: #fff;
+}
+.parati-hero-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 12.5px; font-weight: 600;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    padding: 8px 13px; border-radius: 999px;
+    transition: gap 0.25s ease, background 0.25s ease;
+}
+.parati-hero:hover .parati-hero-cta { gap: 9px; background: rgba(255, 255, 255, 0.2); }
+
+/* ── Secciones / carruseles ── */
+.parati-seccion { margin-bottom: 32px; }
 .parati-seccion:last-child { margin-bottom: 0; }
-
+.parati-seccion-head {
+    display: flex; align-items: center; gap: 9px;
+    padding: 0 26px; margin: 0 0 14px;
+}
+.parati-seccion-icon {
+    color: var(--carrito-acento);
+    font-size: 14px; line-height: 1;
+}
 .parati-seccion-titulo {
-    font-size: 12px;
-    letter-spacing: 0.09em;
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
-
-    margin: 0 0 14px;
-    padding: 0 28px;
+    margin: 0;
     font-weight: 600;
     font-family: 'drink', sans-serif;
+    color: #e8e4d8;
 }
-.parati-tag { color: var(--color-dorado, #caac47); }
-body.is-light .parati-tag { color: #8a6f1e; }
+body.is-light .parati-seccion-titulo { color: #1a1a2e; }
+.parati-tag { color: var(--carrito-acento); }
 
 .parati-cards {
     display: flex;
     flex-direction: row;
-    gap: 12px;
-    padding: 4px 28px 10px;
+    gap: 13px;
+    padding: 4px 26px 12px;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 28px;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 26px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
 }
 .parati-cards::-webkit-scrollbar { display: none; }
 
 .parati-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    width: 136px;
+    width: 150px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(202, 172, 71, 0.09);
-    border-radius: 14px;
+    border: 1px solid var(--carrito-borde);
+    border-radius: 16px;
     overflow: hidden;
     cursor: pointer;
     text-align: left;
     scroll-snap-align: start;
-    transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease;
+    padding: 0;
+    transition: background 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
-body.is-light .parati-card {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.07);
-}
+body.is-light .parati-card { background: rgba(0, 0, 0, 0.03); }
 .parati-card:hover {
-    background: rgba(202, 172, 71, 0.07);
-    border-color: rgba(202, 172, 71, 0.30);
-    transform: translateY(-4px);
+    background: rgba(var(--carrito-acento-rgb), 0.07);
+    border-color: var(--carrito-borde-fuerte);
+    transform: translateY(-5px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32);
 }
-
 .parati-card-img {
+    position: relative;
     display: block;
     width: 100%;
-    height: 160px;
+    height: 172px;
     background-color: rgba(255, 255, 255, 0.05);
     background-size: cover;
     background-position: center top;
     flex-shrink: 0;
 }
-body.is-light .parati-card-img { background-color: rgba(0,0,0,0.06); }
-
+body.is-light .parati-card-img { background-color: rgba(0, 0, 0, 0.06); }
+.parati-card-img::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
+    pointer-events: none;
+}
+.parati-card-match {
+    position: absolute;
+    top: 8px; left: 8px;
+    z-index: 1;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--carrito-badge-color);
+    background: var(--carrito-btn-bg);
+    padding: 3px 8px;
+    border-radius: 999px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
 .parati-card-info {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    padding: 10px 10px 12px;
+    gap: 4px;
+    padding: 11px 11px 13px;
 }
 .parati-card-nombre {
-    font-size: 14px;
-    color: var(--color-texto, #e8e4d8);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 13.5px;
+    color: #e8e4d8;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     font-family: 'Quicksand', sans-serif;
 }
 body.is-light .parati-card-nombre { color: #1a1a2e; }
 .parati-card-precio {
-    font-size: 11.5px;
-    color: var(--color-dorado, #caac47);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--carrito-acento);
     font-family: 'Quicksand', sans-serif;
 }
-body.is-light .parati-card-precio { color: #8a6f1e; }
 
+/* ── Estado vacío ── */
 .parati-vacio {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 64px 28px;
-    gap: 18px;
-    text-align: center;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 70px 28px; gap: 18px; text-align: center;
 }
-.parati-vacio-icono { font-size: 30px; color: rgba(202, 172, 71, 0.32); margin: 0; }
+.parati-vacio-icono {
+    font-size: 34px;
+    color: var(--carrito-acento);
+    opacity: 0.45;
+    animation: paratiFloat 3s ease-in-out infinite;
+}
+@keyframes paratiFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+}
 .parati-vacio-texto {
     font-size: 14px;
-    color: var(--color-texto-suave, rgba(232, 228, 216, 0.48));
-    line-height: 1.7;
-    margin: 0;
-    max-width: 270px;
+    color: rgba(232, 228, 216, 0.55);
+    line-height: 1.7; margin: 0; max-width: 280px;
     font-family: 'Quicksand', sans-serif;
 }
-body.is-light .parati-vacio-texto { color: rgba(30, 30, 50, 0.50); }
+body.is-light .parati-vacio-texto { color: rgba(30, 30, 50, 0.55); }
+.parati-vacio-cta {
+    margin-top: 4px;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: var(--carrito-badge-color);
+    background: var(--carrito-btn-bg);
+    border: none;
+    padding: 11px 24px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(var(--carrito-acento-rgb), 0.35);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.parati-vacio-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(var(--carrito-acento-rgb), 0.45);
+}
+
+/* ── Entrada escalonada ── */
+.parati-panel.is-active .parati-hero-wrap {
+    animation: paratiUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    animation-delay: 0.06s;
+}
+.parati-panel.is-active .parati-seccion {
+    animation: paratiUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    animation-delay: 0.14s;
+}
+@keyframes paratiUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .parati-meta-dot,
+    .parati-vacio-icono { animation: none; }
+    .parati-panel.is-active .parati-hero-wrap,
+    .parati-panel.is-active .parati-seccion { animation: none; }
+    .parati-hero-media,
+    .parati-hero:hover .parati-hero-media { transition: none; transform: none; }
+}
 
 @media (max-width: 480px) {
-    .parati-header { padding: 30px 20px 18px; }
-    .parati-titulo { font-size: 38px; }
-    .parati-body { padding: 22px 0 28px; }
-    .parati-seccion-titulo { padding: 0 20px; }
-    .parati-cards { padding: 4px 20px 10px; scroll-padding-inline: 20px; }
+    .parati-header { padding: 32px 20px 18px; }
+    .parati-titulo { font-size: 40px; }
+    .parati-hero-wrap { padding: 4px 18px 6px; margin-bottom: 26px; }
+    .parati-hero { height: 220px; }
+    .parati-hero-nombre { font-size: 22px; }
+    .parati-seccion-head { padding: 0 20px; }
+    .parati-cards { padding: 4px 20px 12px; scroll-padding-inline: 20px; }
+    .parati-card { width: 140px; }
+    .parati-card-img { height: 160px; }
 }
 
 body.parati-abierto { overflow: hidden; }
-
-/* ── Para Ti: Modo Encargue ── */
-body.is-encargue .parati-panel {
-    border-left-color: rgba(93, 114, 233, 0.18);
-}
-body.is-encargue .parati-header::after {
-    background: linear-gradient(90deg, rgba(93,114,233,0.28) 0%, rgba(93,114,233,0.06) 70%, transparent 100%);
-}
-body.is-encargue .parati-cerrar {
-    background: rgba(93, 114, 233, 0.12);
-    border-color: rgba(93, 114, 233, 0.28);
-}
-body.is-encargue .parati-cerrar:hover {
-    background: rgba(93, 114, 233, 0.14);
-    border-color: rgba(93, 114, 233, 0.40);
-}
-body.is-encargue .parati-eyebrow {
-    color: rgba(93, 114, 233, 0.56);
-}
-body.is-encargue .parati-titulo {
-    color: var(--acento-encargue);
-}
-body.is-encargue .parati-seccion-titulo {
-    color: rgba(93, 114, 233, 0.48);
-}
-body.is-encargue .parati-tag {
-    color: var(--acento-encargue);
-}
-body.is-encargue .parati-card {
-    background: rgba(93, 114, 233, 0.08);
-    border-color: rgba(93, 114, 233, 0.16);
-}
-body.is-encargue .parati-card:hover {
-    background: rgba(93, 114, 233, 0.07);
-    border-color: rgba(93, 114, 233, 0.30);
-}
-body.is-encargue .parati-card-precio {
-    color: var(--acento-encargue);
-}
-body.is-encargue .parati-vacio-icono {
-    color: rgba(93, 114, 233, 0.32);
-}
-body.is-encargue .parati-body::-webkit-scrollbar-thumb {
-    background: rgba(93, 114, 233, 0.18);
-}
-
-/* ── Para Ti: Light + Encargue (anula las reglas is-light) ── */
-body.is-light.is-encargue .parati-titulo {
-    color: rgba(93, 114, 233, 0.85);
-}
-body.is-light.is-encargue .parati-tag {
-    color: rgba(93, 114, 233, 0.85);
-}
-body.is-light.is-encargue .parati-card {
-    background: rgba(93, 114, 233, 0.06);
-    border-color: rgba(93, 114, 233, 0.14);
-}
-body.is-light.is-encargue .parati-card-precio {
-    color: rgba(93, 114, 233, 0.85);
-}
-body.is-light.is-encargue .parati-cerrar {
-    background: rgba(93, 114, 233, 0.10);
-    border-color: rgba(93, 114, 233, 0.25);
-    color: #5d72e9;
-}
 
 /* ═══════════════════════════════════════════════════════════
    Panel Categorías — explorar prendas por categoría y ranking
@@ -5986,7 +6332,7 @@ body.is-light .aviso-cerrar {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Modal Kouma — créditos del desarrollador
+   Modal Kuroma — créditos del desarrollador
    Se activa al pulsar [data-kouma-trigger]. Pantalla completa, paleta
    dorado-sobre-negro para encajar con Lévitad. Animación en dos tiempos:
      1) Una "cortina" sólida sube de abajo a arriba (~700ms).
@@ -5998,7 +6344,7 @@ body.is-light .aviso-cerrar {
 .kouma-modal {
     position: fixed;
     inset: 0;
-    z-index: 1400; /* por encima de cualquier modal/sheet del sitio */
+    z-index: 999999; /* por encima de absolutamente todo */
     display: none;
     background: transparent;
     overflow: hidden;
@@ -6132,7 +6478,7 @@ body.is-light .aviso-cerrar {
     animation: kouma-line-grow 500ms cubic-bezier(0.65, 0, 0.35, 1) 1280ms forwards;
 }
 
-/* KOUMA — wordmark display. Tipografía serif del sitio si existe;
+/* KUROMA — wordmark display. Tipografía serif del sitio si existe;
    si no, serif del sistema con feel editorial. */
 .kouma-logo__wordmark {
     font-family: 'Cinzel', 'Trajan Pro', 'Playfair Display', Georgia, serif;

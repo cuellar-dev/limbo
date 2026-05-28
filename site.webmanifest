@@ -1,0 +1,22 @@
+{
+  "name": "Lévitad",
+  "short_name": "Lévitad",
+  "description": "Tienda online de ropa importada con encargos a Cuba (Sancti Spíritus).",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0c0f17",
+  "theme_color": "#caac47",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["shopping", "lifestyle"],
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
