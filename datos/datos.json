@@ -1424,68 +1424,6 @@
       }
     },
     {
-      "nombre": "Camisa Lino Sage",
-      "precio": 38900,
-      "imagenes": [
-        "imagenes/images.jpg",
-        "imagenes/img.webp",
-        "imagenes/sudadera.jpg"
-      ],
-      "categoria": "camisa",
-      "modo": "encargue",
-      "enlace": "",
-      "tags": [
-        "camisa",
-        "lino",
-        "sage",
-        "minimal"
-      ],
-      "ventas": 16,
-      "interacciones": 58,
-      "pesoManual": 8,
-      "detalles": {
-        "Talla": "M",
-        "Color": "Verde sage",
-        "Material": "Lino lavado",
-        "Corte": "Boxy",
-        "Ajuste": "Relajado",
-        "Temporada": "Primavera / Verano",
-        "Cuidados": "Lavar a mano frio",
-        "Stock": "6 unidades"
-      }
-    },
-    {
-      "nombre": "Conjunto Tundra Oscuro",
-      "precio": 71900,
-      "imagenes": [
-        "imagenes/sudadera.jpg",
-        "imagenes/img.webp",
-        "imagenes/images.jpg"
-      ],
-      "categoria": "conjunto",
-      "modo": "stack",
-      "enlace": "none",
-      "tags": [
-        "conjunto",
-        "oscuro",
-        "invierno",
-        "premium"
-      ],
-      "ventas": 25,
-      "interacciones": 78,
-      "pesoManual": 14,
-      "detalles": {
-        "Talla": "XL",
-        "Color": "Pizarra oscuro",
-        "Material": "Frisa pesada premium",
-        "Corte": "Relaxed fit",
-        "Ajuste": "Holgado",
-        "Temporada": "Otoño / Invierno",
-        "Cuidados": "No usar secadora",
-        "Stock": "4 unidades"
-      }
-    },
-    {
       "nombre": "Conjunto Cromatico Arena",
       "precio": 69900,
       "imagenes": [
