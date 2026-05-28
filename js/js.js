@@ -627,7 +627,30 @@ if (carritoLista) {
 		setTimeout(() => abrirDetalles(producto), 420);
 	};
 
+	// Patrón anti-tap-accidental igual al usado en categorías/outfits/parati.
+	// El click después de un swipe vertical (scroll del carrito) abría el detalle
+	// del item donde el dedo aterrizaba — porque overscroll-behavior:contain
+	// evita scroll-chaining pero el evento click sí dispara. Detectamos si hubo
+	// movimiento y, si lo hubo, cancelamos el click.
+	const carritoBody = carritoLista.closest('.carrito-panel-body');
+	let _carritoTouchMoved = false, _carritoScrollY0 = 0;
+	if (carritoBody) {
+		carritoBody.addEventListener('touchstart', () => {
+			_carritoTouchMoved = false;
+			_carritoScrollY0   = carritoBody.scrollTop;
+		}, { passive: true });
+		carritoBody.addEventListener('touchmove', () => {
+			_carritoTouchMoved = true;
+		}, { passive: true });
+		// Fallback: en iOS el touchmove puede no dispararse si el scroll lo maneja
+		// el compositor. El evento scroll sí llega siempre.
+		carritoBody.addEventListener('scroll', () => {
+			if (Math.abs(carritoBody.scrollTop - _carritoScrollY0) > 6) _carritoTouchMoved = true;
+		}, { passive: true });
+	}
+
 	carritoLista.addEventListener('click', (e) => {
+		if (_carritoTouchMoved) { _carritoTouchMoved = false; return; }
 		const botonEliminar = e.target.closest('.carrito-item-eliminar');
 		if (botonEliminar) {
 			const item  = botonEliminar.closest('.carrito-item');
@@ -671,13 +694,13 @@ function crearTarjetaProducto(producto, index) {
 	const loadingAttr  = esLcp ? 'eager' : 'lazy';
 	const priorityAttr = esLcp ? ' fetchpriority="high"' : '';
 	return `
-		<article class="tarjeta-producto" data-producto-id="${index}" role="button" tabindex="0" aria-label="Ver detalles de ${nombreEsc}, ${formatPrecio(producto.precio)}">
+		<article class="tarjeta-producto" data-producto-id="${index}">
 			<div class="imagen-contenedor${claseLoading}">
 				<img class="img-producto" src="${imgSrc}" alt="${nombreEsc}" loading="${loadingAttr}" decoding="async"${priorityAttr}>
 				<div class="sombra-interior"></div>
 			</div>
 			<div class="info-producto">
-				<h3 class="nombre-producto">${nombreEsc}</h3>
+				<h3 class="nombre-producto"><button type="button" class="tarjeta-detalle-btn" aria-label="Ver detalles de ${nombreEsc}, ${formatPrecio(producto.precio)}">${nombreEsc}</button></h3>
 				<div class="etiquetas-container">${etiquetas}</div>
 				<div class="contenedor-row">
 					<span class="precio">${formatPrecio(producto.precio)}</span>
@@ -842,6 +865,14 @@ function cargarMas() {
 					tarjeta.classList.add('is-visible');
 				}, i * 25);
 			});
+			// Relayout final tras el lote. Necesario porque las imágenes que ya
+			// están en caché (gracias al prefetch en idle) disparan `desmarcar()`
+			// sincrónicamente — esto quita el `min-height: 260px` del skeleton y
+			// la tarjeta encoge. Pero Masonry posicionó las tarjetas en
+			// `appended()` asumiendo la altura con skeleton, así que su tracker
+			// de columna cree que son más altas y deja un hueco visible sobre la
+			// siguiente tarjeta. Un layout() aquí recoloca con alturas reales.
+			estadoTienda.masonry?.layout();
 			if (estadoTienda.headerScrollTriggerEnabled && typeof ScrollTrigger !== 'undefined') {
 				ScrollTrigger.refresh();
 			}
@@ -896,6 +927,26 @@ function cerrarBuscador(searchBar, searchInput) {
 		searchBar.classList.remove('is-active', 'is-closing');
 		_searchCloseTimer = null;
 	}, 420); // mayor que la transición más larga (380ms)
+}
+
+/* Oculta la barra de búsqueda preservando el texto del input y el filtro aplicado.
+   La barra queda lógicamente "abierta" (mantiene is-active) pero invisible vía
+   is-scroll-hidden. Al pulsar la lupa, abrirBuscador() quita is-scroll-hidden y
+   la barra vuelve a aparecer con todo intacto.
+   Lo usamos en dos triggers:
+     - cuando el header colapsa al hacer scroll (si el input no tiene foco)
+     - cuando el usuario toca cualquier punto fuera de la barra */
+function ocultarBuscadorPreservandoEstado() {
+	const searchBar = document.getElementById('search-bar');
+	if (!searchBar?.classList.contains('is-active')) return;
+	if (searchBar.classList.contains('is-scroll-hidden')) return;
+	searchBar.classList.add('is-scroll-hidden');
+	// Soltar foco — en móvil esto cierra el teclado virtual.
+	document.getElementById('search-input')?.blur();
+	// Reaparecer la nav del header (la habíamos ocultado al abrir).
+	if (!document.getElementById('modal-producto')?.classList.contains('is-active')) {
+		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
+	}
 }
 
 function renderizarProductos(productos, opciones = {}) {
@@ -1138,7 +1189,7 @@ function crearModalEncargue() {
 			</div>
 
 			<h2 id="modal-encargue-titulo" class="modal-encargue-titulo">Modo Para Encargos</h2>
-			<p class="modal-encargue-subtitulo">Un espacio para pedir la ropa que anheles</p>
+			<p class="modal-encargue-subtitulo">Un espacio para que encargues la ropa que no tenemos aun</p>
 
 			<ul class="modal-encargue-lista">
 				<li>
@@ -1147,7 +1198,7 @@ function crearModalEncargue() {
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
-					<span>Diseños únicos que no tenemos ahora mismo, listos para la venta, pero pueden ser suyas</span>
+					<span>Diseños únicos que no tenemos ahora mismo listos para la venta, pero pueden ser suyas</span>
 				</li>
 				<li>
 					<span class="encargue-li-icon">✦</span>
@@ -1217,8 +1268,12 @@ if (switchContainer) {
 		const indicadorX    = buttonRect.left - containerRect.left;
 
 		// Writes
-		switchButtons.forEach(btn => btn.classList.remove('is-active'));
+		switchButtons.forEach(btn => {
+			btn.classList.remove('is-active');
+			btn.setAttribute('aria-pressed', 'false');
+		});
 		button.classList.add('is-active');
+		button.setAttribute('aria-pressed', 'true');
 
 		const isEncargue = switchButtons.indexOf(button) === 1;
 		const modoCambio = isEncargue !== modoAnterior;
@@ -1337,6 +1392,7 @@ function abrirDetalles(datos) {
 	}
 
 	modal.style.display = 'flex';
+	modal.setAttribute('aria-hidden', 'false');
 	setTimeout(() => modal.classList.add('is-active'), 10);
 
 	const _btnComprar = document.getElementById('btn-comprar-ahora');
@@ -1345,6 +1401,7 @@ function abrirDetalles(datos) {
 
 function cerrarModal() {
 	modal.classList.remove('is-active');
+	modal.setAttribute('aria-hidden', 'true');
 	if (!document.getElementById('search-bar')?.classList.contains('is-active')) {
 		document.querySelector('.header-nav')?.classList.remove('nav-oculta');
 	}
@@ -1446,16 +1503,9 @@ if (grid) {
 		}
 	});
 
-	// Accesibilidad: Enter/Espacio sobre la tarjeta enfocada abre el detalle.
-	// Solo si el foco está en la tarjeta misma (el botón añadir se activa solo).
-	grid.addEventListener('keydown', (e) => {
-		if (e.key !== 'Enter' && e.key !== ' ') return;
-		const tarjeta = e.target.closest('.tarjeta-producto');
-		if (!tarjeta || e.target !== tarjeta) return;
-		e.preventDefault();
-		const producto = productosVisibles[Number(tarjeta.dataset.productoId)];
-		if (producto) abrirDetalles(producto);
-	});
+	// Accesibilidad por teclado: el foco aterriza en el .tarjeta-detalle-btn
+	// (botón dentro del <h3>). Su Enter/Espacio nativo dispara un click que
+	// burbujea hasta este grid y abre el detalle — no hace falta keydown manual.
 }
 
 /* ─── NAV DEL HEADER: interactivo y accesible por teclado ─── */
@@ -1734,6 +1784,8 @@ function initMenuHamburguesa() {
 		if (panel.classList.contains('is-active')) return;
 		_hambTouchMoved = false;
 		menuBtn.classList.add('is-open');
+		menuBtn.setAttribute('aria-expanded', 'true');
+		menuBtn.setAttribute('aria-label', 'Cerrar menú');
 		panel.style.display = 'flex';
 		requestAnimationFrame(() => requestAnimationFrame(() => {
 			ov.classList.add('is-active');
@@ -1744,6 +1796,8 @@ function initMenuHamburguesa() {
 
 	function cerrarMenu() {
 		menuBtn.classList.remove('is-open');
+		menuBtn.setAttribute('aria-expanded', 'false');
+		menuBtn.setAttribute('aria-label', 'Abrir menú');
 		ov.classList.remove('is-active');
 		ov.classList.add('is-closing');
 		panel.classList.remove('is-active');
@@ -1797,9 +1851,10 @@ function initMenuHamburguesa() {
 		if (_hambTouchMoved) return;
 		setTimeout(() => abrirSobreLevitadPanel(), 400);
 	});
-	panel.querySelector('#tema-toggle')?.addEventListener('click', () => {
+	panel.querySelector('#tema-toggle')?.addEventListener('click', (e) => {
 		const esClaro = document.body.classList.toggle('is-light');
 		localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
+		e.currentTarget.setAttribute('aria-pressed', esClaro ? 'true' : 'false');
 	});
 
 	menuBtn.addEventListener('click', () =>
@@ -1840,6 +1895,7 @@ function abrirContactoPanel() {
 	const panel = document.getElementById('contacto-panel');
 	if (!ov || !panel || panel.classList.contains('is-active')) return;
 	document.body.classList.add('contacto-abierto');
+	panel.setAttribute('aria-hidden', 'false');
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		ov.classList.add('is-active');
 		panel.classList.add('is-active');
@@ -1853,7 +1909,7 @@ function cerrarContactoPanel() {
 	const ov    = document.getElementById('contacto-overlay');
 	const panel = document.getElementById('contacto-panel');
 	if (ov)    { ov.classList.remove('is-active');    ov.classList.add('is-closing');    setTimeout(() => ov.classList.remove('is-closing'),    380); }
-	if (panel) { panel.classList.remove('is-active'); panel.classList.add('is-closing'); setTimeout(() => panel.classList.remove('is-closing'), 380); }
+	if (panel) { panel.classList.remove('is-active'); panel.classList.add('is-closing'); panel.setAttribute('aria-hidden', 'true'); setTimeout(() => panel.classList.remove('is-closing'), 380); }
 }
 
 function limpiarErrorCampo(el) {
@@ -1976,6 +2032,7 @@ function abrirSobreLevitadPanel() {
 	const panel = document.getElementById('sobre-panel');
 	if (!panel || panel.classList.contains('is-active')) return;
 	document.body.classList.add('sobre-abierto');
+	panel.setAttribute('aria-hidden', 'false');
 	requestAnimationFrame(() => requestAnimationFrame(() => {
 		panel.classList.add('is-active');
 	}));
@@ -1997,6 +2054,7 @@ function cerrarSobreLevitadPanel() {
 	if (panel) {
 		panel.classList.remove('is-active');
 		panel.classList.add('is-closing');
+		panel.setAttribute('aria-hidden', 'true');
 		setTimeout(() => panel.classList.remove('is-closing'), 420);
 	}
 }
@@ -2330,9 +2388,11 @@ function initFooter() {
 /* ─── INIT ─── */
 
 function initTema() {
-	if (localStorage.getItem('levitad-tema') === 'light') {
-		document.body.classList.add('is-light');
-	}
+	const esClaro = localStorage.getItem('levitad-tema') === 'light';
+	if (esClaro) document.body.classList.add('is-light');
+	// El #tema-toggle vive dentro del menú hamburguesa; cuando initTema corre
+	// puede no existir aún. Si existe, sincronizamos el aria-pressed inicial.
+	document.getElementById('tema-toggle')?.setAttribute('aria-pressed', esClaro ? 'true' : 'false');
 }
 
 /* ── Header Nav Links ── */
@@ -2403,6 +2463,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (filterBtn) {
 			filterBtn.addEventListener('click', abrirModalFiltros);
 		}
+
+		// Tocar fuera de la barra oculta el buscador preservando texto y filtro.
+		// Excluimos clicks dentro de la propia barra y sobre la lupa (que ya
+		// gestiona su propio toggle de apertura/foco).
+		document.addEventListener('click', (e) => {
+			if (!searchBar.classList.contains('is-active')) return;
+			if (searchBar.classList.contains('is-scroll-hidden')) return;
+			if (searchBar.contains(e.target)) return;
+			if (e.target.closest('#buscar-btn')) return;
+			ocultarBuscadorPreservandoEstado();
+		});
 	}
 
 	initMenuHamburguesa();
@@ -2575,12 +2646,18 @@ if (header) {
 				if (expanded !== lastExpandedState) {
 					lastExpandedState = expanded;
 					header.classList.toggle('is-expanded', expanded);
+					// Cuando el header sale del estado expandido (empieza a colapsar),
+					// ocultamos el buscador preservando lo que el usuario haya tecleado
+					// y el filtro aplicado. Se reabre intacto al pulsar la lupa.
+					// Excepción: si el input tiene foco, no lo ocultamos — el teclado
+					// virtual en móvil puede causar scroll falso y romper la edición.
+					if (!expanded) {
+						const searchInput = document.getElementById('search-input');
+						if (!searchInput || document.activeElement !== searchInput) {
+							ocultarBuscadorPreservandoEstado();
+						}
+					}
 				}
-
-				// (Eliminado) Auto-cierre del buscador al scrollear: rompía la
-				// experiencia móvil porque el teclado virtual provocaba scroll
-				// y el buscador se cerraba al escribir una letra. Ahora la
-				// lupa se cierra solo manualmente con su botón ✕.
 
 				// Hamburguesa: no clickeable mientras sea invisible (p < 0.65)
 				if (hambWrap) hambWrap.style.pointerEvents = p >= 0.65 ? 'auto' : 'none';
@@ -2657,6 +2734,11 @@ if (header) {
 	   Esto simula el estado inicial correcto: p=0, por tanto expanded=true */
 	lastExpandedState = true;
 	header.classList.add('is-expanded');
+	// La hamburguesa solo aparece visible cuando el header colapsa (p >= 0.65).
+	// El onUpdate apaga su pointer-events bajo ese umbral, pero como no corre
+	// hasta el primer scroll, en la primera carga el wrap queda tocable
+	// aunque esté invisible. Forzamos el estado inicial aquí.
+	if (hambWrap) hambWrap.style.pointerEvents = 'none';
 	if (searchBar) {
 		searchBar.classList.remove('is-scroll-hidden');
 	}
@@ -2969,10 +3051,16 @@ function abrirCategoriasPanel() {
 	ov.addEventListener('click', cerrar);
 
 	const body = panel.querySelector('.cat-body');
+	// Offset = altura aprox. del .cat-header sticky (140px). Restamos esto al
+	// scrollTop para que el título de la sección no quede tapado por el header.
+	const CAT_HEADER_OFFSET = 140;
 	panel.querySelectorAll('.cat-chip').forEach(chip => {
 		chip.addEventListener('click', () => {
 			const target = panel.querySelector('#' + chip.dataset.target);
-			if (target && body) body.scrollTo({ top: target.offsetTop - 8, behavior: 'smooth' });
+			if (target && body) {
+				const destino = Math.max(0, target.offsetTop - CAT_HEADER_OFFSET);
+				body.scrollTo({ top: destino, behavior: 'smooth' });
+			}
 		});
 	});
 
