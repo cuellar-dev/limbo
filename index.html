@@ -19,7 +19,7 @@
          existe; el hash no concede acceso a otros scripts inline (cada hash matchea
          contenido exacto). Si actualizas Live Server y el hash cambia, actualízalo. -->
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
+          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
 
     <!-- ── SEO básico ── -->
     <title>Lévitad | Tienda de ropa y encargos a Cuba — Sancti Spíritus</title>
@@ -28,6 +28,13 @@
     <meta name="author" content="Luis Ernesto Cuellar">
     <meta name="robots" content="index, follow, max-image-preview:large">
     <link rel="canonical" href="https://levitad.com/">
+
+    <!-- ── Google Search Console ──
+         1. Entra a https://search.google.com/search-console y añade tu propiedad (levitad.com).
+         2. Elige verificación por "Etiqueta HTML": copia el code= que te dan.
+         3. Descomenta la línea de abajo y pega tu código en content. Luego pulsa "Verificar".
+         4. Ya verificado, envía el sitemap: https://levitad.com/sitemap.xml -->
+    <!-- <meta name="google-site-verification" content="PEGA_AQUI_TU_CODIGO"> -->
 
     <!-- ── Open Graph (Facebook, WhatsApp, LinkedIn) ── -->
     <meta property="og:type" content="website">
@@ -99,8 +106,8 @@
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin>
 
     <!-- ── Estilos ── -->
-    <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/angel.css">
+    <link rel="stylesheet" href="Css/style.css?v=4">
+    <link rel="stylesheet" href="Css/angel.css?v=4">
 </head>
 <body>
     <a class="skip-link" href="#main-content">Saltar al contenido</a>
@@ -180,7 +187,7 @@
     </div>
     <div class="switch-container" role="group" aria-label="Modo de compra: productos en stock o por encargo">
                 <div class="color-switch" aria-hidden="true"></div>
-                <button type="button" aria-pressed="true">En Stack</button>
+                <button type="button" aria-pressed="true">Disponible</button>
                 <button type="button" aria-pressed="false">Encargos</button>
             </div>
     <main class="contenedor" id="main-content" tabindex="-1">
@@ -403,6 +410,7 @@
                     <span class="menu-nav-compartir-label">Compartir</span>
                 </button>
             </div>
+            <button type="button" class="menu-nav-foot-link" data-action="faq">Preguntas  y dudas frecuentes</button>
             <div class="menu-nav-divider"></div>
             <div class="menu-nav-creditos">
                 <span class="menu-nav-dev">Hecho con ♡ por <button type="button" class="menu-nav-dev-link" data-kouma-trigger>Kuroma</button></span>
@@ -482,6 +490,51 @@
         </div>
     </div>
 
+    <!-- ── Panel Preguntas frecuentes (FAQ) ── -->
+    <div id="faq-overlay" class="faq-overlay"></div>
+    <section id="faq-panel" class="faq-panel" role="dialog" aria-modal="true" aria-labelledby="faq-titulo" aria-hidden="true">
+        <button class="faq-cerrar" type="button" aria-label="Cerrar preguntas frecuentes">✕</button>
+        <header class="faq-header">
+            <span class="faq-eyebrow">Te ayudamos</span>
+            <h2 class="faq-titulo" id="faq-titulo">Preguntas frecuentes</h2>
+            <p class="faq-sub">Las dudas más comunes sobre pedidos, envíos y pagos.</p>
+        </header>
+        <div class="faq-body">
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Que son los modos?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Tenemos dos modos didacticamente cambiables. El primero (el dorado) es donde aparecen las prendas que ya están listas para comprar, solo seria coordinar la entrega y el pago y tal, son prendas que ya tenemos listas para usted. En el modo de Encargos (el azul), como su nombre sugiere, es un modo en el que aparecen prendas que no están en casa, si usted la elige y le gusta, entonces tendríamos que encargarla fuera del país, y por tanto esperar su llegada.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Cómo hago un pedido o encargo?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Explora el catálogo, añade las prendas que te gusten a tu pedido y pulsa «Enviar pedido por WhatsApp». Te escribimos para confirmar disponibilidad, precio final y coordinar la entrega.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿A qué zonas de Cuba hacen entregas?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Coordinamos entregas en todo Sancti Spíritus, hasta este momento. Si estás en las afueras de la ciudad, o municipio, escríbenos y vemos cómo podemos resolver.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Cuánto tarda un encargo en llegar?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Depende de la prenda y de su origen. Al confirmar tu pedido te damos una fecha estimada; normalmente los encargos tardan algunas semanas.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Cómo puedo pagar?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Coordinamos la forma de pago al confirmar tu pedido por WhatsApp. Escríbenos y te indicamos las opciones disponibles.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Puedo cambiar o devolver una prenda?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Si algo no está bien con tu pedido, escríbenos lo antes posible y buscamos la mejor solución contigo.</p></div>
+            </details>
+            <details class="faq-item" name="faq">
+                <summary class="faq-q">¿Cual es la calidad de las prendas?<span class="faq-icono" aria-hidden="true"></span></summary>
+                <div class="faq-a"><p>Las prendas tienen la calidad estándar del provedor, según el que haya sido de su prenda en especifico (Shein, Temu, etc...).</p></div>
+            </details>
+            <div class="faq-cta">
+                <p class="faq-cta-texto">¿No encontraste tu respuesta?</p>
+                <button type="button" class="faq-cta-btn" id="faq-cta-contacto">Escríbenos</button>
+            </div>
+        </div>
+    </section>
+
     <!-- ── Footer de página ── -->
     <footer id="site-footer" class="site-footer">
         <div class="site-footer-glow"></div>
@@ -505,6 +558,13 @@
                 </span>D</h2>
                 <p class="footer-slogan">Prendas que elevan.</p>
             </div>
+            <div class="footer-col footer-col-ayuda">
+                <p class="footer-col-titulo">Ayuda</p>
+                <ul class="footer-links">
+                    <li><button type="button" class="footer-link" id="footer-faq-link">Preguntas frecuentes</button></li>
+                    <li><button type="button" class="footer-link" id="footer-contacto-link">Contacto</button></li>
+                </ul>
+            </div>
             <div class="footer-col footer-col-redes">
                 <p class="footer-col-titulo">Síguenos</p>
                 <div class="footer-redes">
@@ -516,12 +576,11 @@
                         </svg>
                         <span>Instagram</span>
                     </a>
-                    <a href="https://wa.me/5490000000000" target="_blank" rel="noopener noreferrer" class="footer-red" aria-label="WhatsApp">
+                    <a href="https://facebook.com/levitad" target="_blank" rel="noopener noreferrer" class="footer-red" aria-label="Facebook">
                         <svg viewBox="0 0 24 24" fill="none">
-                            <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.98-1.418A9.956 9.956 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
-                            <path d="M8.5 9.5c.5 1 1.5 3 3.5 4s3-1 3-1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
-                        <span>WhatsApp</span>
+                        <span>Facebook</span>
                     </a>
                 </div>
             </div>
@@ -576,9 +635,21 @@
     </div>
 
     <script defer src="js/vendor/masonry.pkgd.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+            integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+            integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script defer src="js/js.js"></script>
     <script defer src="js/angel.js"></script>
+
+    <!-- ── Cloudflare Web Analytics (gratis, privacy-first, sin cookies) ──
+         1. Entra a https://dash.cloudflare.com → Web Analytics → "Add a site".
+         2. Pon levitad.com; Cloudflare te da un token (cadena larga).
+         3. Reemplaza PEGA_AQUI_TU_TOKEN abajo por ese token. Listo, ya mide.
+         (Mientras el token sea el placeholder, el beacon carga pero no registra.) -->
+    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon='{"token": "PEGA_AQUI_TU_TOKEN"}'></script>
 </body>
 </html>

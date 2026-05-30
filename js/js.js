@@ -1916,6 +1916,10 @@ function initMenuHamburguesa() {
 		if (_hambTouchMoved) return;
 		setTimeout(() => abrirSobreLevitadPanel(), 400);
 	});
+	panel.querySelector('[data-action="faq"]')?.addEventListener('click', () => {
+		if (_hambTouchMoved) return;
+		setTimeout(() => abrirFaqPanel(), 400);
+	});
 	panel.querySelector('#tema-toggle')?.addEventListener('click', (e) => {
 		const esClaro = document.body.classList.toggle('is-light');
 		localStorage.setItem('levitad-tema', esClaro ? 'light' : 'dark');
@@ -2122,6 +2126,84 @@ function cerrarSobreLevitadPanel() {
 		panel.setAttribute('aria-hidden', 'true');
 		setTimeout(() => panel.classList.remove('is-closing'), 420);
 	}
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Panel Preguntas frecuentes (FAQ) — vive en el HTML.
+   El acordeón es nativo (<details name="faq">), así que el JS
+   solo abre/cierra el panel y conecta los accesos (menú, footer
+   y CTA hacia Contacto).
+═══════════════════════════════════════════════════════════ */
+function initFaqPanel() {
+	const ov    = document.getElementById('faq-overlay');
+	const panel = document.getElementById('faq-panel');
+	if (!panel) return;
+
+	ov?.addEventListener('click', cerrarFaqPanel);
+	panel.querySelector('.faq-cerrar')?.addEventListener('click', cerrarFaqPanel);
+
+	// CTA "Escríbenos": cierra FAQ y abre el panel de Contacto.
+	panel.querySelector('#faq-cta-contacto')?.addEventListener('click', () => {
+		cerrarFaqPanel();
+		setTimeout(() => abrirContactoPanel(), 420);
+	});
+
+	// Accesos desde el footer del sitio.
+	document.getElementById('footer-faq-link')?.addEventListener('click', abrirFaqPanel);
+	document.getElementById('footer-contacto-link')?.addEventListener('click', abrirContactoPanel);
+}
+
+function _faqEscHandler(e) {
+	if (e.key === 'Escape') {
+		const panel = document.getElementById('faq-panel');
+		if (panel?.classList.contains('is-active')) cerrarFaqPanel();
+	}
+}
+
+function abrirFaqPanel() {
+	const ov    = document.getElementById('faq-overlay');
+	const panel = document.getElementById('faq-panel');
+	if (!panel || panel.classList.contains('is-active')) return;
+	document.body.classList.add('faq-abierto');
+	panel.setAttribute('aria-hidden', 'false');
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov?.classList.add('is-active');
+		panel.classList.add('is-active');
+	}));
+	enfocarModal(panel);
+	document.addEventListener('keydown', _faqEscHandler);
+}
+
+function cerrarFaqPanel() {
+	document.body.classList.remove('faq-abierto');
+	document.removeEventListener('keydown', _faqEscHandler);
+	const ov    = document.getElementById('faq-overlay');
+	const panel = document.getElementById('faq-panel');
+	if (ov)    { ov.classList.remove('is-active');    ov.classList.add('is-closing');    setTimeout(() => ov.classList.remove('is-closing'),    380); }
+	if (panel) { panel.classList.remove('is-active'); panel.classList.add('is-closing'); panel.setAttribute('aria-hidden', 'true'); setTimeout(() => panel.classList.remove('is-closing'), 380); }
+}
+
+/* Inyecta FAQPage JSON-LD leyendo las preguntas/respuestas del DOM,
+   así el dato estructurado para Google coincide siempre con lo visible. */
+function inyectarFaqJsonLd() {
+	const items = document.querySelectorAll('#faq-panel .faq-item');
+	if (!items.length) return;
+	const faqs = [];
+	items.forEach(item => {
+		const q = item.querySelector('.faq-q')?.textContent.trim();
+		const a = item.querySelector('.faq-a')?.textContent.trim();
+		if (q && a) faqs.push({
+			'@type': 'Question',
+			name: q,
+			acceptedAnswer: { '@type': 'Answer', text: a }
+		});
+	});
+	if (!faqs.length) return;
+	const data = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faqs };
+	const script = document.createElement('script');
+	script.type = 'application/ld+json';
+	script.textContent = JSON.stringify(data);
+	document.head.appendChild(script);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -2544,6 +2626,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	initMenuHamburguesa();
 	initContactoPanel();
 	initSobrePanel();
+	initFaqPanel();
+	inyectarFaqJsonLd();
 	initKoumaModal();
 	initHeaderNavLinks();
 	initLightbox();

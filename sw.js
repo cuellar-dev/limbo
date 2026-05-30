@@ -1,29 +1,53 @@
 /* ═══════════════════════════════════════════════════════════════════════
    Lévitad — Service Worker
-   Cachea imágenes (Cloudinary + locales) para que cargas posteriores
-   vengan del disco. Pensado para usuarios con red lenta o intermitente.
+   Cachea el "app-shell" (HTML/CSS/JS), las imágenes (Cloudinary + locales)
+   y el catálogo (datos.json) para que el sitio cargue rápido y funcione
+   offline. Pensado para usuarios con red lenta o intermitente.
 
-   Estrategia: cache-first para imágenes con fallback a red.
-   - Cloudinary versiona las URLs (/upload/.../v123/...), así que un
-     cambio de imagen genera URL distinta → cachear "para siempre" es seguro.
-   - Solo intercepta requests GET de imágenes; cualquier otra cosa
-     (API de GitHub, JSON, scripts) pasa de largo al fetch normal.
+   Estrategias:
+   - App-shell (HTML): network-first → si no hay red, sirve index.html cacheado.
+   - Estáticos (CSS/JS/fuentes/manifest): stale-while-revalidate (rápido + fresco).
+   - Imágenes: cache-first (Cloudinary versiona URLs, cachear es seguro).
+   - datos.json: stale-while-revalidate.
 
-   Para invalidar todo el caché de imágenes (raro): subir el número de
-   versión en CACHE_NAME. El activate borra los cachés viejos.
+   Para forzar actualización tras un deploy: sube el número de versión del
+   caché correspondiente (CACHE_SHELL / CACHE_IMG / CACHE_DATA). El `activate`
+   borra los cachés viejos de 'levitad-'.
    ═══════════════════════════════════════════════════════════════════════ */
 
+const CACHE_SHELL = 'levitad-shell-v1';
 // CACHE_IMG sube a v2: el v1 guardaba respuestas opacas (cross-origin sin CORS)
 // que a veces eran bytes truncados. El activate borra v1 al instalar este SW.
 const CACHE_IMG  = 'levitad-img-v2';
 const CACHE_DATA = 'levitad-data-v1';
 
-self.addEventListener('install', () => {
+// Archivos núcleo que permiten arrancar la app sin red. NO incluimos las
+// fuentes ni GSAP aquí: se cachean bajo demanda (las fuentes vía SWR; GSAP es
+// CDN externa con SRI y el código degrada bien si falta).
+const SHELL_ASSETS = [
+    './',
+    'index.html',
+    'Css/style.css',
+    'Css/angel.css',
+    'js/js.js',
+    'js/angel.js',
+    'js/vendor/masonry.pkgd.min.js',
+    'favicon.svg',
+    'site.webmanifest'
+];
+
+self.addEventListener('install', (e) => {
     self.skipWaiting();
+    // Precache resiliente: si un asset falla, no tumba toda la instalación.
+    e.waitUntil(
+        caches.open(CACHE_SHELL).then(cache =>
+            Promise.allSettled(SHELL_ASSETS.map(u => cache.add(u)))
+        )
+    );
 });
 
 self.addEventListener('activate', (e) => {
-    const vigentes = new Set([CACHE_IMG, CACHE_DATA]);
+    const vigentes = new Set([CACHE_SHELL, CACHE_IMG, CACHE_DATA]);
     e.waitUntil(
         caches.keys()
             .then(keys => Promise.all(
@@ -40,6 +64,8 @@ self.addEventListener('fetch', (e) => {
 
     let url;
     try { url = new URL(req.url); } catch (_) { return; }
+
+    const mismoOrigen = url.origin === self.location.origin;
 
     // 1) Catálogo (datos.json): stale-while-revalidate.
     //    Servimos la versión cacheada al instante; en paralelo bajamos la nueva
@@ -92,5 +118,41 @@ self.addEventListener('fetch', (e) => {
         return;
     }
 
-    // 3) Cualquier otra cosa pasa al fetch normal del navegador.
+    // 3) Navegaciones (HTML): network-first con fallback offline al index cacheado.
+    //    Online ves siempre el HTML fresco; offline arranca el app-shell.
+    if (req.mode === 'navigate') {
+        e.respondWith(
+            fetch(req)
+                .then(res => {
+                    if (res && res.ok && mismoOrigen) {
+                        const copia = res.clone();
+                        caches.open(CACHE_SHELL).then(c => c.put('index.html', copia)).catch(() => {});
+                    }
+                    return res;
+                })
+                .catch(() => caches.match('index.html').then(c => c || caches.match('./')))
+        );
+        return;
+    }
+
+    // 4) Estáticos propios (CSS/JS/fuentes/manifest): stale-while-revalidate.
+    //    Sirve del caché al instante y refresca en segundo plano para la próxima carga.
+    if (mismoOrigen && /\.(css|js|mjs|woff2?|ttf|otf|webmanifest)(\?|$)/i.test(url.pathname)) {
+        e.respondWith(
+            caches.open(CACHE_SHELL).then(cache =>
+                cache.match(req).then(cached => {
+                    const red = fetch(req).then(res => {
+                        if (res && res.ok && res.type !== 'opaque') {
+                            cache.put(req, res.clone()).catch(() => {});
+                        }
+                        return res;
+                    }).catch(() => cached);
+                    return cached || red;
+                })
+            )
+        );
+        return;
+    }
+
+    // 5) Cualquier otra cosa pasa al fetch normal del navegador.
 });
