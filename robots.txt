@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /panel-9f3a.html
+Disallow: /limbo/panel-9f3a.html
 
-Sitemap: https://levitad.com/sitemap.xml
+Sitemap: https://cuellar-dev.github.io/limbo/sitemap.xml

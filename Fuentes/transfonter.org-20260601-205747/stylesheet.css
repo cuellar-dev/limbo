@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'Quicksand';
+    src: url('subset-Quicksand-Light.woff2') format('woff2'),
+        url('subset-Quicksand-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Josefin Sans';
+    src: url('subset-JosefinSans-Bold.woff2') format('woff2'),
+        url('subset-JosefinSans-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'The Foregen';
+    src: url('subset-TheForegen-Regular.woff2') format('woff2'),
+        url('subset-TheForegen-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+

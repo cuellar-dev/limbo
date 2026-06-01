@@ -19,7 +19,7 @@
          existe; el hash no concede acceso a otros scripts inline (cada hash matchea
          contenido exacto). Si actualizas Live Server y el hash cambia, actualízalo. -->
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co https://cloudflareinsights.com; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
+          content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://gc.zgo.at 'sha256-vvt4KWwuNr51XfE5m+hzeNEGhiOfZzG97ccfqGsPwvE='; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self' https://formsubmit.co https://*.goatcounter.com; form-action 'self' https://formsubmit.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none';">
 
     <!-- ── SEO básico ── -->
     <title>Lévitad | Tienda de ropa y encargos a Cuba — Sancti Spíritus</title>
@@ -27,13 +27,13 @@
     <meta name="keywords" content="Lévitad, Levitad, ropa, encargos, encargar ropa, Cuba, Sancti Spíritus, tienda online, encargos para Cuba, moda, prendas importadas">
     <meta name="author" content="Luis Ernesto Cuellar">
     <meta name="robots" content="index, follow, max-image-preview:large">
-    <link rel="canonical" href="https://levitad.com/">
+    <link rel="canonical" href="https://cuellar-dev.github.io/limbo/">
 
     <!-- ── Google Search Console ──
-         1. Entra a https://search.google.com/search-console y añade tu propiedad (levitad.com).
+         1. Entra a https://search.google.com/search-console y añade tu propiedad (cuellar-dev.github.io/limbo).
          2. Elige verificación por "Etiqueta HTML": copia el code= que te dan.
          3. Descomenta la línea de abajo y pega tu código en content. Luego pulsa "Verificar".
-         4. Ya verificado, envía el sitemap: https://levitad.com/sitemap.xml -->
+         4. Ya verificado, envía el sitemap: https://cuellar-dev.github.io/limbo/sitemap.xml -->
     <!-- <meta name="google-site-verification" content="PEGA_AQUI_TU_CODIGO"> -->
 
     <!-- ── Open Graph (Facebook, WhatsApp, LinkedIn) ── -->
@@ -41,8 +41,8 @@
     <meta property="og:site_name" content="Lévitad">
     <meta property="og:title" content="Lévitad | Ropa y encargos a Cuba con estilo">
     <meta property="og:description" content="Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.">
-    <meta property="og:url" content="https://levitad.com/">
-    <meta property="og:image" content="https://levitad.com/imagenes/sudadera.jpg">
+    <meta property="og:url" content="https://cuellar-dev.github.io/limbo/">
+    <meta property="og:image" content="https://cuellar-dev.github.io/limbo/imagenes/sudadera.jpg">
     <meta property="og:image:alt" content="Prenda de Lévitad">
     <meta property="og:locale" content="es_ES">
 
@@ -50,7 +50,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Lévitad | Ropa y encargos a Cuba con estilo">
     <meta name="twitter:description" content="Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles.">
-    <meta name="twitter:image" content="https://levitad.com/imagenes/sudadera.jpg">
+    <meta name="twitter:image" content="https://cuellar-dev.github.io/limbo/imagenes/sudadera.jpg">
     <meta name="twitter:image:alt" content="Prenda de Lévitad">
 
     <!-- ── Apariencia móvil ── -->
@@ -69,19 +69,19 @@
       "@graph": [
         {
           "@type": "WebSite",
-          "@id": "https://levitad.com/#website",
-          "url": "https://levitad.com/",
+          "@id": "https://cuellar-dev.github.io/limbo/#website",
+          "url": "https://cuellar-dev.github.io/limbo/",
           "name": "Lévitad",
           "description": "Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus.",
           "inLanguage": "es"
         },
         {
           "@type": "ClothingStore",
-          "@id": "https://levitad.com/#store",
+          "@id": "https://cuellar-dev.github.io/limbo/#store",
           "name": "Lévitad",
-          "url": "https://levitad.com/",
-          "image": "https://levitad.com/imagenes/sudadera.jpg",
-          "logo": "https://levitad.com/favicon.svg",
+          "url": "https://cuellar-dev.github.io/limbo/",
+          "image": "https://cuellar-dev.github.io/limbo/imagenes/sudadera.jpg",
+          "logo": "https://cuellar-dev.github.io/limbo/favicon.svg",
           "description": "Tienda online de ropa importada con encargos a Cuba y Sancti Spíritus. Prendas de calidad a precios accesibles, con estilo y distinción.",
           "address": {
             "@type": "PostalAddress",
@@ -683,12 +683,15 @@
     <script defer src="js/js.min.js?v=7"></script>
     <script defer src="js/angel.js"></script>
 
-    <!-- ── Cloudflare Web Analytics (gratis, privacy-first, sin cookies) ──
-         1. Entra a https://dash.cloudflare.com → Web Analytics → "Add a site".
-         2. Pon levitad.com; Cloudflare te da un token (cadena larga).
-         3. Reemplaza PEGA_AQUI_TU_TOKEN abajo por ese token. Listo, ya mide.
-         (Mientras el token sea el placeholder, el beacon carga pero no registra.) -->
-    <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
-            data-cf-beacon='{"token": "PEGA_AQUI_TU_TOKEN"}'></script>
+    <!-- ── GoatCounter (gratis hasta 100k vistas/mes, sin cookies, GDPR-friendly) ──
+         1. Crea cuenta gratis en https://www.goatcounter.com/signup
+         2. Elige un "code" — será tu subdominio: TU_CODIGO.goatcounter.com
+            (ej. "limbo" → limbo.goatcounter.com; sugerido: algo corto y único).
+         3. Reemplaza TU_CODIGO abajo por el que elegiste. Empieza a medir solo.
+         4. Tu panel privado vivirá en https://TU_CODIGO.goatcounter.com
+         Si dejas el placeholder, el script intenta cargar y falla en silencio:
+         no se rompe nada en la web. -->
+    <script async data-goatcounter="https://levitad.goatcounter.com/count"
+            src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>
