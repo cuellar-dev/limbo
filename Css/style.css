@@ -3,14 +3,14 @@
 /* Importación de fuentes (Eliminada la fuente Limbo) */
 @font-face {
     font-family: 'Arcane';
-    src: url('../Fuentes/The\ Foregen\ Regular.ttf') format('truetype');
+    src: url('../Fuentes/subset-TheForegen-Regular.woff2') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 @font-face{
     font-family: 'Quicksand';
-    src: url('../Fuentes/Quicksand/Quicksand-VariableFont_wght.ttf') format('truetype');
+    src: url('../Fuentes/Quicksand/subset-Quicksand-Light.woff2') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -23,7 +23,7 @@
 }
 @font-face{
     font-family: 'Elegante';
-    src: url('../Fuentes/josefin-sans/JosefinSans-Bold.ttf') format('truetype');
+    src: url('../Fuentes/josefin-sans/subset-JosefinSans-Bold.woff2') format('truetype');
     font-display: swap;
 }
 
