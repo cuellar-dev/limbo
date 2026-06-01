@@ -385,6 +385,19 @@ document.querySelectorAll('.filtros button').forEach(b => {
 document.getElementById('btn-nuevo-prod').addEventListener('click', () => abrirEditorProducto(-1));
 
 /* ─── Editor de producto (modal) ─── */
+/* Etiquetas existentes en cualquier producto: el editor las muestra
+   como chips para reutilizar la nomenclatura entre prendas. */
+function obtenerTagsExistentes() {
+	const set = new Set();
+	(state.data.productos || []).forEach(p => {
+		(p.tags || []).forEach(t => {
+			const tag = String(t).trim().toLowerCase();
+			if (tag) set.add(tag);
+		});
+	});
+	return [...set].sort();
+}
+
 function abrirEditorProducto(indice) {
     const esNuevo = indice < 0;
     const p = esNuevo
@@ -393,6 +406,13 @@ function abrirEditorProducto(indice) {
 
     const detallesEntries = Object.entries(p.detalles || {});
     const detallesHTML = detallesEntries.map(([k, v]) => filaDetalle(k, v)).join('') || filaDetalle('', '');
+
+    /* Chips de tags ya usados en otros productos — el dueño puede añadir o quitar con un click. */
+    const tagsTodos    = obtenerTagsExistentes();
+    const tagsActuales = new Set((p.tags || []).map(t => String(t).toLowerCase()));
+    const tagsChipsHTML = tagsTodos.length
+        ? `<p class="tags-chips-label">Etiquetas existentes — pulsa para añadir o quitar:</p><div class="tags-chips" id="f-tags-chips">${tagsTodos.map(t => `<button type="button" class="tag-chip${tagsActuales.has(t) ? ' is-active' : ''}" data-tag="${esc(t)}">${esc(t)}</button>`).join('')}</div>`
+        : `<p class="tags-chips-vacio">Aún no hay etiquetas registradas. Las que crees aquí estarán disponibles para reutilizar en próximas prendas.</p>`;
 
     const card = document.getElementById('modal-card');
     card.innerHTML = `
@@ -425,6 +445,7 @@ function abrirEditorProducto(indice) {
         <div class="campo">
             <label>Tags (separados por coma)</label>
             <input id="f-tags" type="text" value="${esc((p.tags || []).join(', '))}" placeholder="oversize, premium, urbano">
+            ${tagsChipsHTML}
         </div>
 
         <div class="campo" id="campo-enlace" ${p.modo === 'encargue' ? '' : 'style="display:none"'}>
@@ -470,6 +491,33 @@ function abrirEditorProducto(indice) {
         const lista = card.querySelector('#f-detalles');
         lista.insertAdjacentHTML('beforeend', filaDetalle('', ''));
         engancharBorrarDetalle(card);
+
+    /* Chips de tags: añade/quita la etiqueta del input al pulsar. */
+    const tagsInputEl = card.querySelector('#f-tags');
+    card.querySelectorAll('.tag-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const tag = chip.dataset.tag;
+            const lista = tagsInputEl.value.split(',').map(t => t.trim()).filter(Boolean);
+            const idx = lista.findIndex(t => t.toLowerCase() === tag.toLowerCase());
+            if (idx >= 0) {
+                lista.splice(idx, 1);
+                chip.classList.remove('is-active');
+            } else {
+                lista.push(tag);
+                chip.classList.add('is-active');
+            }
+            tagsInputEl.value = lista.join(', ');
+        });
+    });
+    /* Si el dueño escribe a mano en el input, mantén los chips sincronizados. */
+    if (tagsInputEl) {
+        tagsInputEl.addEventListener('input', () => {
+            const enInput = new Set(tagsInputEl.value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean));
+            card.querySelectorAll('.tag-chip').forEach(chip => {
+                chip.classList.toggle('is-active', enInput.has(chip.dataset.tag.toLowerCase()));
+            });
+        });
+    }
     });
     engancharBorrarDetalle(card);
 

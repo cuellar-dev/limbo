@@ -32,6 +32,53 @@ const STORAGE_KEY_CARRITO_ENCARGUE = 'levitad-carrito-encargue';
 const STORAGE_KEY_MODAL_ENCARGUE   = 'levitad-modal-encargue-visto';
 const STORAGE_KEY_ULTIMO_PEDIDO    = 'levitad-ultimo-pedido';
 const PEDIDO_COOLDOWN_MS           = 3 * 60 * 1000; // 3 minutos entre pedidos
+
+/* ─── Cooldown del pedido: capa anti-tampering ───
+   Sin backend no hay seguridad real, pero levantamos la barrera para que
+   un usuario casual NO pueda saltarse el cooldown borrando una sola clave
+   ni inventando un timestamp falso:
+     - Guardamos el timestamp en TRES claves distintas de localStorage
+       (nombres no obvios) + una copia en sessionStorage.
+     - Cada valor lleva un checksum: poner un timestamp arbitrario
+       requiere conocer la "sal" y reproducir el hash.
+     - Al leer, tomamos el MÁXIMO de los valores que pasen checksum.
+       Hay que destruirlos todos para volver a pedir. Si el usuario hace
+       "Clear site data", el cooldown se pierde (techo sin backend).        */
+const _COOLDOWN_KEYS = ['levitad-ultimo-pedido', '_lvtd_lp', '_lvtd_uop_v2'];
+const _COOLDOWN_SAL  = 'levitad/v1/pedido/sal';
+
+function _firmarPedido(ts) {
+	// djb2-like — barato pero suficiente para frenar al usuario casual.
+	let h = 5381;
+	const s = String(ts) + _COOLDOWN_SAL;
+	for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+	return (h >>> 0).toString(36);
+}
+
+function _leerTimestampSeguro() {
+	let max = 0;
+	const lee = (raw) => {
+		if (!raw) return;
+		const [tsStr, sig] = raw.split('|');
+		const ts = Number(tsStr);
+		if (!Number.isFinite(ts) || ts <= 0) return;
+		if (_firmarPedido(ts) !== sig) return; // valor falsificado → se ignora
+		if (ts > max) max = ts;
+	};
+	for (const k of _COOLDOWN_KEYS) {
+		try { lee(localStorage.getItem(k)); } catch (_) {}
+	}
+	try { lee(sessionStorage.getItem(_COOLDOWN_KEYS[1])); } catch (_) {}
+	return max;
+}
+
+function _escribirTimestampSeguro(ts) {
+	const stamp = `${ts}|${_firmarPedido(ts)}`;
+	for (const k of _COOLDOWN_KEYS) {
+		try { localStorage.setItem(k, stamp); } catch (_) {}
+	}
+	try { sessionStorage.setItem(_COOLDOWN_KEYS[1], stamp); } catch (_) {}
+}
 const WHATSAPP_OWNER_NUMBER        = '+5359271359';
 
 /* ─── DUEÑOS / DESTINATARIOS DEL PEDIDO ───
@@ -508,7 +555,7 @@ async function enviarPedidoWhatsApp(numero) {
 	renderizarCarrito();
 
 	// Marca para el cooldown: bloquea reenviar otro pedido durante PEDIDO_COOLDOWN_MS
-	localStorage.setItem(STORAGE_KEY_ULTIMO_PEDIDO, String(Date.now()));
+	_escribirTimestampSeguro(Date.now());
 
 	// El aviso de éxito se muestra cuando el usuario VUELVE a la web (no ahora,
 	// porque al abrir WhatsApp se va de la página y no lo vería)
@@ -527,7 +574,7 @@ function abrirSelectorDueno() {
 	if (carritoActivo().length === 0) return;
 	if (document.getElementById('dueno-sheet')) return;
 
-	const restante = PEDIDO_COOLDOWN_MS - (Date.now() - (Number(localStorage.getItem(STORAGE_KEY_ULTIMO_PEDIDO)) || 0));
+	const restante = PEDIDO_COOLDOWN_MS - (Date.now() - _leerTimestampSeguro());
 	if (restante > 0) {
 		const totalSeg = Math.ceil(restante / 1000);
 		const min = Math.floor(totalSeg / 60);
@@ -3481,4 +3528,108 @@ function initCompartir() {
 			window.prompt('Copia el enlace:', datos.url);
 		}
 	});
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Modal Bienvenida Beta — sale UNA sola vez en la primera
+   visita del navegador. Lo creamos por JS (no se monta en
+   HTML) para no pagar coste a los visitantes recurrentes:
+   si ya cerraron el modal, esta función retorna al instante.
+   El secundario "Reportar un error" cierra y abre Contacto.
+═══════════════════════════════════════════════════════════ */
+function mostrarModalBeta() {
+	const FLAG = 'levitad-beta-bienvenida';
+	if (localStorage.getItem(FLAG)) return;
+	if (document.getElementById('modal-beta-overlay')) return;
+
+	const ov = document.createElement('div');
+	ov.id = 'modal-beta-overlay';
+	ov.className = 'modal-beta-overlay';
+	ov.setAttribute('role', 'dialog');
+	ov.setAttribute('aria-modal', 'true');
+	ov.setAttribute('aria-labelledby', 'modal-beta-titulo');
+
+	// Estrella 4-puntas para los sparkles.
+	const SPARK_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L13.2 9 L20 12 L13.2 15 L12 22 L10.8 15 L4 12 L10.8 9 Z" fill="currentColor"/></svg>`;
+
+	ov.innerHTML = `
+		<div class="modal-beta-card">
+			<button class="modal-beta-cerrar" type="button" aria-label="Cerrar bienvenida">✕</button>
+			<div class="modal-beta-glow" aria-hidden="true"></div>
+
+			<span class="modal-beta-spark modal-beta-spark-1">${SPARK_SVG}</span>
+			<span class="modal-beta-spark modal-beta-spark-2">${SPARK_SVG}</span>
+			<span class="modal-beta-spark modal-beta-spark-3">${SPARK_SVG}</span>
+
+			<svg class="modal-beta-halo" viewBox="0 0 130 42" aria-hidden="true">
+				<path d="M16 32 A44 14 0 1 1 114 28" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>
+			</svg>
+
+			<span class="modal-beta-badge">
+				<span class="modal-beta-badge-dot"></span>
+				Versión Beta
+			</span>
+
+			<h2 id="modal-beta-titulo" class="modal-beta-titulo">Bienvenido a Lévitad</h2>
+			<span class="modal-beta-subtitulo">Estás entre los primeros en verlo</span>
+
+			<div class="modal-beta-body">
+				<p>Gracias por estar aquí. Lo que tienes en pantalla es la <strong>versión Beta</strong> del sitio web — todo está implementado, pero todavía no tenemos prendas para ser vendidas. Las primeras llegan muy pronto.</p>
+				<p>Por eso mientras tanto, necesitamos de tu ayuda. Si ves un error, algo que no se ve bien, o tienes una idea, escríbenos. Cada granito de arena que aportes nos ayuda a despegar mejor. Espero que te guste y aprecies el trabajo dedicado en este sitio</p>
+			</div>
+
+			<div class="modal-beta-acciones">
+				<button class="modal-beta-btn modal-beta-btn-primario" type="button" id="modal-beta-cerrar-cta">Empezar a explorar</button>
+			</div>
+		</div>
+	`;
+
+	// Los <span> que envuelven el SVG necesitan flex para que el SVG ocupe el span.
+	ov.querySelectorAll('.modal-beta-spark svg').forEach(svg => {
+		svg.setAttribute('width',  '100%');
+		svg.setAttribute('height', '100%');
+	});
+
+	document.body.appendChild(ov);
+	document.body.classList.add('modal-beta-abierto');
+
+	requestAnimationFrame(() => requestAnimationFrame(() => {
+		ov.classList.add('is-active');
+	}));
+
+	if (typeof enfocarModal === 'function') {
+		enfocarModal(ov, ov.querySelector('.modal-beta-btn-primario'));
+	}
+
+	function cerrar() {
+		ov.classList.remove('is-active');
+		document.body.classList.remove('modal-beta-abierto');
+		try { localStorage.setItem(FLAG, '1'); } catch (_) {}
+		setTimeout(() => ov.remove(), 480);
+		document.removeEventListener('keydown', onKey);
+	}
+
+	function onKey(e) {
+		if (e.key === 'Escape') cerrar();
+	}
+
+	ov.querySelector('.modal-beta-cerrar')      .addEventListener('click', cerrar);
+	ov.querySelector('#modal-beta-cerrar-cta')  .addEventListener('click', cerrar);
+	ov.querySelector('#modal-beta-reportar')    .addEventListener('click', () => {
+		cerrar();
+		if (typeof abrirContactoPanel === 'function') {
+			setTimeout(() => abrirContactoPanel(), 460);
+		}
+	});
+	// Click en el fondo (fuera de la card) cierra el modal.
+	ov.addEventListener('click', (e) => { if (e.target === ov) cerrar(); });
+	document.addEventListener('keydown', onKey);
+}
+
+/* Disparar tras DOMContentLoaded con un pequeño delay: que el usuario vea la
+   página por un instante antes de que el modal aparezca con su animación. */
+if (document.readyState === 'loading') {
+	document.addEventListener('DOMContentLoaded', () => setTimeout(mostrarModalBeta, 800));
+} else {
+	setTimeout(mostrarModalBeta, 800);
 }
