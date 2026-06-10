@@ -647,6 +647,36 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 13
+    },
+    {
+      "nombre": "Top sin espalda con cuello en V y lazo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076864/levitad/rzelekttp5lrm0ontexd.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076864/levitad/q3phbs4pnje7ojvdpjc9.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076865/levitad/kuvvufqc2ugtor07iwt6.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "verano",
+        "fresco",
+        "vacaciones",
+        "playa",
+        "sexy",
+        "girl",
+        "Y2K"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "95% Algodon",
+        "Elasticidad": "Elastico Alto"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
     }
   ],
   "outfits": []
