@@ -312,6 +312,62 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 18
+    },
+    {
+      "nombre": "Camiseta sin mangas unicolor",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071534/levitad/wwull4aa8hnwfkapdcs5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071543/levitad/wmnsv1matpprj3dxjdzl.jpg"
+      ],
+      "categoria": "camiseta",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "Y2K",
+        "deportivo",
+        "fresco",
+        "ajustado",
+        "verano",
+        "girl"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "95% Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 9
+    },
+    {
+      "nombre": "Camisa de mujer comoda a rayas",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/zxwmyq1bwwg3xhrdsp3a.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/dg5je3fxyiovlpphkfxh.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/ymxwy9mo89hc8fitvdzm.jpg"
+      ],
+      "categoria": "camisa",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "rayas",
+        "girl",
+        "elegante",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Marron",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 19
     }
   ],
   "outfits": []
