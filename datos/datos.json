@@ -32,9 +32,9 @@
       "nombre": "Pulover de cuello redondo",
       "precio": 5000,
       "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067618/levitad/qqgoqxmgylkjnqloyesi.jpg",
         "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067616/levitad/kt3g56mhsyw4qmidkejf.jpg",
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067617/levitad/kliihishronnisli4kfz.jpg",
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067618/levitad/qqgoqxmgylkjnqloyesi.jpg"
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067617/levitad/kliihishronnisli4kfz.jpg"
       ],
       "categoria": "pulover",
       "modo": "stack",
@@ -144,12 +144,12 @@
       "pesoManual": 10
     },
     {
-      "nombre": "Pulover polo de manga corta oversize",
+      "nombre": "Pulover oversize polo de manga corta",
       "precio": 5000,
       "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/rfgtfraezuumhkcvzfsz.jpg",
         "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069086/levitad/mwuhgwvojhsswdssecmu.jpg",
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/atlpdlwqa9cnmfyvf1vj.jpg",
-        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/rfgtfraezuumhkcvzfsz.jpg"
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/atlpdlwqa9cnmfyvf1vj.jpg"
       ],
       "categoria": "pulover",
       "modo": "stack",
@@ -202,6 +202,35 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover deportivo con cuello corto",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069781/levitad/vqmsgsfjzexrc7hvmov8.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069781/levitad/qxgq32ics8mddnzzsqqs.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069782/levitad/gppgpw9guu1vpye6w0c4.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069782/levitad/qqtsu0uxx5ffd6kln9g2.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "casual",
+        "fresco",
+        "hombre",
+        "urbano",
+        "deportivo",
+        "lineas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul - Rojo"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
     }
   ],
   "outfits": []
