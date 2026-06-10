@@ -368,6 +368,35 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 19
+    },
+    {
+      "nombre": "Camiseta sin mangas unicolor",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073230/levitad/uxufitvcxnxmu7yc6g2d.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073230/levitad/g7logncebbeds8dknlyf.jpg"
+      ],
+      "categoria": "camiseta",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "fresco",
+        "deportivo",
+        "verano",
+        "ajustado",
+        "girl",
+        "Y2K"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rojo",
+        "Tela": "95% Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 9
     }
   ],
   "outfits": []
