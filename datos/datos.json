@@ -233,7 +233,7 @@
       "pesoManual": 12
     },
     {
-      "nombre": "Pulover manga cora de cuello redondo",
+      "nombre": "Pulover manga corta de cuello redondo",
       "precio": 5000,
       "imagenes": [
         "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/azegnxnowc0xqkprkp7p.jpg",
@@ -261,6 +261,57 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 17
+    },
+    {
+      "nombre": "Pulover manga corta oversize con cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/fijozkjxvhhway3xhyxv.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/cdcblrxswno48be9ge8h.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/xljvhxe4rkoisjwvru9r.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "azul",
+        "urbano",
+        "hombre",
+        "out",
+        "polo",
+        "party"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul - Blanco",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Alta"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
+    },
+    {
+      "nombre": "Pulover de mujer ajustado cuello en V",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071087/levitad/von4pdvsdiwyyixpgc33.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071087/levitad/lwlumzpa4jogewibb4yo.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071088/levitad/djsqlizm6mvw76swyped.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "62% Poliester 34% Algodon"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 18
     }
   ],
   "outfits": []
