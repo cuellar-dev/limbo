@@ -455,6 +455,58 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 11
+    },
+    {
+      "nombre": "Sueter de mujer con estampado",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074444/levitad/pkkllxcycwvv2fhngtrp.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074444/levitad/wes18hfnkkramjp29xji.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074445/levitad/tzvsjkgcpvdl6tonubut.jpg"
+      ],
+      "categoria": "sueter",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "casual",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Verde",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
+    },
+    {
+      "nombre": "Sueter de mujer con estampado",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/qktufxpgosppsyhg8tki.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/ycvywiiiklu1ydxppwyh.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/auw4i3e3ceyboe056yrz.jpg"
+      ],
+      "categoria": "sueter",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "casual",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Albaricoque",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
     }
   ],
   "outfits": []
