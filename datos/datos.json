@@ -1,4 +1,89 @@
 {
-  "productos": [],
+  "productos": [
+    {
+      "nombre": "Top de punto con escote halter",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066584/levitad/w7yf7nceohhxfjj2nhew.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066585/levitad/vr891jp5dtvel0imusb5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066584/levitad/fser01sm4knzypadin4p.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "verano",
+        "playa",
+        "girl",
+        "vacaciones",
+        "fresco",
+        "artesanal"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco Albaricoque",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 7
+    },
+    {
+      "nombre": "Pulover de cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067616/levitad/kt3g56mhsyw4qmidkejf.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067617/levitad/kliihishronnisli4kfz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067618/levitad/qqgoqxmgylkjnqloyesi.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "pinky",
+        "girl",
+        "ajustado",
+        "out",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rosado",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover  polo  de manga corta oversize",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/cqg7nd2zjhrm4j53kuiz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/or9bbrzi73tq9qha4xqz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/pghthktjekahcwiqdthd.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "hombre",
+        "holgado",
+        "fresco",
+        "polo",
+        "party",
+        "black"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Blanco",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    }
+  ],
   "outfits": []
 }
