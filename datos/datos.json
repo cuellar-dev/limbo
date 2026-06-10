@@ -83,6 +83,125 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover polo de manga corta oversize",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068230/levitad/eqcdmiefzwnnlfhygz4x.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068231/levitad/gtef5pb5og0zfg0gwazx.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068231/levitad/o15oryibf0o5gzovlkun.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "fresco",
+        "out",
+        "party",
+        "holgado",
+        "hombre",
+        "polo"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Marrón",
+        "Material": "Poliéster",
+        "Elasticidad": "Elástico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover polo cuello en V de manga corta",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/pxqqviwtpohxemx5xh3a.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/s5i74xoaopdoqx55zuws.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/cxp2n9nsb83hr0c4eof3.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "hombre",
+        "out",
+        "oversize",
+        "polo",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Elástico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 10
+    },
+    {
+      "nombre": "Pulover polo de manga corta oversize",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069086/levitad/mwuhgwvojhsswdssecmu.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/atlpdlwqa9cnmfyvf1vj.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/rfgtfraezuumhkcvzfsz.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "black",
+        "casual",
+        "hombre",
+        "out",
+        "party",
+        "polo",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Rojo vino",
+        "Tela": "97% Poliéster",
+        "Elasticidad": "Estiramiento Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover cuello polo con bordado",
+      "precio": 50000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069431/levitad/osbqezyttkmlwxt1h1vj.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069432/levitad/uthyytcrsqz015tsfzbg.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069432/levitad/nvyvyytaravtkj0jr9tt.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "out",
+        "girl",
+        "polo",
+        "bordado",
+        "college"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rojo - blanco",
+        "Tela": "%95 Poliéster",
+        "Elasticidad": "Estiramiento Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
     }
   ],
   "outfits": []
