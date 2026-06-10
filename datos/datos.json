@@ -231,6 +231,36 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 12
+    },
+    {
+      "nombre": "Pulover manga cora de cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/azegnxnowc0xqkprkp7p.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/nxzusqqqhnkoqll20hug.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/okxfb2bzmdscfsddmjkr.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "black",
+        "urbano",
+        "hombre",
+        "out",
+        "polo",
+        "party"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Blanco",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Elástico alto"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 17
     }
   ],
   "outfits": []
