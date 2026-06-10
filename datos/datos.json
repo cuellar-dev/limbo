@@ -507,6 +507,88 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 13
+    },
+    {
+      "nombre": "Pantalon ancho de estilo vintage",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075054/levitad/jsycxga9w4vhncrzh03n.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/p1hhti4bdejzwne2v9po.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/vwth9gzzdne5laauwzwp.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/iljc0zofscgacvzzwkwv.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "vintage",
+        "holgado",
+        "ancho",
+        "oversize"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Gris",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 10
+    },
+    {
+      "nombre": "Conjunto de pantalon y camisa de hombre",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/xumdosfamommlue8y0h1.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/g36bbgdsls9zborkbaa5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/tdxb3ykgh8prb4fvx2tt.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "hombre",
+        "urbano",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Albaricoque"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 8
+    },
+    {
+      "nombre": "Conjunto casual de top a rayas y short",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/btuprnv40sno8ysrbuqj.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/egh9gb0srohzligko2vf.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/gfs0t1mxxnnfmsiaow1k.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "girl",
+        "verano",
+        "playa",
+        "fresco",
+        "vacaciones",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco y Azul",
+        "Tela": "98% Poliester",
+        "Elasticidad": "Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
     }
   ],
   "outfits": []
