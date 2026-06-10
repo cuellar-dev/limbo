@@ -397,6 +397,64 @@
       "ventas": 0,
       "interacciones": 0,
       "pesoManual": 9
+    },
+    {
+      "nombre": "Pantalon deportivo con cordon en la cintura",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073925/levitad/j0ov4sudj3nr8ffooeor.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073925/levitad/m4j1yoeedbaaksbz0y0b.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073926/levitad/it7hvo4rk4nfyttaakou.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "deportivo",
+        "casual",
+        "holgado",
+        "oversize",
+        "black",
+        "unisex"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 11
+    },
+    {
+      "nombre": "Pantalon deportivo con cordon en la cintura",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074217/levitad/pam3j01jbncdluciszyn.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074217/levitad/iuu4ypgfspfqpwi67a0x.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074218/levitad/vwlrtum0l9zd3c6f3s4y.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "deportivo",
+        "holgado",
+        "black",
+        "oversize",
+        "unisex",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Gris Claro",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastica"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 11
     }
   ],
   "outfits": []
