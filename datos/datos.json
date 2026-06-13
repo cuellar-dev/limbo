@@ -1,74 +1,683 @@
 {
-  "productos": [],
-  "outfits": [
+  "productos": [
     {
-      "id": "outfit-eclipse-urbano",
-      "nombre": "Eclipse Urbano",
-      "estilo": "Casual / Streetwear",
-      "descripcion": "Silueta oversize y caída cargo, ideal para días frescos.",
-      "imagen": "imagenes/sudadera.jpg",
-      "prendas": [
-        {
-          "producto": "Buzo Oversize Nube Oxidada",
-          "puntoX": 50,
-          "puntoY": 32,
-          "etiqueta": "Buzo"
-        },
-        {
-          "producto": "Pantalon Cargo Noche",
-          "puntoX": 50,
-          "puntoY": 72,
-          "etiqueta": "Pantalón"
-        }
-      ]
+      "nombre": "Top de punto con escote halter",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066584/levitad/w7yf7nceohhxfjj2nhew.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066585/levitad/vr891jp5dtvel0imusb5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781066584/levitad/fser01sm4knzypadin4p.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "verano",
+        "playa",
+        "girl",
+        "vacaciones",
+        "fresco",
+        "artesanal"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco Albaricoque",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 7
     },
     {
-      "id": "outfit-verano-sereno",
-      "nombre": "Verano Sereno",
-      "estilo": "Liviano / Diario",
-      "descripcion": "Tonos arena y crema para una caída fresca con corte relajado.",
-      "imagen": "imagenes/images.jpg",
-      "prendas": [
-        {
-          "producto": "Top Marea Arena",
-          "puntoX": 50,
-          "puntoY": 30,
-          "etiqueta": "Top"
-        },
-        {
-          "producto": "Short Urbano Crema",
-          "puntoX": 50,
-          "puntoY": 70,
-          "etiqueta": "Short"
-        }
-      ]
+      "nombre": "Pulover de cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067618/levitad/qqgoqxmgylkjnqloyesi.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067616/levitad/kt3g56mhsyw4qmidkejf.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067617/levitad/kliihishronnisli4kfz.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "pinky",
+        "girl",
+        "ajustado",
+        "out",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rosado",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
     },
     {
-      "id": "outfit-layered-tiza",
-      "nombre": "Layered Tiza",
-      "estilo": "Capas / Minimal",
-      "descripcion": "Tres capas livianas para un look minimal en clima cambiante.",
-      "imagen": "imagenes/img.webp",
-      "prendas": [
-        {
-          "producto": "Camisa Boxy Tiza",
-          "puntoX": 50,
-          "puntoY": 22,
-          "etiqueta": "Camisa"
-        },
-        {
-          "producto": "Remera Grafito Relieve",
-          "puntoX": 50,
-          "puntoY": 48,
-          "etiqueta": "Remera"
-        },
-        {
-          "producto": "Jogger Eclipse Negro",
-          "puntoX": 50,
-          "puntoY": 78,
-          "etiqueta": "Jogger"
-        }
-      ]
+      "nombre": "Pulover  polo  de manga corta oversize",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/cqg7nd2zjhrm4j53kuiz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/or9bbrzi73tq9qha4xqz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781067877/levitad/pghthktjekahcwiqdthd.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "hombre",
+        "holgado",
+        "fresco",
+        "polo",
+        "party",
+        "black"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Blanco",
+        "Tela": "~"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover polo de manga corta oversize",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068230/levitad/eqcdmiefzwnnlfhygz4x.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068231/levitad/gtef5pb5og0zfg0gwazx.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068231/levitad/o15oryibf0o5gzovlkun.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "fresco",
+        "out",
+        "party",
+        "holgado",
+        "hombre",
+        "polo"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Marrón",
+        "Material": "Poliéster",
+        "Elasticidad": "Elástico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover polo cuello en V de manga corta",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/pxqqviwtpohxemx5xh3a.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/s5i74xoaopdoqx55zuws.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781068749/levitad/cxp2n9nsb83hr0c4eof3.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "hombre",
+        "out",
+        "oversize",
+        "polo",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Elástico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 10
+    },
+    {
+      "nombre": "Pulover oversize polo de manga corta",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/rfgtfraezuumhkcvzfsz.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069086/levitad/mwuhgwvojhsswdssecmu.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069087/levitad/atlpdlwqa9cnmfyvf1vj.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "black",
+        "casual",
+        "hombre",
+        "out",
+        "party",
+        "polo",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Rojo vino",
+        "Tela": "97% Poliéster",
+        "Elasticidad": "Estiramiento Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover cuello polo con bordado",
+      "precio": 50000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069431/levitad/osbqezyttkmlwxt1h1vj.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069432/levitad/uthyytcrsqz015tsfzbg.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069432/levitad/nvyvyytaravtkj0jr9tt.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "out",
+        "girl",
+        "polo",
+        "bordado",
+        "college"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rojo - blanco",
+        "Tela": "%95 Poliéster",
+        "Elasticidad": "Estiramiento Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 15
+    },
+    {
+      "nombre": "Pulover deportivo con cuello corto",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069781/levitad/vqmsgsfjzexrc7hvmov8.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069781/levitad/qxgq32ics8mddnzzsqqs.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069782/levitad/gppgpw9guu1vpye6w0c4.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781069782/levitad/qqtsu0uxx5ffd6kln9g2.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "casual",
+        "fresco",
+        "hombre",
+        "urbano",
+        "deportivo",
+        "lineas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul - Rojo"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
+    },
+    {
+      "nombre": "Pulover manga corta de cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/azegnxnowc0xqkprkp7p.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/nxzusqqqhnkoqll20hug.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070492/levitad/okxfb2bzmdscfsddmjkr.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "black",
+        "urbano",
+        "hombre",
+        "out",
+        "polo",
+        "party"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro - Blanco",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Elástico alto"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 17
+    },
+    {
+      "nombre": "Pulover manga corta oversize con cuello redondo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/fijozkjxvhhway3xhyxv.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/cdcblrxswno48be9ge8h.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781070820/levitad/xljvhxe4rkoisjwvru9r.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "oversize",
+        "azul",
+        "urbano",
+        "hombre",
+        "out",
+        "polo",
+        "party"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Azul - Blanco",
+        "Tela": "95% Poliéster",
+        "Elasticidad": "Alta"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
+    },
+    {
+      "nombre": "Pulover de mujer ajustado cuello en V",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071087/levitad/von4pdvsdiwyyixpgc33.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071087/levitad/lwlumzpa4jogewibb4yo.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071088/levitad/djsqlizm6mvw76swyped.jpg"
+      ],
+      "categoria": "pulover",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "62% Poliester 34% Algodon"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 18
+    },
+    {
+      "nombre": "Camiseta sin mangas unicolor",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071534/levitad/wwull4aa8hnwfkapdcs5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781071543/levitad/wmnsv1matpprj3dxjdzl.jpg"
+      ],
+      "categoria": "camiseta",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "Y2K",
+        "deportivo",
+        "fresco",
+        "ajustado",
+        "verano",
+        "girl"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "95% Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 9
+    },
+    {
+      "nombre": "Camisa de mujer comoda a rayas",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/zxwmyq1bwwg3xhrdsp3a.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/dg5je3fxyiovlpphkfxh.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781072675/levitad/ymxwy9mo89hc8fitvdzm.jpg"
+      ],
+      "categoria": "camisa",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "rayas",
+        "girl",
+        "elegante",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Marron",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 19
+    },
+    {
+      "nombre": "Camiseta sin mangas unicolor",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073230/levitad/uxufitvcxnxmu7yc6g2d.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073230/levitad/g7logncebbeds8dknlyf.jpg"
+      ],
+      "categoria": "camiseta",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "fresco",
+        "deportivo",
+        "verano",
+        "ajustado",
+        "girl",
+        "Y2K"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Rojo",
+        "Tela": "95% Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 9
+    },
+    {
+      "nombre": "Pantalon deportivo con cordon en la cintura",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073925/levitad/j0ov4sudj3nr8ffooeor.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073925/levitad/m4j1yoeedbaaksbz0y0b.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781073926/levitad/it7hvo4rk4nfyttaakou.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "deportivo",
+        "casual",
+        "holgado",
+        "oversize",
+        "black",
+        "unisex"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Negro",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastico"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 11
+    },
+    {
+      "nombre": "Pantalon deportivo con cordon en la cintura",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074217/levitad/pam3j01jbncdluciszyn.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074217/levitad/iuu4ypgfspfqpwi67a0x.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074218/levitad/vwlrtum0l9zd3c6f3s4y.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "deportivo",
+        "holgado",
+        "black",
+        "oversize",
+        "unisex",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Gris Claro",
+        "Tela": "Poliester",
+        "Elasticidad": "No Elastica"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 11
+    },
+    {
+      "nombre": "Sueter de mujer con estampado",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074444/levitad/pkkllxcycwvv2fhngtrp.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074444/levitad/wes18hfnkkramjp29xji.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074445/levitad/tzvsjkgcpvdl6tonubut.jpg"
+      ],
+      "categoria": "sueter",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "casual",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Verde",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
+    },
+    {
+      "nombre": "Sueter de mujer con estampado",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/qktufxpgosppsyhg8tki.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/ycvywiiiklu1ydxppwyh.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781074720/levitad/auw4i3e3ceyboe056yrz.jpg"
+      ],
+      "categoria": "sueter",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "casual",
+        "ajustado"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Albaricoque",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
+    },
+    {
+      "nombre": "Pantalon ancho de estilo vintage",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075054/levitad/jsycxga9w4vhncrzh03n.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/p1hhti4bdejzwne2v9po.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/vwth9gzzdne5laauwzwp.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075055/levitad/iljc0zofscgacvzzwkwv.jpg"
+      ],
+      "categoria": "pantalon",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "vintage",
+        "holgado",
+        "ancho",
+        "oversize"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Gris",
+        "Tela": "Poliester",
+        "Elasticidad": "Elastico Ligero"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 10
+    },
+    {
+      "nombre": "Conjunto de pantalon y camisa de hombre",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/xumdosfamommlue8y0h1.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/g36bbgdsls9zborkbaa5.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075484/levitad/tdxb3ykgh8prb4fvx2tt.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "hombre",
+        "urbano",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Albaricoque"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 8
+    },
+    {
+      "nombre": "Conjunto casual de top a rayas y short",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/btuprnv40sno8ysrbuqj.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/egh9gb0srohzligko2vf.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781075732/levitad/gfs0t1mxxnnfmsiaow1k.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "casual",
+        "girl",
+        "verano",
+        "playa",
+        "fresco",
+        "vacaciones",
+        "rayas"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco y Azul",
+        "Tela": "98% Poliester",
+        "Elasticidad": "Medio"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 12
+    },
+    {
+      "nombre": "Conjunto de top de manga larga y short",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076288/levitad/mlzzwtbxqh1isbgyarqa.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076288/levitad/zfxpyicpuwuv0qselasm.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076288/levitad/fsmfhumpyupgkggzdueo.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076288/levitad/irgvv53opjiykb9rujw4.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "verano",
+        "playa",
+        "vacaciones",
+        "fresco",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Verde Oscuro",
+        "Tela": "Algodon"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
+    },
+    {
+      "nombre": "Conjunto de top manga larga y short",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076515/levitad/m0aefsfor7k9n6rs2i71.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076516/levitad/vcaepgam1hw0dhh9cuon.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076516/levitad/xampq7wqcw4mpyz0l3lv.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076516/levitad/pjnhtd8zdatwb43tnymd.jpg"
+      ],
+      "categoria": "conjunto",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "girl",
+        "verano",
+        "vacaciones",
+        "playa",
+        "fresco",
+        "casual"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Caqui",
+        "Tela": "Algodon"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
+    },
+    {
+      "nombre": "Top sin espalda con cuello en V y lazo",
+      "precio": 5000,
+      "imagenes": [
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076864/levitad/rzelekttp5lrm0ontexd.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076864/levitad/q3phbs4pnje7ojvdpjc9.jpg",
+        "https://res.cloudinary.com/ddhwh86yd/image/upload/f_auto,q_auto/v1781076865/levitad/kuvvufqc2ugtor07iwt6.jpg"
+      ],
+      "categoria": "top",
+      "modo": "stack",
+      "enlace": "none",
+      "tags": [
+        "verano",
+        "fresco",
+        "vacaciones",
+        "playa",
+        "sexy",
+        "girl",
+        "Y2K"
+      ],
+      "detalles": {
+        "Talla": "M",
+        "Color": "Blanco",
+        "Tela": "95% Algodon",
+        "Elasticidad": "Elastico Alto"
+      },
+      "ventas": 0,
+      "interacciones": 0,
+      "pesoManual": 13
     }
-  ]
+  ],
+  "outfits": []
 }
