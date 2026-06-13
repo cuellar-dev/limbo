@@ -4408,6 +4408,7 @@ body.is-light .contacto-campo textarea::placeholder {
    tema (--tarjeta-fondo, --texto-brillante, etc.) para responder
    a oscuro/claro automáticamente.
 ═══════════════════════════════════════════════════════════ */
+
 .outfits-overlay {
     position: fixed; inset: 0;
     background: rgba(0, 0, 0, 0.82);
@@ -7390,4 +7391,8 @@ body.is-light .contacto-canales-separador { color: rgba(43, 47, 51, 0.55); }
     flex: 1;
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--carrito-borde-fuerte), transparent);
+}
+#outfit{
+    opacity: .7;
+    pointer-events: none;
 }
