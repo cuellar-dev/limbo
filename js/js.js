@@ -3575,6 +3575,7 @@ function mostrarModalBeta() {
 
 			<div class="modal-beta-body">
 				<p>Gracias por estar aquí. Lo que tienes en pantalla es la <strong>versión Beta</strong> del sitio web — todo está implementado, pero todavía no tenemos prendas para ser vendidas. Las primeras llegan muy pronto.</p>
+				<p>Existen aún discordancias entre datos, como precios no reales, y datos escasos de cada prendas. Tampoco tenemos nada para encargar, las redes sociales no existen y demás detalles que se van de mis manos como desarrollador. Sin embargo, todo está muy funcional y es navegable, para que le eches un ojo a lo que se viene y me ayudes a mejorarlo con tus comentarios.</p>
 				<p>Por eso mientras tanto, necesitamos de tu ayuda. Si ves un error, algo que no se ve bien, o tienes una idea, escríbenos. Cada granito de arena que aportes nos ayuda a despegar mejor. Espero que te guste y aprecies el trabajo dedicado en este sitio</p>
 			</div>
 
