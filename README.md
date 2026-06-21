@@ -1,165 +1,70 @@
-# Lévitad
+# Lévitad — E‑commerce (PWA) with a Git‑based admin panel
 
-Tienda web estática para mostrar prendas, ver detalles de producto, armar pedidos y enviar la compra por WhatsApp.
+> Repository name: `limbo` · Product/brand: **Lévitad** — a clothing store and import‑to‑order shop based in Sancti Spíritus, Cuba.
 
-## Qué incluye
+A complete, **mobile‑first** web store to browse clothing, view product details, build an order and check out via **WhatsApp**. It includes a custom **admin panel** that manages the catalog using the **GitHub REST API as a serverless backend** — no traditional database server required.
 
-- Catálogo de productos cargado desde `datos/datos.json`
-- Vista de detalles en modal
-- Buscador de productos
-- Carrito de compra con persistencia en `localStorage`
-- Dos modos de pedido: `En Stack` y `Encargue`
-- Envío del pedido por WhatsApp
-- Diseño responsive con animaciones y grid tipo Masonry
+> 🔗 **Live demo:** https://cuellar-dev.github.io/limbo/
+> 📱 **Designed mobile‑first** — best viewed on a phone (it doesn't break on desktop, but the experience is built for mobile).
 
-## Tecnologías
+## Storefront features
 
-- HTML5
-- CSS3
-- JavaScript vanilla
-- [Masonry](https://masonry.desandro.com/) vía CDN
-- [GSAP](https://gsap.com/) vía CDN
-- [ScrollTrigger](https://gsap.com/scrolltrigger/) vía CDN
+- 🛍️ Dynamic **catalog** loaded from `datos/datos.json` (products and "outfits").
+- 🔎 **Product search** and a **detail modal** with image zoom, price and specs.
+- 🛒 **Shopping cart** with `localStorage` persistence and **two order modes**: `Disponible` (in‑stock items) and `Encargos` (special orders imported from abroad).
+- 📲 **WhatsApp checkout**: the order is turned into a ready‑to‑send WhatsApp message to coordinate delivery and payment.
+- 🎨 **Custom UI** with a Masonry grid, light/dark theme, custom fonts and GSAP‑style animations.
+- ⚡ **PWA**: service worker (`sw.js`) + web manifest (`site.webmanifest`) for installability and caching.
+- 🔍 **SEO‑ready**: `sitemap.xml`, `robots.txt`, semantic markup and an FAQ section.
 
-## Estructura del proyecto
+## Admin panel — a Git‑based CMS (the interesting part)
 
-```text
-Lévitad/
-├── index.html
-├── Css/
-│   ├── style.css
-│   └── angel.css
-├── js/
-│   ├── js.js
-│   └── angel.js
-├── datos/
-│   └── datos.json
-├── imagenes/
-└── Fuentes/
+Instead of standing up a separate server, the admin panel (`panel-*.html` + `js/admin.js`) turns **GitHub itself into the backend**:
+
+- 🔐 **Token authentication** with a GitHub Personal Access Token (entered by the admin, never hardcoded).
+- 💾 **Reads and writes `datos/datos.json` through the GitHub Contents API** — create, edit and delete products and outfits from a UI.
+- 🔁 **Optimistic concurrency**: it tracks the file `sha` and warns if the file changed on GitHub before saving, to avoid overwriting data.
+- 🛡️ **Session‑scoped security**: the token is validated against the repo before use and kept only in `sessionStorage` (cleared when invalid or when the session ends).
+- 🚀 On save, the change is committed to the repo and **GitHub Pages republishes the store automatically** (~1 min).
+
+This is the same idea behind Git‑based CMSs (Decap/Netlify CMS): the data lives in the repo as JSON and the site is fully static, so it can be hosted for free with no database to maintain.
+
+> **Note on `backend/`:** while building this project I also explored a **PocketBase** backend (kept in `backend/` with its Docker/Fly.io config and migrations) as a learning exercise. The **production version intentionally uses the GitHub‑API approach above**, so that folder is not required to run the store.
+
+## Tech stack
+
+- **Frontend:** HTML5, CSS3, JavaScript (vanilla), Masonry, PWA (Service Worker + Manifest)
+- **"Backend":** GitHub REST API (Contents API) used as a serverless data layer
+- **Tooling:** asset conversion script (`scripts/convert-assets.js`), minified CSS/JS builds
+- **Explored (not in production):** PocketBase + Docker + Fly.io + Litestream (`backend/`)
+
+## Project structure
+
+```
+limbo/
+├── index.html            # storefront
+├── panel-*.html          # admin panel (Git-based CMS)
+├── Css/                  # styles (style.css + minified build)
+├── js/                   # js.js (storefront), admin.js (panel), vendor/
+├── datos/datos.json      # catalog data (the "database")
+├── imagenes/ , Fuentes/  # assets and custom fonts
+├── sw.js , site.webmanifest, robots.txt, sitemap.xml
+├── scripts/              # build/asset helpers
+└── backend/              # PocketBase experiment (not used in production)
 ```
 
-## Cómo correrlo localmente
+## Run it locally
 
-Como es un proyecto estático, no necesita instalación de dependencias.
+Static frontend — no build step required:
 
-### Opción 1: Live Server en VS Code
-
-1. Abrí el proyecto en VS Code.
-2. Instalá la extensión **Live Server** si no la tenés.
-3. Hacé clic derecho sobre `index.html`.
-4. Elegí **Open with Live Server**.
-
-### Opción 2: servidor local simple
-
-En la carpeta raíz del proyecto:
-
-```powershell
+```bash
 python -m http.server 5500
+# then open http://localhost:5500
 ```
 
-Luego abrí:
+Or use the **Live Server** extension in VS Code. Some libraries load from a CDN, so an internet connection is needed.
 
-```text
-http://localhost:5500
-```
+## Author
 
-## Cómo editar el catálogo
-
-Los productos se cargan desde `datos/datos.json`.
-
-Cada producto usa una estructura parecida a esta:
-
-```json
-{
-  "nombre": "Buzo Oversize Nube Oxidada",
-  "precio": 48900,
-  "imagen": "imagenes/sudadera.jpg",
-  "categoria": "buzo",
-  "tags": ["oversize", "unisex", "urbano"],
-  "detalles": {
-    "Talla": "XL",
-    "Color": "Naranja oxidado",
-    "Stock": "8 unidades"
-  }
-}
-```
-
-Si querés agregar productos nuevos:
-
-1. Abrí `datos/datos.json`.
-2. Copiá un objeto existente.
-3. Cambiá nombre, precio, imagen, tags y detalles.
-4. Verificá que el JSON siga siendo válido.
-
-## Funcionalidades principales
-
-- El catálogo se arma dinámicamente desde el JSON.
-- El buscador filtra por nombre.
-- El modal muestra imagen, precio y especificaciones.
-- El carrito guarda productos en `localStorage`.
-- El botón de WhatsApp arma el mensaje con el pedido actual.
-- El proyecto usa dos carritos separados:
-  - `En Stack` para stock disponible
-  - `Encargue` para pedidos especiales
-
-## Dependencias externas
-
-El sitio carga recursos desde CDN, así que necesitás conexión a internet para ver todo correctamente:
-
-- `https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js`
-- `https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js`
-- `https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js`
-
-## Cómo subirlo a GitHub
-
-Si el repositorio ya está conectado al remoto `origin`, los pasos son estos:
-
-```powershell
-git status
-git add README.md
-git commit -m "docs: add project README"
-git push origin main
-```
-
-Si todavía no tenés remoto configurado:
-
-```powershell
-git init
-git add .
-git commit -m "initial commit"
-git branch -M main
-git remote add origin https://github.com/TU_USUARIO/TU_REPO.git
-git push -u origin main
-```
-
-## Cómo publicarlo en GitHub Pages
-
-1. Subí el proyecto a GitHub.
-2. Entrá al repositorio en GitHub.
-3. Andá a **Settings** > **Pages**.
-4. En **Build and deployment**, elegí:
-   - Source: **Deploy from a branch**
-   - Branch: `main`
-   - Folder: `/ (root)`
-5. Guardá los cambios.
-6. Esperá a que GitHub genere la URL pública.
-
-## Despliegue alternativo
-
-También podés publicar el sitio en:
-
-- Netlify
-- Vercel
-- Cloudflare Pages
-
-Como no hay backend ni build step, podés subir la carpeta completa directamente.
-
-## Notas importantes
-
-- Las imágenes deben existir en la ruta definida en `datos/datos.json`.
-- Si cambiás nombres de archivos, revisá también las rutas en HTML, CSS y JS.
-- El enlace de WhatsApp usa el número configurado en `js/js.js`.
-
-## Autor
-
-Lévitad
+**Luis Ernesto Cuellar del Castillo** (a.k.a. *Kuroma*) — [@cuellar-dev](https://github.com/cuellar-dev)
+Designed and developed end‑to‑end — no templates.
